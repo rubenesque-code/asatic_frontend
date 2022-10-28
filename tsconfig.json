@@ -13,8 +13,29 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "downlevelIteration": true,
+    "incremental": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "^components/*": ["src/components/*"],
+      "^config/*": ["src/config/*"],
+      "^constants/*": ["src/constants/*"],
+      "^context/*": ["src/context/*"],
+      "^data/*": ["src/data/*"],
+      "^helpers/*": ["src/helpers/*"],
+      "^hooks/*": ["src/hooks/*"],
+      "^lib/*": ["src/lib/*"],
+      "^redux/*": ["src/redux/*"],
+      "^styles/*": ["src/styles/*"],
+      "^types/*": ["src/types/*"]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/components/landing-page/body/section/auto-section/_containers/Entitytsx"
+  ],
   "exclude": ["node_modules"]
 }
