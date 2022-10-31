@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import tw from 'twin.macro'
+
 import FirestoreImage from '^components/FirestoreImage'
 
 import { StaticData } from '^components/pages/document/article/staticData'
@@ -8,16 +9,12 @@ export {
   getStaticProps,
 } from '^components/pages/document/article/staticData'
 
-const ArticlePage = ({ data }: { data: StaticData }) => {
-  console.log('data:', data)
-  // const image = data.data.images[0]
-  // console.log('image:', image)
-
+const ArticlePage: NextPage<StaticData> = (props) => {
   return (
     <div>
       Article
-      <div css={[tw`aspect-ratio[16 / 9]`]}>
-        {/* <FirestoreImage image={image} /> */}
+      <div css={[tw`relative aspect-ratio[16 / 9]`]}>
+        <FirestoreImage image={props.images[0]} />
       </div>
     </div>
   )

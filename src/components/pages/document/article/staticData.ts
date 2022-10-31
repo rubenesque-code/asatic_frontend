@@ -1,6 +1,4 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
-import { getArticleLikeDocumentImageIds } from '^helpers/articleLike'
-import { mapLanguageIds } from '^helpers/data'
 
 import {
   fetchArticle,
@@ -12,6 +10,16 @@ import {
   fetchSubjects,
   fetchTags,
 } from '^lib/firebase/firestore'
+
+import {
+  getArticleLikeDocumentImageIds,
+  mapIds,
+  mapLanguageIds,
+  processArticleLikeEntities,
+  mapEntitiesLanguageIds,
+  processLanguages,
+} from '^helpers/index'
+
 import {
   Article,
   Author,
@@ -24,8 +32,16 @@ import {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const articles = await fetchArticles()
-  // process articles!
-  const paths = articles.map((article) => ({
+  const articleLanguageIds = mapEntitiesLanguageIds(articles)
+  const articleLanguages = await fetchLanguages(articleLanguageIds)
+
+  const processedLanguages = processLanguages(articleLanguages)
+  const processedArticles = processArticleLikeEntities(
+    articles,
+    mapIds(processedLanguages)
+  )
+
+  const paths = processedArticles.map((article) => ({
     params: {
       id: article.id,
     },
@@ -54,22 +70,26 @@ export const getStaticProps: GetStaticProps<
   // * won't get to this point if article doesn't exist (true?), so below workaround for fetching article is fine
   const { params } = context
 
+  //Todo: process authors, collections, subjects, etc.
+
   const article = await fetchArticle(params?.id || '')
-  const { authorsIds, collectionsIds, translations, subjectsIds, tagsIds } =
-    article
-  const languageIds = mapLanguageIds(translations)
-  const imageIds = getArticleLikeDocumentImageIds(translations)
+  const languageIds = mapLanguageIds(article.translations)
+  const imageIds = getArticleLikeDocumentImageIds(article.translations)
 
   const data = {
     article: await fetchArticle(params?.id || ''),
-    authors: authorsIds.length ? await fetchAuthors(authorsIds) : [],
-    collections: collectionsIds.length
-      ? await fetchCollections(collectionsIds)
+    authors: article.authorsIds.length
+      ? await fetchAuthors(article.authorsIds)
+      : [],
+    collections: article.collectionsIds.length
+      ? await fetchCollections(article.collectionsIds)
       : [],
     images: imageIds.length ? await fetchImages(imageIds) : [],
     languages: languageIds.length ? await fetchLanguages(languageIds) : [],
-    subjects: subjectsIds.length ? await fetchSubjects(subjectsIds) : [],
-    tags: tagsIds.length ? await fetchTags(tagsIds) : [],
+    subjects: article.subjectsIds.length
+      ? await fetchSubjects(article.subjectsIds)
+      : [],
+    tags: article.tagsIds.length ? await fetchTags(article.tagsIds) : [],
   }
 
   return {
