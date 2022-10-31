@@ -10,6 +10,7 @@ module.exports = {
     fontFamily: {
       date: ['Montserrat', 'sans-serif'],
       documentTitle: ['Nanum Myeongjo', 'serif'],
+      'serif-body': ['Bitter', 'serif'],
     },
     extend: {
       spacing: {
