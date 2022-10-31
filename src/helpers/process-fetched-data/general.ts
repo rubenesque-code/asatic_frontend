@@ -2,7 +2,7 @@ import { Language } from '^types/language'
 
 import { mapLanguageIds } from '../data'
 
-export function processLanguages(languages: Language[]) {
+export function validateLanguages(languages: Language[]) {
   return languages.filter((l) => l.name.length)
 }
 

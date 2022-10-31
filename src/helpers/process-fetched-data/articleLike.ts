@@ -30,7 +30,7 @@ const checkTranslationHasText = (translation: ArticleLikeTranslation) => {
   return hasText
 }
 
-function isValidTranslation(
+function validateTranslation(
   translation: ArticleLikeTranslation,
   languageIds: string[]
 ) {
@@ -46,18 +46,18 @@ function isValidTranslation(
   return true
 }
 
-export function processArticleLikeEntities<TEntity extends Article | Blog>(
+export function validateArticleLikeEntities<TEntity extends Article | Blog>(
   entities: TEntity[],
   validLanguageIds: string[]
 ) {
   // * filtering for published entities happens when fetching data
-  const processed = produce(entities, (draft) => {
+  const validated = produce(entities, (draft) => {
     for (let i = 0; i < draft.length; i++) {
       const entity = draft[i]
 
       for (let j = 0; j < entity.translations.length; j++) {
         const translation = entity.translations[j]
-        const isValid = isValidTranslation(translation, validLanguageIds)
+        const isValid = validateTranslation(translation, validLanguageIds)
 
         if (!isValid) {
           const translationIndex = entity.translations.findIndex(
@@ -67,6 +67,7 @@ export function processArticleLikeEntities<TEntity extends Article | Blog>(
         }
       }
 
+      // todo: this is definitely working as expected?
       if (!entity.translations.length) {
         const entityIndex = draft.findIndex((e) => e.id === entity.id)
         draft.splice(entityIndex, 1)
@@ -74,5 +75,5 @@ export function processArticleLikeEntities<TEntity extends Article | Blog>(
     }
   })
 
-  return processed
+  return validated
 }

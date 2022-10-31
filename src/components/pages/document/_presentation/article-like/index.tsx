@@ -6,7 +6,7 @@ export const $Container_ = ({
 }: {
   children: ReactElement | ReactElement[]
 }) => (
-  <div css={[tw`flex justify-center`]}>
-    <div css={[tw`max-w-[800px] px-sm`]}>{children}</div>
+  <div css={[tw`flex justify-center px-sm mt-lg`]}>
+    <div css={[tw`max-w-[628.41px]`]}>{children}</div>
   </div>
 )

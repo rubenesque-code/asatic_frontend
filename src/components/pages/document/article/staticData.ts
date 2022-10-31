@@ -15,9 +15,9 @@ import {
   getArticleLikeDocumentImageIds,
   mapIds,
   mapLanguageIds,
-  processArticleLikeEntities,
+  validateArticleLikeEntities,
   mapEntitiesLanguageIds,
-  processLanguages,
+  validateLanguages,
 } from '^helpers/index'
 
 import {
@@ -31,17 +31,17 @@ import {
 } from '^types/index'
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const articles = await fetchArticles()
-  const articleLanguageIds = mapEntitiesLanguageIds(articles)
+  const allArticles = await fetchArticles()
+  const articleLanguageIds = mapEntitiesLanguageIds(allArticles)
   const articleLanguages = await fetchLanguages(articleLanguageIds)
 
-  const processedLanguages = processLanguages(articleLanguages)
-  const processedArticles = processArticleLikeEntities(
-    articles,
-    mapIds(processedLanguages)
+  const validLanguages = validateLanguages(articleLanguages)
+  const validArticles = validateArticleLikeEntities(
+    allArticles,
+    mapIds(validLanguages)
   )
 
-  const paths = processedArticles.map((article) => ({
+  const paths = validArticles.map((article) => ({
     params: {
       id: article.id,
     },
@@ -66,9 +66,8 @@ export type StaticData = {
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
-> = async (context) => {
+> = async ({ params }) => {
   // * won't get to this point if article doesn't exist (true?), so below workaround for fetching article is fine
-  const { params } = context
 
   //Todo: process authors, collections, subjects, etc.
 
