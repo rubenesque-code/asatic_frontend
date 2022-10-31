@@ -9,7 +9,7 @@ export type DisplayEntityStatus<TContentSpecificError extends string> =
 
 export type Publishable = {
   publishStatus: Expand<PublishStatus>
-  publishDate?: Date | null
+  publishDate?: string | null
 }
 
 type PublishStatus = 'published' | 'draft'

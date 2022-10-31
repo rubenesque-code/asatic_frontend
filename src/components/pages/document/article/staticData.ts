@@ -73,8 +73,9 @@ export const getStaticProps: GetStaticProps<
   //Todo: process authors, collections, subjects, etc.
 
   const article = await fetchArticle(params?.id || '')
-  const languageIds = mapLanguageIds(article.translations)
-  const imageIds = getArticleLikeDocumentImageIds(article.translations)
+  // * article has been filtered in `getStaticPaths` above for invalid translations; languages will be valid.
+  const articleLanguageIds = mapLanguageIds(article.translations)
+  const articleImageIds = getArticleLikeDocumentImageIds(article.translations)
 
   const data = {
     article: await fetchArticle(params?.id || ''),
@@ -84,8 +85,10 @@ export const getStaticProps: GetStaticProps<
     collections: article.collectionsIds.length
       ? await fetchCollections(article.collectionsIds)
       : [],
-    images: imageIds.length ? await fetchImages(imageIds) : [],
-    languages: languageIds.length ? await fetchLanguages(languageIds) : [],
+    images: articleImageIds.length ? await fetchImages(articleImageIds) : [],
+    languages: articleLanguageIds.length
+      ? await fetchLanguages(articleLanguageIds)
+      : [],
     subjects: article.subjectsIds.length
       ? await fetchSubjects(article.subjectsIds)
       : [],

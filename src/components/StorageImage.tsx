@@ -9,7 +9,7 @@ type FirestoreImageProps = {
   vertPosition?: number
 }
 
-const FirestoreImage = ({
+const StorageImage = ({
   image,
   layout = 'fill',
   objectFit = 'cover',
@@ -29,4 +29,4 @@ const FirestoreImage = ({
   )
 }
 
-export default FirestoreImage
+export default StorageImage
