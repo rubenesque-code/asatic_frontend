@@ -29,7 +29,7 @@ export const TextSection_ = ({ data }: { data: ArticleLikeTextSection }) => {
   }
 
   return (
-    <$TextSection>
+    <$TextSection className="custom-prose">
       <HtmlStrToJSX text={data.text} />
     </$TextSection>
   )

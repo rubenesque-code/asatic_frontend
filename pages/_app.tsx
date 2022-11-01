@@ -1,12 +1,18 @@
-import "../styles/globals.css";
-import type { AppProps } from 'next/app'
+import "../styles/globals.css"
+import type { AppProps } from "next/app"
 
-import GlobalStyles from '../styles/GlobalStyles'
+import GlobalStyles from "../styles/GlobalStyles"
+import { SiteLanguageProvider } from "^context/SiteLanguage"
+import Layout from "^components/Layout"
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Component {...pageProps} />
+      <SiteLanguageProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </SiteLanguageProvider>
       <GlobalStyles />
     </>
   )

@@ -21,13 +21,13 @@ export const SelectTranslation = ({
       <div css={[tw`text-gray-400`]}>
         <TranslateIcon weight="light" />
       </div>
-      <div css={[tw`flex gap-sm items-center`]}>
+      <div css={[tw`flex gap-xs items-center`]}>
         {documentLanguages.map((language) => (
           <div
             css={[
               tw`py-0.5 px-2 border rounded-md text-sm font-serif-body tracking-wide text-gray-700 transition-colors ease-in-out`,
               language.id !== selectedLanguage.id &&
-                tw`text-gray-500 cursor-pointer`,
+                tw`text-gray-400 cursor-pointer border-gray-100`,
             ]}
             onClick={() => setSelectedLanguage(language)}
             key={language.id}

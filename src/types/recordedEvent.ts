@@ -1,28 +1,26 @@
-import { JSONContent } from "@tiptap/react";
-
-import { PrimaryEntity } from "^types/primary-entity";
-import { DisplayEntityType } from "./display-entity";
-import { TranslationGeneric } from "./translation";
-import { Expand } from "./utilities";
+import { PrimaryEntity } from '^types/primary-entity'
+import { DisplayEntityType } from './display-entity'
+import { TranslationGeneric } from './translation'
+import { Expand } from './utilities'
 
 export type RecordedEvent = {
-  id: string;
-  translations: RecordedEventTranslation[];
-  youtubeId?: string;
-  recordedEventTypeId?: string;
+  id: string
+  translations: RecordedEventTranslation[]
+  youtubeId?: string
+  recordedEventTypeId?: string
 } & PrimaryEntity &
-  DisplayEntityType<"recorded-event">;
+  DisplayEntityType<'recorded-event'>
 
 export type RecordedEventTranslation = Expand<TranslationGeneric> & {
-  title?: string;
-  body?: JSONContent;
-};
+  title?: string
+  body?: string
+}
 
 export type RecordedEventType = {
-  id: string;
-  translations: RecordedEventTypeTranslation[];
-};
+  id: string
+  translations: RecordedEventTypeTranslation[]
+}
 
 export type RecordedEventTypeTranslation = TranslationGeneric & {
-  name: string;
-};
+  name: string
+}

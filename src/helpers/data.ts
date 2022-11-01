@@ -7,3 +7,9 @@ export function mapLanguageIds<T extends { languageId: string }>(
 ): string[] {
   return arr.map((a) => a.languageId)
 }
+
+export function checkObjectHasField<T extends Record<string, unknown>>(obj: T) {
+  const hasAKey = Object.keys(obj).length
+
+  return Boolean(hasAKey)
+}

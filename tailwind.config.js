@@ -8,11 +8,15 @@ module.exports = {
   darkMode: false,
   theme: {
     fontFamily: {
-      date: ['Montserrat', 'sans-serif'],
       documentTitle: ['Nanum Myeongjo', 'serif'],
       'serif-body': ['Bitter', 'serif'],
+      date: ['Montserrat', 'sans-serif'],
+      'sans-2': ['Lato', 'sans-serif'],
     },
     extend: {
+      colors: {
+        'overlay-mid': 'rgba(237, 242, 247, 0.6)',
+      },
       spacing: {
         xxxs: '.1rem',
         xxs: '.25rem',

@@ -33,10 +33,11 @@ if (!appInitialised) {
   storage = getStorage(app)
 
   if (process.env.NODE_ENV === 'development') {
+    console.log('connecting to emulator...')
+
     connectFirestoreEmulator(firestore, '127.0.0.1', 8080)
     connectStorageEmulator(storage, '127.0.0.1', 9199)
   }
 }
 
 export { firestore, storage }
-// export { firestore, auth, storage }

@@ -31,13 +31,22 @@ import {
 } from '^types/index'
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const allArticles = await fetchArticles()
-  const articleLanguageIds = mapEntitiesLanguageIds(allArticles)
+  // * since only published articles returned, need to account for possibility of empty articles array
+  const publishedArticles = await fetchArticles()
+
+  if (!publishedArticles.length) {
+    return {
+      paths: [],
+      fallback: false,
+    }
+  }
+
+  const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
   const articleLanguages = await fetchLanguages(articleLanguageIds)
 
   const validLanguages = validateLanguages(articleLanguages)
   const validArticles = validateArticleLikeEntities(
-    allArticles,
+    publishedArticles,
     mapIds(validLanguages)
   )
 
@@ -67,10 +76,9 @@ export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
-  // * won't get to this point if article doesn't exist (true?), so below workaround for fetching article is fine
-
   //Todo: process authors, collections, subjects, etc.
 
+  // * won't get to this point if article doesn't exist (true?), so below workaround for fetching article is fine
   const article = await fetchArticle(params?.id || '')
   // * article has been filtered in `getStaticPaths` above for invalid translations; languages will be valid.
   const articleLanguageIds = mapLanguageIds(article.translations)
