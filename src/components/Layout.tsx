@@ -1,11 +1,18 @@
 import { ReactElement } from "react"
+import { Subject } from "^types/subject"
 
 import Header from "./header"
 
-const Layout = ({ children }: { children: ReactElement }) => {
+const Layout = ({
+  children,
+  subjects,
+}: {
+  children: ReactElement
+  subjects: Subject[]
+}) => {
   return (
     <div>
-      <Header />
+      <Header subjects={subjects} />
       {children}
     </div>
   )

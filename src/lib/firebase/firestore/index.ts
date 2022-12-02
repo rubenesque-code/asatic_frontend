@@ -1,9 +1,9 @@
-import { firestore_collection_key } from '^constants/firestoreCollections'
+import { firestore_collection_key } from "^constants/firestoreCollections"
 import {
   UnsanitizedFirestoreDocument,
   sanitiseNonSerializableDoc,
   sanitiseNonSerializableCollection,
-} from '^helpers/firestore'
+} from "^helpers/firestore"
 import {
   Article,
   Author,
@@ -16,7 +16,7 @@ import {
   RecordedEventType,
   Subject,
   Tag,
-} from '^types/index'
+} from "^types/entities"
 
 import {
   fetchFirestoreDocument,
@@ -24,7 +24,7 @@ import {
   fetchFirestoreDocuments,
   fetchFirestorePublishableCollection,
   fetchFirestorePublishableDocuments,
-} from './helpers'
+} from "./helpers"
 
 export const fetchArticle = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
@@ -40,8 +40,8 @@ export const fetchArticle = async (docId: string) => {
 export const fetchArticles = async (ids?: string[]) => {
   const firestoreDocs = (
     ids
-      ? await fetchFirestorePublishableDocuments('articles', ids)
-      : await fetchFirestorePublishableCollection('articles')
+      ? await fetchFirestorePublishableDocuments("articles", ids)
+      : await fetchFirestorePublishableCollection("articles")
   ) as UnsanitizedFirestoreDocument<Article>[]
 
   const sanitised = sanitiseNonSerializableCollection(
@@ -52,11 +52,11 @@ export const fetchArticles = async (ids?: string[]) => {
 }
 
 export const fetchAuthors = async (ids: string[]) =>
-  (await fetchFirestoreDocuments('authors', ids)) as Author[]
+  (await fetchFirestoreDocuments("authors", ids)) as Author[]
 
 export const fetchBlog = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    'blogs',
+    "blogs",
     docId
   )) as UnsanitizedFirestoreDocument<Blog>
 
@@ -68,7 +68,7 @@ export const fetchBlog = async (docId: string) => {
 export const fetchBlogs = async (ids?: string[]) => {
   const firestoreDocs = (
     ids
-      ? await fetchFirestoreDocuments('blogs', ids)
+      ? await fetchFirestoreDocuments("blogs", ids)
       : await fetchFirestoreCollection(firestore_collection_key.blogs)
   ) as UnsanitizedFirestoreDocument<Blog>[]
 
@@ -79,7 +79,7 @@ export const fetchBlogs = async (ids?: string[]) => {
 
 export const fetchCollection = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    'collections',
+    "collections",
     docId
   )) as UnsanitizedFirestoreDocument<Collection>
 
@@ -90,8 +90,8 @@ export const fetchCollection = async (docId: string) => {
 export const fetchCollections = async (ids?: string[]) => {
   const firestoreDocs = (
     ids
-      ? await fetchFirestoreDocuments('collections', ids)
-      : await fetchFirestoreCollection('collections')
+      ? await fetchFirestoreDocuments("collections", ids)
+      : await fetchFirestoreCollection("collections")
   ) as UnsanitizedFirestoreDocument<Collection>[]
 
   const sanitised = sanitiseNonSerializableCollection(
@@ -102,7 +102,7 @@ export const fetchCollections = async (ids?: string[]) => {
 }
 
 export const fetchImages = async (ids: string[]) =>
-  (await fetchFirestoreDocuments('images', ids)) as Image[]
+  (await fetchFirestoreDocuments("images", ids)) as Image[]
 
 export const fetchLanguages = async (ids: string[]) =>
   (await fetchFirestoreDocuments(
@@ -111,11 +111,11 @@ export const fetchLanguages = async (ids: string[]) =>
   )) as Language[]
 
 export const fetchLanding = async () =>
-  (await fetchFirestoreCollection('landing')) as LandingSection[]
+  (await fetchFirestoreCollection("landing")) as LandingSection[]
 
 export const fetchRecordedEvent = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    'recordedEvents',
+    "recordedEvents",
     docId
   )) as UnsanitizedFirestoreDocument<RecordedEvent>
 
@@ -126,8 +126,8 @@ export const fetchRecordedEvent = async (docId: string) => {
 export const fetchRecordedEvents = async (ids?: string[]) => {
   const firestoreDocs = (
     ids
-      ? await fetchFirestoreDocuments('recordedEvents', ids)
-      : await fetchFirestoreCollection('recordedEvents')
+      ? await fetchFirestoreDocuments("recordedEvents", ids)
+      : await fetchFirestoreCollection("recordedEvents")
   ) as UnsanitizedFirestoreDocument<RecordedEvent>[]
 
   const sanitised = sanitiseNonSerializableCollection(
@@ -138,10 +138,12 @@ export const fetchRecordedEvents = async (ids?: string[]) => {
 }
 
 export const fetchRecordedEventTypes = async () =>
-  (await fetchFirestoreCollection('recordedEventTypes')) as RecordedEventType[]
+  (await fetchFirestoreCollection("recordedEventTypes")) as RecordedEventType[]
 
-export const fetchSubjects = async (ids: string[]) =>
-  (await fetchFirestoreDocuments('subjects', ids)) as Subject[]
+export const fetchSubjects = async (ids?: string[]) =>
+  (ids
+    ? await fetchFirestoreDocuments("subjects", ids)
+    : await fetchFirestoreCollection("subjects")) as Subject[]
 
 export const fetchTags = async (ids: string[]) =>
-  (await fetchFirestoreDocuments('tags', ids)) as Tag[]
+  (await fetchFirestoreDocuments("tags", ids)) as Tag[]

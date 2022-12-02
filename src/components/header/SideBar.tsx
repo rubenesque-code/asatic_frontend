@@ -5,11 +5,12 @@ import tw from "twin.macro"
 import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
+import { Subject } from "^types/subject"
 
 //todo: overlay transition doesn't work cleanly because of it being hidden
 
 // todo: need to pass in e.g. subjects at build time so remove header from _app.tsx
-const SideBar = () => {
+const SideBar = ({ subjects }: { subjects: Subject[] }) => {
   return (
     <Menu>
       {({ open }) => (
@@ -44,7 +45,7 @@ const SideBar = () => {
 
 const CloseButton = () => (
   <Menu.Item>
-    <div css={[tw`text-2xl`]}>
+    <div css={[tw`text-2xl cursor-pointer`]}>
       <X />
     </div>
   </Menu.Item>

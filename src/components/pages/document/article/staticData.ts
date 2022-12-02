@@ -1,4 +1,4 @@
-import { GetStaticPaths, GetStaticProps } from 'next'
+import { GetStaticPaths, GetStaticProps } from "next"
 
 import {
   fetchArticle,
@@ -9,16 +9,17 @@ import {
   fetchLanguages,
   fetchSubjects,
   fetchTags,
-} from '^lib/firebase/firestore'
+} from "^lib/firebase/firestore"
 
 import {
   getArticleLikeDocumentImageIds,
   mapIds,
   mapLanguageIds,
-  validateArticleLikeEntities,
   mapEntitiesLanguageIds,
-  validateLanguages,
-} from '^helpers/index'
+  validateLanguage,
+  validateArticleLikeEntity,
+  processValidatedArticleLikeEntity,
+} from "^helpers/index"
 
 import {
   Article,
@@ -28,27 +29,29 @@ import {
   Language,
   Subject,
   Tag,
-} from '^types/index'
+} from "^types/entities"
+import { validateAuthorAsChild } from "^helpers/process-fetched-data/author"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // * since only published articles returned, need to account for possibility of empty articles array
   const publishedArticles = await fetchArticles()
 
-  if (!publishedArticles.length) {
+  const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
+  const articleLanguages = await fetchLanguages(articleLanguageIds)
+
+  const validLanguages = articleLanguages.filter((language) =>
+    validateLanguage(language)
+  )
+
+  const validArticles = publishedArticles.filter((article) =>
+    validateArticleLikeEntity(article, mapIds(validLanguages))
+  )
+
+  if (!validArticles.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
-
-  const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
-  const articleLanguages = await fetchLanguages(articleLanguageIds)
-
-  const validLanguages = validateLanguages(articleLanguages)
-  const validArticles = validateArticleLikeEntities(
-    publishedArticles,
-    mapIds(validLanguages)
-  )
 
   const paths = validArticles.map((article) => ({
     params: {
@@ -63,43 +66,74 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  article: Article
-  authors: Author[]
-  collections: Collection[]
-  images: Image[]
-  languages: Language[]
+  article: {
+    data: Article
+    subEntities: {
+      authors: Author[]
+      collections: Collection[]
+      images: Image[]
+      languages: Language[]
+      subjects: Subject[]
+      tags: Tag[]
+    }
+  }
   subjects: Subject[]
-  tags: Tag[]
 }
 
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
-  //Todo: process authors, collections, subjects, etc.
-
   // * won't get to this point if article doesn't exist (true?), so below workaround for fetching article is fine
-  const article = await fetchArticle(params?.id || '')
-  // * article has been filtered in `getStaticPaths` above for invalid translations; languages will be valid.
+  const article = await fetchArticle(params?.id || "")
+
   const articleLanguageIds = mapLanguageIds(article.translations)
+  const articleLanguages = await fetchLanguages(articleLanguageIds)
+  const validLanguages = articleLanguages.filter((language) =>
+    validateLanguage(language)
+  )
+  const validLanguageIds = mapIds(validLanguages)
+
   const articleImageIds = getArticleLikeDocumentImageIds(article.translations)
 
+  const authors = article.authorsIds.length
+    ? await fetchAuthors(article.authorsIds)
+    : []
+  const validAuthors = authors.filter((author) =>
+    validateAuthorAsChild(author, validLanguageIds)
+  )
+
+  const processedArticle = processValidatedArticleLikeEntity({
+    entity: article,
+    validRelatedEntitiesIds: {
+      authors: validAuthors,
+      collections,
+    },
+  })
+
   const data = {
-    article: await fetchArticle(params?.id || ''),
-    authors: article.authorsIds.length
-      ? await fetchAuthors(article.authorsIds)
-      : [],
-    collections: article.collectionsIds.length
-      ? await fetchCollections(article.collectionsIds)
-      : [],
-    images: articleImageIds.length ? await fetchImages(articleImageIds) : [],
-    languages: articleLanguageIds.length
-      ? await fetchLanguages(articleLanguageIds)
-      : [],
-    subjects: article.subjectsIds.length
-      ? await fetchSubjects(article.subjectsIds)
-      : [],
-    tags: article.tagsIds.length ? await fetchTags(article.tagsIds) : [],
+    article: {
+      data: await fetchArticle(params?.id || ""),
+      subEntities: {
+        authors: article.authorsIds.length
+          ? await fetchAuthors(article.authorsIds)
+          : [],
+        collections: article.collectionsIds.length
+          ? await fetchCollections(article.collectionsIds)
+          : [],
+        images: articleImageIds.length
+          ? await fetchImages(articleImageIds)
+          : [],
+        languages: articleLanguageIds.length
+          ? await fetchLanguages(articleLanguageIds)
+          : [],
+        subjects: article.subjectsIds.length
+          ? await fetchSubjects(article.subjectsIds)
+          : [],
+        tags: article.tagsIds.length ? await fetchTags(article.tagsIds) : [],
+      },
+    },
+    subjects: await fetchSubjects(),
   }
 
   return {

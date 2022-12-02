@@ -1,14 +1,14 @@
-import { initializeApp, getApps } from 'firebase/app'
+import { initializeApp, getApps } from "firebase/app"
 import {
   getFirestore,
   connectFirestoreEmulator,
   Firestore,
-} from 'firebase/firestore/lite'
+} from "firebase/firestore/lite"
 import {
   getStorage,
   connectStorageEmulator,
   FirebaseStorage,
-} from 'firebase/storage'
+} from "firebase/storage"
 
 const config = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -32,11 +32,9 @@ if (!appInitialised) {
   firestore = getFirestore(app)
   storage = getStorage(app)
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log('connecting to emulator...')
-
-    connectFirestoreEmulator(firestore, '127.0.0.1', 8080)
-    connectStorageEmulator(storage, '127.0.0.1', 9199)
+  if (process.env.NODE_ENV === "development") {
+    connectFirestoreEmulator(firestore, "127.0.0.1", 8080)
+    connectStorageEmulator(storage, "127.0.0.1", 9199)
   }
 }
 

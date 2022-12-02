@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import produce from 'immer'
+import produce from "immer"
 
-import { MyOmit } from '^types/utilities'
-import { Publishable } from '^types/display-entity'
-import { formatDateDMYStr } from './document'
+import { MyOmit } from "^types/utilities"
+import { PublishFields } from "^types/entities/entity"
+import { formatDateDMYStr } from "./document"
 
 // * type `any` used as a workaround to change the type from Timestamp to Date.
 
 export type UnsanitizedFirestoreDocument<
   TEntity extends {
     lastSave: Date | null
-    publishDate?: Publishable['publishDate']
+    publishDate?: PublishFields["publishDate"]
   }
-> = MyOmit<TEntity, 'lastSave' | 'publishDate'> & {
+> = MyOmit<TEntity, "lastSave" | "publishDate"> & {
   lastSave: any
   publishDate: any
 }

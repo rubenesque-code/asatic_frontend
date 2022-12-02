@@ -7,11 +7,14 @@ import {
   query,
   where,
   QueryConstraint,
-} from '@firebase/firestore/lite'
+} from "@firebase/firestore/lite"
 
-import { firestore } from '../init'
+import { firestore } from "../init"
 
-import { FirestoreCollectionKey } from '^constants/firestoreCollections'
+import { FirestoreCollectionKey } from "^constants/firestoreCollections"
+
+// * if fetching by documentId and it doesn't exist, firestore won't return anything
+// * can't query for value of object field in array field of doc. e.g. can't check if article.translations[number].title has string with length
 
 export const fetchFirestoreDocument = async (
   collectionKey: FirestoreCollectionKey,
@@ -32,10 +35,10 @@ export const fetchFirestoreDocuments = async (
   const docsRefs = additionalQueryContstraint
     ? query(
         collection(firestore, collectionKey),
-        where('id', 'in', docIds),
+        where("id", "in", docIds),
         additionalQueryContstraint
       )
-    : query(collection(firestore, collectionKey), where('id', 'in', docIds))
+    : query(collection(firestore, collectionKey), where("id", "in", docIds))
 
   const docsSnap = await getDocs(docsRefs)
   const data: DocumentData[] = []
@@ -64,14 +67,14 @@ export const fetchFirestoreCollection = async (
 export async function fetchFirestorePublishableDocuments(
   collectionKey: Extract<
     FirestoreCollectionKey,
-    'articles' | 'blogs' | 'collections' | 'recordedEvents'
+    "articles" | "blogs" | "collections" | "recordedEvents" | "subjects"
   >,
   docIds: string[]
 ) {
   const docsRefs = query(
     collection(firestore, collectionKey),
-    where('id', 'in', docIds),
-    where('publishStatus', '==', 'published')
+    where("id", "in", docIds),
+    where("publishStatus", "==", "published")
   )
   const docsSnap = await getDocs(docsRefs)
   const data: DocumentData[] = []
@@ -86,12 +89,12 @@ export async function fetchFirestorePublishableDocuments(
 export async function fetchFirestorePublishableCollection(
   collectionKey: Extract<
     FirestoreCollectionKey,
-    'articles' | 'blogs' | 'collections' | 'recordedEvents'
+    "articles" | "blogs" | "collections" | "recordedEvents"
   >
 ) {
   const docsRefs = query(
     collection(firestore, collectionKey),
-    where('publishStatus', '==', 'published')
+    where("publishStatus", "==", "published")
   )
   const docsSnap = await getDocs(docsRefs)
   const data: DocumentData[] = []
