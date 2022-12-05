@@ -10,17 +10,11 @@ import { $Header, $Title, $authors } from "../_styles/article-like"
 
 // Todo: `article` data can be stripped of fields since e.g. languages, authors, are fetched from it
 
+// article has been processed so only valid translations and child entities remain; invalid translations and child entities have been removed.
+// ...any child entity id of `article`, e.g. article.authorsIds[number], is within `childEntities`
+
 const PageContent = ({ article, childEntities }: StaticData) => {
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    article.subEntities.languages[0]
-  )
-  console.log("article:", article)
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const selectedTranslation = article.data.translations.find(
-    (t) => t.languageId === selectedLanguage.id
-  )!
-
+  // todo: pick translation
   return (
     <$Container_>
       <$Header>
@@ -30,7 +24,8 @@ const PageContent = ({ article, childEntities }: StaticData) => {
           setSelectedLanguage={setSelectedLanguage}
         /> */}
         {/* <Date_ date={article.data.publishDate} /> */}
-        <$Title>{selectedTranslation.title}</$Title>
+        {/* <$Title>{selectedTranslation.title}</$Title> */}
+        {JSON.stringify(article)}
         {/*         <Authors_
           authors={articleAuthors}
           selectedLanguage={selectedLanguage}
