@@ -10,7 +10,7 @@ import { $Header, $Title, $authors } from "../_styles/article-like"
 
 // Todo: `article` data can be stripped of fields since e.g. languages, authors, are fetched from it
 
-const PageContent = ({ article }: StaticData) => {
+const PageContent = ({ article, childEntities }: StaticData) => {
   const [selectedLanguage, setSelectedLanguage] = useState(
     article.subEntities.languages[0]
   )

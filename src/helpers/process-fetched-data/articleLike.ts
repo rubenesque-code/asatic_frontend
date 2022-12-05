@@ -1,5 +1,11 @@
 import produce from "immer"
-import { Article, Blog, ArticleLikeTranslation } from "^types/entities"
+import {
+  Article,
+  Blog,
+  ArticleLikeTranslation,
+  ArticleLikeChildEntitiesKeysTuple,
+  ArticleLikeChildEntityFields,
+} from "^types/entities"
 
 export function getArticleLikeDocumentImageIds(
   articleLikeTranslations: ArticleLikeTranslation[]
@@ -60,6 +66,20 @@ export function validateArticleLikeEntity<TEntity extends Article | Blog>(
   return true
 }
 
+const removeInvalidChildEntityIds = ({
+  childEntityIdArr,
+  validIdArr,
+}: {
+  childEntityIdArr: string[]
+  validIdArr: string[]
+}) => {
+  childEntityIdArr.forEach((id, i) => {
+    if (!validIdArr.includes(id)) {
+      childEntityIdArr.splice(i, 1)
+    }
+  })
+}
+
 /**Used within getStaticProps after validation has occurred in getStaticPaths  */
 export function processValidatedArticleLikeEntity<
   TEntity extends Article | Blog
@@ -69,62 +89,38 @@ export function processValidatedArticleLikeEntity<
 }: {
   entity: TEntity
   validRelatedEntitiesIds: {
-    languages: string[]
-    authors: string[]
-    collections: string[]
-    subjects: string[]
-    tags: string[]
-  }
+    languagesIds: string[]
+  } & ArticleLikeChildEntityFields
 }) {
   const processed = produce(entity, (draft) => {
     for (let i = 0; i < draft.translations.length; i++) {
       const translation = draft.translations[i]
       const translationIsValid = validateTranslation(
         translation,
-        validRelatedEntitiesIds.languages
+        validRelatedEntitiesIds.languagesIds
       )
 
       if (!translationIsValid) {
-        const translationIndex = entity.translations.findIndex(
+        const translationIndex = draft.translations.findIndex(
           (t) => t.id === translation.id
         )
-        entity.translations.splice(translationIndex, 1)
+        draft.translations.splice(translationIndex, 1)
       }
     }
 
-    for (let i = 0; i < draft.authorsIds.length; i++) {
-      const authorId = draft.authorsIds[i]
-      if (!validRelatedEntitiesIds.authors.includes(authorId)) {
-        const index = entity.authorsIds.findIndex((id) => id === authorId)
-        entity.authorsIds.splice(index, 1)
-      }
-    }
+    const articleLikeChildKeysArr: ArticleLikeChildEntitiesKeysTuple = [
+      "authorsIds",
+      "collectionsIds",
+      "subjectsIds",
+      "tagsIds",
+    ]
 
-    for (let i = 0; i < draft.collectionsIds.length; i++) {
-      const collectionId = draft.collectionsIds[i]
-      if (!validRelatedEntitiesIds.collections.includes(collectionId)) {
-        const index = entity.collectionsIds.findIndex(
-          (id) => id === collectionId
-        )
-        entity.collectionsIds.splice(index, 1)
-      }
-    }
-
-    for (let i = 0; i < draft.subjectsIds.length; i++) {
-      const subjectId = draft.subjectsIds[i]
-      if (!validRelatedEntitiesIds.subjects.includes(subjectId)) {
-        const index = entity.subjectsIds.findIndex((id) => id === subjectId)
-        entity.subjectsIds.splice(index, 1)
-      }
-    }
-
-    for (let i = 0; i < draft.tagsIds.length; i++) {
-      const tagId = draft.tagsIds[i]
-      if (!validRelatedEntitiesIds.tags.includes(tagId)) {
-        const index = entity.tagsIds.findIndex((id) => id === tagId)
-        entity.tagsIds.splice(index, 1)
-      }
-    }
+    articleLikeChildKeysArr.forEach((key) =>
+      removeInvalidChildEntityIds({
+        childEntityIdArr: draft[key],
+        validIdArr: validRelatedEntitiesIds[key],
+      })
+    )
   })
 
   return processed

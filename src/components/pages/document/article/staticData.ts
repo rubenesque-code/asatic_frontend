@@ -16,9 +16,7 @@ import {
   mapIds,
   mapLanguageIds,
   mapEntitiesLanguageIds,
-  validateLanguage,
   validateArticleLikeEntity,
-  processValidatedArticleLikeEntity,
 } from "^helpers/index"
 
 import {
@@ -30,7 +28,14 @@ import {
   Subject,
   Tag,
 } from "^types/entities"
-import { validateAuthorAsChild } from "^helpers/process-fetched-data/author"
+import {
+  processValidatedArticleLikeEntity,
+  validateAuthorAsChild,
+  validateCollectionAsChild,
+  validateLanguage,
+  validateSubjectAsChild,
+  validateTagAsChild,
+} from "^helpers/process-fetched-data"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const publishedArticles = await fetchArticles()
@@ -66,18 +71,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  article: {
-    data: Article
-    subEntities: {
-      authors: Author[]
-      collections: Collection[]
-      images: Image[]
-      languages: Language[]
-      subjects: Subject[]
-      tags: Tag[]
-    }
+  article: Article
+  childEntities: {
+    authors: Author[]
+    collections: Collection[]
+    images: Image[]
+    languages: Language[]
+    subjects: Subject[]
+    tags: Tag[]
   }
-  subjects: Subject[]
 }
 
 export const getStaticProps: GetStaticProps<
@@ -103,42 +105,47 @@ export const getStaticProps: GetStaticProps<
     validateAuthorAsChild(author, validLanguageIds)
   )
 
+  const collections = article.collectionsIds.length
+    ? await fetchCollections(article.collectionsIds)
+    : []
+  const validCollections = collections.filter((collection) =>
+    validateCollectionAsChild(collection, validLanguageIds)
+  )
+
+  const subjects = article.subjectsIds.length
+    ? await fetchSubjects(article.subjectsIds)
+    : []
+  const validSubjects = subjects.filter((subject) =>
+    validateSubjectAsChild(subject, validLanguageIds)
+  )
+
+  const tags = article.tagsIds.length ? await fetchTags(article.tagsIds) : []
+  const validTags = tags.filter((tag) => validateTagAsChild(tag))
+
   const processedArticle = processValidatedArticleLikeEntity({
     entity: article,
     validRelatedEntitiesIds: {
-      authors: validAuthors,
-      collections,
+      languagesIds: validLanguageIds,
+      authorsIds: mapIds(validAuthors),
+      collectionsIds: mapIds(validCollections),
+      subjectsIds: mapIds(validSubjects),
+      tagsIds: mapIds(validTags),
     },
   })
 
-  const data = {
-    article: {
-      data: await fetchArticle(params?.id || ""),
-      subEntities: {
-        authors: article.authorsIds.length
-          ? await fetchAuthors(article.authorsIds)
-          : [],
-        collections: article.collectionsIds.length
-          ? await fetchCollections(article.collectionsIds)
-          : [],
-        images: articleImageIds.length
-          ? await fetchImages(articleImageIds)
-          : [],
-        languages: articleLanguageIds.length
-          ? await fetchLanguages(articleLanguageIds)
-          : [],
-        subjects: article.subjectsIds.length
-          ? await fetchSubjects(article.subjectsIds)
-          : [],
-        tags: article.tagsIds.length ? await fetchTags(article.tagsIds) : [],
-      },
+  const pageData: StaticData = {
+    article: processedArticle,
+    childEntities: {
+      authors: validAuthors,
+      collections: validCollections,
+      images: articleImageIds.length ? await fetchImages(articleImageIds) : [],
+      languages: validLanguages,
+      subjects: validSubjects,
+      tags: validTags,
     },
-    subjects: await fetchSubjects(),
   }
 
   return {
-    props: {
-      ...data,
-    },
+    props: pageData,
   }
 }
