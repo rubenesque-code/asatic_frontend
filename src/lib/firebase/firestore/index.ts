@@ -9,12 +9,15 @@ import {
   Author,
   Blog,
   Collection,
+  FetchedArticle,
+  FetchedSubject,
   Image,
   LandingSection,
   Language,
   RecordedEvent,
   RecordedEventType,
-  Subject,
+  SanitisedArticle,
+  SanitisedSubject,
   Tag,
 } from "^types/entities"
 
@@ -26,13 +29,15 @@ import {
   fetchFirestorePublishableDocuments,
 } from "./helpers"
 
+// have to 'sanitise' data (handle firestore timestamps) before pass to Next component else get an error.
+
 export const fetchArticle = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
     firestore_collection_key.articles,
     docId
-  )) as UnsanitizedFirestoreDocument<Article>
+  )) as UnsanitizedFirestoreDocument<FetchedArticle>
 
-  const sanitised = sanitiseNonSerializableDoc(firestoreDoc) as Article
+  const sanitised = sanitiseNonSerializableDoc(firestoreDoc) as SanitisedArticle
 
   return sanitised
 }
@@ -46,7 +51,7 @@ export const fetchArticles = async (ids?: string[]) => {
 
   const sanitised = sanitiseNonSerializableCollection(
     firestoreDocs
-  ) as Article[]
+  ) as SanitisedArticle[]
 
   return sanitised
 }
@@ -140,10 +145,30 @@ export const fetchRecordedEvents = async (ids?: string[]) => {
 export const fetchRecordedEventTypes = async () =>
   (await fetchFirestoreCollection("recordedEventTypes")) as RecordedEventType[]
 
-export const fetchSubjects = async (ids?: string[]) =>
-  (ids
-    ? await fetchFirestoreDocuments("subjects", ids)
-    : await fetchFirestoreCollection("subjects")) as Subject[]
+export const fetchSubject = async (docId: string) => {
+  const firestoreDoc = (await fetchFirestoreDocument(
+    firestore_collection_key.articles,
+    docId
+  )) as UnsanitizedFirestoreDocument<FetchedSubject>
+
+  const sanitised = sanitiseNonSerializableDoc(firestoreDoc) as SanitisedSubject
+
+  return sanitised
+}
+
+export const fetchSubjects = async (ids?: string[]) => {
+  const firestoreDocs = (
+    ids
+      ? await fetchFirestorePublishableDocuments("subjects", ids)
+      : await fetchFirestorePublishableCollection("subjects")
+  ) as UnsanitizedFirestoreDocument<FetchedSubject>[]
+
+  const sanitised = sanitiseNonSerializableCollection(
+    firestoreDocs
+  ) as SanitisedSubject[]
+
+  return sanitised
+}
 
 export const fetchTags = async (ids: string[]) =>
   (await fetchFirestoreDocuments("tags", ids)) as Tag[]

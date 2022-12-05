@@ -1,16 +1,16 @@
-import tw from 'twin.macro'
-import { TranslateIcon } from '^components/Icons'
+import tw from "twin.macro"
+import { TranslateIcon } from "^components/Icons"
 
-import { Language } from '^types/language'
+import { Language } from "^types/entities"
 
-export const SelectTranslation = ({
+export const Languages_ = ({
   documentLanguages,
-  selectedLanguage,
-  setSelectedLanguage,
+  documentLanguage,
+  setDocumentLanguage,
 }: {
   documentLanguages: Language[]
-  selectedLanguage: Language
-  setSelectedLanguage: (language: Language) => void
+  documentLanguage: Language
+  setDocumentLanguage: (language: Language) => void
 }) => {
   if (!documentLanguages.length || documentLanguages.length < 2) {
     return null
@@ -26,10 +26,10 @@ export const SelectTranslation = ({
           <div
             css={[
               tw`py-0.5 px-2 border rounded-md text-sm font-serif-body tracking-wide text-gray-700 transition-colors ease-in-out`,
-              language.id !== selectedLanguage.id &&
+              language.id !== documentLanguage.id &&
                 tw`text-gray-400 cursor-pointer border-gray-100`,
             ]}
-            onClick={() => setSelectedLanguage(language)}
+            onClick={() => setDocumentLanguage(language)}
             key={language.id}
           >
             {language.name}

@@ -32,22 +32,26 @@ export const fetchFirestoreDocuments = async (
   docIds: string[],
   additionalQueryContstraint?: QueryConstraint
 ) => {
-  const docsRefs = additionalQueryContstraint
-    ? query(
-        collection(firestore, collectionKey),
-        where("id", "in", docIds),
-        additionalQueryContstraint
-      )
-    : query(collection(firestore, collectionKey), where("id", "in", docIds))
+  try {
+    const docsRefs = additionalQueryContstraint
+      ? query(
+          collection(firestore, collectionKey),
+          where("id", "in", docIds),
+          additionalQueryContstraint
+        )
+      : query(collection(firestore, collectionKey), where("id", "in", docIds))
 
-  const docsSnap = await getDocs(docsRefs)
-  const data: DocumentData[] = []
-  docsSnap.forEach((doc) => {
-    const d = doc.data()
-    data.push(d)
-  })
+    const docsSnap = await getDocs(docsRefs)
+    const data: DocumentData[] = []
+    docsSnap.forEach((doc) => {
+      const d = doc.data()
+      data.push(d)
+    })
 
-  return data
+    return data
+  } catch (error) {
+    console.log("error:", error)
+  }
 }
 
 export const fetchFirestoreCollection = async (
@@ -71,25 +75,29 @@ export async function fetchFirestorePublishableDocuments(
   >,
   docIds: string[]
 ) {
-  const docsRefs = query(
-    collection(firestore, collectionKey),
-    where("id", "in", docIds),
-    where("publishStatus", "==", "published")
-  )
-  const docsSnap = await getDocs(docsRefs)
-  const data: DocumentData[] = []
-  docsSnap.forEach((doc) => {
-    const d = doc.data()
-    data.push(d)
-  })
+  try {
+    const docsRefs = query(
+      collection(firestore, collectionKey),
+      where("id", "in", docIds),
+      where("publishStatus", "==", "published")
+    )
+    const docsSnap = await getDocs(docsRefs)
+    const data: DocumentData[] = []
+    docsSnap.forEach((doc) => {
+      const d = doc.data()
+      data.push(d)
+    })
 
-  return data
+    return data
+  } catch (error) {
+    console.log("error:", error)
+  }
 }
 
 export async function fetchFirestorePublishableCollection(
   collectionKey: Extract<
     FirestoreCollectionKey,
-    "articles" | "blogs" | "collections" | "recordedEvents"
+    "articles" | "blogs" | "collections" | "recordedEvents" | "subjects"
   >
 ) {
   const docsRefs = query(

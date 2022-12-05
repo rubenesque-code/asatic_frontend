@@ -1,10 +1,10 @@
 import produce from "immer"
 import {
-  Article,
   Blog,
   ArticleLikeTranslation,
   ArticleLikeChildEntitiesKeysTuple,
   ArticleLikeChildEntityFields,
+  SanitisedArticle,
 } from "^types/entities"
 
 export function getArticleLikeDocumentImageIds(
@@ -46,15 +46,9 @@ function validateTranslation(
   return true
 }
 
-export function validateArticleLikeEntity<TEntity extends Article | Blog>(
-  entity: TEntity,
-  validLanguageIds: string[]
-): boolean {
-  // valid article: published; at least 1 translation with valid language, title and body text
-  if (entity.publishStatus !== "published") {
-    return false
-  }
-
+export function validateArticleLikeEntity<
+  TEntity extends SanitisedArticle | Blog
+>(entity: TEntity, validLanguageIds: string[]): boolean {
   const validTranslation = entity.translations.find((translation) =>
     validateTranslation(translation, validLanguageIds)
   )
@@ -82,7 +76,7 @@ const removeInvalidChildEntityIds = ({
 
 /**Used within getStaticProps after validation has occurred in getStaticPaths  */
 export function processValidatedArticleLikeEntity<
-  TEntity extends Article | Blog
+  TEntity extends SanitisedArticle | Blog
 >({
   entity,
   validRelatedEntitiesIds,

@@ -5,44 +5,51 @@ import {
   PublishFields,
   RelatedEntityFields,
   SaveFields,
-} from "./entity";
-import { DisplayEntityStatus, EntityAsChildStatus } from "./entity-status";
-import { TranslationField, Translations } from "./entity-translation";
-import { TupleToUnion } from "./utilities";
+} from "./entity"
+import { DisplayEntityStatus, EntityAsChildStatus } from "./entity-status"
+import { TranslationField, Translations } from "./entity-translation"
+import { MyOmit, TupleToUnion } from "./utilities"
 
 export type Subject = EntityGlobalFields<"subject"> &
   PublishFields &
   SaveFields &
   Translations<SubjectTranslationFields> &
-  RelatedEntityFields<SubjectRelatedEntity>;
+  RelatedEntityFields<SubjectRelatedEntity>
 
-type SubjectTranslationFields = TranslationField<"title">;
+export type FetchedSubject = MyOmit<Subject, "publishStatus">
 
-export type SubjectTranslation = Subject["translations"][number];
+export type SanitisedSubject = MyOmit<
+  FetchedSubject,
+  "lastSave" | "publishDate"
+> & { publishDate: string }
+
+type SubjectTranslationFields = TranslationField<"title">
+
+export type SubjectTranslation = Subject["translations"][number]
 
 export type SubjectRelatedEntityTuple = EntityNameTupleSubset<
   "article" | "blog" | "collection" | "recordedEvent" | "tag"
->;
+>
 
-export type SubjectRelatedEntity = TupleToUnion<SubjectRelatedEntityTuple>;
+export type SubjectRelatedEntity = TupleToUnion<SubjectRelatedEntityTuple>
 
 export type SubjectDisplayEntity = EntityNameSubSet<
   "article" | "blog" | "collection" | "recordedEvent"
->;
+>
 
 export type MissingRequirement =
   | "no valid translation"
-  | "no valid related diplay entity";
+  | "no valid related diplay entity"
 
 export type SubjectStatus = DisplayEntityStatus<
   SubjectRelatedEntity,
   MissingRequirement
->;
+>
 
-export type ChildSubjectMissingRequirement = "no valid translation";
+export type ChildSubjectMissingRequirement = "no valid translation"
 
 export type SubjectAsChildStatus =
-  EntityAsChildStatus<ChildSubjectMissingRequirement>;
+  EntityAsChildStatus<ChildSubjectMissingRequirement>
 
 /* const subject: Subject = {
   articlesIds: [],

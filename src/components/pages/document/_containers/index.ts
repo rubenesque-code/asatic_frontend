@@ -1,2 +1,2 @@
-export * from './SelectTranslation'
-export * from './Authors'
+export * from "./Languages_"
+export * from "./Authors"

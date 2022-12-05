@@ -1,16 +1,23 @@
 import { Menu } from "@headlessui/react"
 import Link from "next/link"
-import { List, X } from "phosphor-react"
+import { CaretDown, CaretUp, List, X } from "phosphor-react"
+import { useState } from "react"
 import tw from "twin.macro"
+
 import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { Subject } from "^types/subject"
+import { findTranslation } from "^helpers/data"
+import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
+import { SanitisedSubject } from "^types/entities"
 
-//todo: overlay transition doesn't work cleanly because of it being hidden
+export type SideBarProps = SubjectsProp
 
-// todo: need to pass in e.g. subjects at build time so remove header from _app.tsx
-const SideBar = ({ subjects }: { subjects: Subject[] }) => {
+type SubjectsProp = {
+  subjects: SanitisedSubject[]
+}
+
+const SideBar = (subjectsProp: SideBarProps) => {
   return (
     <Menu>
       {({ open }) => (
@@ -28,7 +35,7 @@ const SideBar = ({ subjects }: { subjects: Subject[] }) => {
             ]}
             static
           >
-            <Content />
+            <Content {...subjectsProp} />
           </Menu.Items>
           <div
             css={[
@@ -51,29 +58,28 @@ const CloseButton = () => (
   </Menu.Item>
 )
 
-const Content = () => {
-  const { siteLanguageId: siteLanguage } = useSiteLanguageContext()
-
-  const pageLinks = [
-    {
-      label: siteTranslations.home[siteLanguage],
-      route: routes.landing,
-    },
-    {
-      label: siteTranslations.articles[siteLanguage],
-      route: routes.articles,
-    },
-  ]
+const Content = (subjectsProp: SubjectsProp) => {
+  const { siteLanguage } = useSiteLanguageContext()
 
   return (
     <div css={[tw`mt-lg`]}>
       <CloseButton />
       <div css={[tw`flex flex-col gap-md min-w-[200px] mt-md`]}>
-        {pageLinks.map((link) => (
-          <div css={[tw`pt-md border-t`]} key={link.label}>
-            <PageLink {...link} />
-          </div>
-        ))}
+        <div css={[tw`pt-md border-t`]}>
+          <PageLink
+            label={siteTranslations.home[siteLanguage.id]}
+            route={routes.landing}
+          />
+        </div>
+        <div css={[tw`pt-md border-t`]}>
+          <PageLink
+            label={siteTranslations.articles[siteLanguage.id]}
+            route={routes.articles}
+          />
+        </div>
+        <div css={[tw`pt-md border-t`]}>
+          <Subjects {...subjectsProp} />
+        </div>
       </div>
     </div>
   )
@@ -91,6 +97,58 @@ const PageLink = ({ label, route }: { label: string; route: string }) => {
       >
         {label}
       </div>
+    </Link>
+  )
+}
+
+const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  return (
+    <div>
+      <div
+        css={[tw`flex items-center justify-between`]}
+        className="group"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <span
+          css={[
+            tw`font-serif-body capitalize text-lg cursor-pointer text-gray-700 group-hover:text-gray-900 transition-colors`,
+          ]}
+        >
+          Subjects
+        </span>
+        <span css={[tw`group-hover:bg-gray-50 rounded-full p-xxxs`]}>
+          {isExpanded ? <CaretUp /> : <CaretDown />}
+        </span>
+      </div>
+      <div css={[tw`flex flex-col gap-sm`]}>
+        {subjects.map((subject) => (
+          <Subject subject={subject} key={subject.id} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const Subject = ({ subject }: { subject: SanitisedSubject }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
+  const translationForSiteLanguage = findTranslation(
+    subject.translations,
+    siteLanguage.id
+  )
+
+  if (
+    !translationForSiteLanguage ||
+    !translationForSiteLanguage.title?.length
+  ) {
+    return null
+  }
+
+  return (
+    <Link href={`/subjects/${subject.id}`} passHref>
+      <div>{translationForSiteLanguage.title}</div>
     </Link>
   )
 }

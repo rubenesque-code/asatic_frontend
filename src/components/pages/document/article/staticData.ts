@@ -12,23 +12,20 @@ import {
 } from "^lib/firebase/firestore"
 
 import {
-  getArticleLikeDocumentImageIds,
-  mapIds,
-  mapLanguageIds,
-  mapEntitiesLanguageIds,
-  validateArticleLikeEntity,
-} from "^helpers/index"
-
-import {
-  Article,
   Author,
   Collection,
   Image,
   Language,
-  Subject,
+  SanitisedArticle,
+  SanitisedSubject,
   Tag,
 } from "^types/entities"
+
+import { mapIds, mapLanguageIds } from "^helpers/data"
 import {
+  getArticleLikeDocumentImageIds,
+  mapEntitiesLanguageIds,
+  validateArticleLikeEntity,
   processValidatedArticleLikeEntity,
   validateAuthorAsChild,
   validateCollectionAsChild,
@@ -39,6 +36,13 @@ import {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const publishedArticles = await fetchArticles()
+
+  if (!publishedArticles.length) {
+    return {
+      paths: [],
+      fallback: false,
+    }
+  }
 
   const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
   const articleLanguages = await fetchLanguages(articleLanguageIds)
@@ -71,14 +75,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  article: Article
+  article: SanitisedArticle
   childEntities: {
     authors: Author[]
     collections: Collection[]
     images: Image[]
     languages: Language[]
-    subjects: Subject[]
+    subjects: SanitisedSubject[]
     tags: Tag[]
+  }
+  header: {
+    subjects: SanitisedSubject[]
   }
 }
 
@@ -94,6 +101,7 @@ export const getStaticProps: GetStaticProps<
   const article = await fetchArticle(params?.id || "")
 
   const articleLanguageIds = mapLanguageIds(article.translations)
+  console.log("articleLanguageIds:", articleLanguageIds)
   const articleLanguages = await fetchLanguages(articleLanguageIds)
   const validLanguages = articleLanguages.filter((language) =>
     validateLanguage(language)
@@ -116,12 +124,16 @@ export const getStaticProps: GetStaticProps<
     validateCollectionAsChild(collection, validLanguageIds)
   )
 
-  const subjects = article.subjectsIds.length
-    ? await fetchSubjects(article.subjectsIds)
-    : []
-  const validSubjects = subjects.filter((subject) =>
+  // todo: e.g. article.subjectIds doesn't necessarily map to a subject
+  const allSubjects = await fetchSubjects()
+  const allValidSubjects = allSubjects.filter((subject) =>
     validateSubjectAsChild(subject, validLanguageIds)
   )
+  const validArticleSubjects = article.subjectsIds
+    .map((subjectId) =>
+      allValidSubjects.find((subject) => subject.id === subjectId)
+    )
+    .flatMap((subject) => (subject ? [subject] : []))
 
   const tags = article.tagsIds.length ? await fetchTags(article.tagsIds) : []
   const validTags = tags.filter((tag) => validateTagAsChild(tag))
@@ -132,7 +144,7 @@ export const getStaticProps: GetStaticProps<
       languagesIds: validLanguageIds,
       authorsIds: mapIds(validAuthors),
       collectionsIds: mapIds(validCollections),
-      subjectsIds: mapIds(validSubjects),
+      subjectsIds: mapIds(validArticleSubjects),
       tagsIds: mapIds(validTags),
     },
   })
@@ -153,8 +165,11 @@ export const getStaticProps: GetStaticProps<
       collections: validCollections,
       images: articleImageIds.length ? await fetchImages(articleImageIds) : [],
       languages: processedTranslationLanguages,
-      subjects: validSubjects,
+      subjects: validArticleSubjects,
       tags: validTags,
+    },
+    header: {
+      subjects: validArticleSubjects,
     },
   }
 

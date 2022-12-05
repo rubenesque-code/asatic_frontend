@@ -5,7 +5,7 @@ import { MyOmit } from "^types/utilities"
 import { PublishFields } from "^types/entities/entity"
 import { formatDateDMYStr } from "./document"
 
-// * type `any` used as a workaround to change the type from Timestamp to Date.
+// type `any` used as a workaround to change the type from Timestamp to Date.
 
 export type UnsanitizedFirestoreDocument<
   TEntity extends {

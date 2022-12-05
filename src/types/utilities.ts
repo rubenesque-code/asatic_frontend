@@ -60,3 +60,5 @@ export type FilterTuple<
     ? [H, ...FilterTuple<R, TMember>]
     : FilterTuple<R, TMember>
   : TTuple
+
+export type OverwriteInterface<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U

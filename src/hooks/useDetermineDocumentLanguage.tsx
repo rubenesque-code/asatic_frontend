@@ -4,7 +4,7 @@ import { mapIds } from "^helpers/data"
 
 import { Language } from "^types/entities"
 
-const determineDocumentLanguage = (
+const initDocumentLanguage = (
   languages: Language[],
   siteLanguage: SiteLanguage
 ) => {
@@ -20,7 +20,7 @@ export const useDetermineDocumentLanguage = (documentLanguages: Language[]) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   const [documentLanguage, setDocumentLanguage] = useState(
-    determineDocumentLanguage(documentLanguages, siteLanguage)
+    initDocumentLanguage(documentLanguages, siteLanguage)
   )
 
   useEffect(() => {

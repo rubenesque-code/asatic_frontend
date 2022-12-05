@@ -1,21 +1,15 @@
-import tw from 'twin.macro'
+import tw from "twin.macro"
 
-import {
-  ArticleLikeTextSection,
-  ArticleLikeImageSection,
-  Publishable,
-  Image,
-  ArticleLikeVideoSection,
-} from '^types/index'
+import { TextSection, ImageSection, VideoSection, Image } from "^types/entities"
 
-import { mapIds } from '^helpers/data'
+import { mapIds } from "^helpers/data"
 
-import HtmlStrToJSX from '^components/HtmlStrToJSX'
-import StorageImage from '^components/StorageImage'
-import { $Date, $TextSection, $Caption } from '../../_styles/article-like'
-import Video_ from '../Video'
+import HtmlStrToJSX from "^components/HtmlStrToJSX"
+import StorageImage from "^components/StorageImage"
+import { $Date, $TextSection, $Caption } from "../../_styles/article-like"
+import Video_ from "../Video"
 
-export const Date_ = ({ date }: { date: Publishable['publishDate'] }) => {
+export const Date_ = ({ date }: { date: string }) => {
   if (!date) {
     return null
   }
@@ -23,7 +17,7 @@ export const Date_ = ({ date }: { date: Publishable['publishDate'] }) => {
   return <$Date>{date}</$Date>
 }
 
-export const TextSection_ = ({ data }: { data: ArticleLikeTextSection }) => {
+export const TextSection_ = ({ data }: { data: TextSection }) => {
   if (!data.text) {
     return null
   }
@@ -39,7 +33,7 @@ export const ImageSection_ = ({
   section,
   fetchedImages,
 }: {
-  section: ArticleLikeImageSection
+  section: ImageSection
   fetchedImages: Image[]
 }) => {
   if (!section.image.imageId) {
@@ -59,28 +53,20 @@ export const ImageSection_ = ({
       <div css={[tw`relative aspect-ratio[16 / 9]`]}>
         <StorageImage image={image} />
       </div>
-      {section.image.caption ? (
-        <$Caption>{section.image.caption}</$Caption>
-      ) : null}
+      {section.caption ? <$Caption>{section.caption}</$Caption> : null}
     </div>
   )
 }
 
-export const VideoSection_ = ({
-  section,
-}: {
-  section: ArticleLikeVideoSection
-}) => {
-  if (!section.video.youtubeId) {
+export const VideoSection_ = ({ section }: { section: VideoSection }) => {
+  if (!section.youtubeId) {
     return null
   }
 
   return (
     <div>
-      <Video_ youtubeId={section.video.youtubeId} />
-      {section.video.caption ? (
-        <$Caption>{section.video.caption}</$Caption>
-      ) : null}
+      <Video_ youtubeId={section.youtubeId} />
+      {section.caption ? <$Caption>{section.caption}</$Caption> : null}
     </div>
   )
 }

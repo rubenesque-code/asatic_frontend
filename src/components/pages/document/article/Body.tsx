@@ -1,29 +1,33 @@
-import { Fragment } from 'react'
+import produce from "immer"
+import { Fragment } from "react"
 
-import { ArticleLikeTranslation } from '^types/article-like-entity'
-import { Image } from '^types/image'
+import { ArticleLikeTranslation, Image } from "^types/entities"
 
 import {
   TextSection_,
   ImageSection_,
   VideoSection_,
-} from '../_containers/article-like'
-import { $Body } from '../_styles/article-like'
+} from "../_containers/article-like"
+import { $Body } from "../_styles/article-like"
 
 const Body = ({
   body,
   images,
 }: {
-  body: ArticleLikeTranslation['body']
+  body: ArticleLikeTranslation["body"]
   images: Image[]
 }) => {
+  const ordered = produce(body, (draft) => {
+    draft.sort((a, b) => a.index - b.index)
+  })
+
   return (
     <$Body>
-      {body.map((section) => (
+      {ordered.map((section) => (
         <Fragment key={section.id}>
-          {section.type === 'image' ? (
+          {section.type === "image" ? (
             <ImageSection_ section={section} fetchedImages={images} />
-          ) : section.type === 'text' ? (
+          ) : section.type === "text" ? (
             <TextSection_ data={section} />
           ) : (
             <VideoSection_ section={section} />

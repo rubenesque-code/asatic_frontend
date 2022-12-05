@@ -1,6 +1,14 @@
-import { ArticleLikeEntity } from "./article-like-entity";
+import { ArticleLikeEntity } from "./article-like-entity"
+import { MyOmit } from "./utilities"
 
-export type Article = ArticleLikeEntity<"article">;
+export type Article = ArticleLikeEntity<"article">
+
+export type FetchedArticle = MyOmit<Article, "publishStatus">
+
+export type SanitisedArticle = MyOmit<
+  FetchedArticle,
+  "lastSave" | "publishDate"
+> & { publishDate: string }
 
 /*
  const article: Article = {

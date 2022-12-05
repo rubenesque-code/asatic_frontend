@@ -1,4 +1,4 @@
-import { Subject, SubjectTranslation } from "^types/entities"
+import { SanitisedSubject, SubjectTranslation } from "^types/entities"
 
 const validateTranslation = (
   translation: SubjectTranslation,
@@ -11,13 +11,9 @@ const validateTranslation = (
 }
 
 export function validateSubjectAsChild(
-  subject: Subject,
+  subject: SanitisedSubject,
   validLanguageIds: string[]
 ) {
-  if (subject.publishStatus !== "published") {
-    return false
-  }
-
   const validTranslation = subject.translations.find((translation) =>
     validateTranslation(translation, validLanguageIds)
   )
