@@ -1,9 +1,16 @@
-import { useRouter } from 'next/router'
-import { createContext, ReactElement, useContext } from 'react'
-import { checkObjectHasField } from '^helpers/data'
+import { useRouter } from "next/router"
+import { createContext, ReactElement, useContext } from "react"
+import { checkObjectHasField } from "^helpers/data"
+import { Language } from "^types/entities"
 
-const siteLanguages = ['english', 'tamil'] as const
-type SiteLanguage = typeof siteLanguages[number]
+const siteLanguageIds = ["english", "tamil"] as const
+type SiteLanguageId = typeof siteLanguageIds[number]
+
+type SiteLanguageHelper<TLanguage extends Language> = TLanguage
+
+export type SiteLanguage = SiteLanguageHelper<
+  { id: "english"; name: "English" } | { id: "tamil"; name: "Tamil" }
+>
 
 type Value = {
   siteLanguage: SiteLanguage
@@ -12,30 +19,34 @@ type Value = {
 
 const Context = createContext({} as Value)
 
-// todo: should just be hook?
-
 const SiteLanguageProvider = ({ children }: { children: ReactElement }) => {
   const router = useRouter()
-  const routeQueryLanguage = router.query?.sitelang as undefined | string
+  const routerQueryLanguageId = router.query?.sitelang as
+    | undefined
+    | SiteLanguageId
 
-  const siteLanguage = !siteLanguages.find(
-    (siteLanguage) => siteLanguage === routeQueryLanguage
-  )
-    ? 'english'
-    : (routeQueryLanguage as SiteLanguage)
+  const siteLanguage: SiteLanguage =
+    routerQueryLanguageId === "tamil"
+      ? { id: "tamil", name: "Tamil" }
+      : { id: "english", name: "English" }
 
   const toggleSiteLanguage = () => {
     router.push({
       ...router,
       query: {
         ...router.query,
-        sitelang: siteLanguage === 'english' ? 'tamil' : 'english',
+        siteLanguageId: siteLanguage.id,
       },
     })
   }
 
   return (
-    <Context.Provider value={{ toggleSiteLanguage, siteLanguage }}>
+    <Context.Provider
+      value={{
+        toggleSiteLanguage,
+        siteLanguage,
+      }}
+    >
       {children}
     </Context.Provider>
   )
@@ -45,7 +56,7 @@ const useSiteLanguageContext = () => {
   const context = useContext(Context)
   const contextIsPopulated = checkObjectHasField(context)
   if (!contextIsPopulated) {
-    throw new Error('useSiteLanguageContext must be used within its provider!')
+    throw new Error("useSiteLanguageContext must be used within its provider!")
   }
   return context
 }

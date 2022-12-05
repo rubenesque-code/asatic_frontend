@@ -13,3 +13,12 @@ export function checkObjectHasField<T extends Record<string, unknown>>(obj: T) {
 
   return Boolean(hasAKey)
 }
+
+export function findTranslation<TTranslation extends { languageId: string }>(
+  translations: TTranslation[],
+  languageId: string
+) {
+  return translations.find(
+    (translation) => translation.languageId === languageId
+  )
+}

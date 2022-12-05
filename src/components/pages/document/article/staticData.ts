@@ -82,6 +82,10 @@ export type StaticData = {
   }
 }
 
+// todo: should process sub entities as well? e.g. remove author translations without a name with length. Then need an updated, processed Type.
+// todo: ...it's a bit confusing having to validate in different places. e.g. in authors component not sure if need to check if translation is valid.
+// todo: maybe come back to after building out subjects, etc.
+
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
@@ -133,13 +137,22 @@ export const getStaticProps: GetStaticProps<
     },
   })
 
+  const processedTranslationLanguageIds = mapLanguageIds(
+    processedArticle.translations
+  )
+  const processedTranslationLanguages = processedTranslationLanguageIds.map(
+    (languageId) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      validLanguages.find((language) => language.id === languageId)!
+  )
+
   const pageData: StaticData = {
     article: processedArticle,
     childEntities: {
       authors: validAuthors,
       collections: validCollections,
       images: articleImageIds.length ? await fetchImages(articleImageIds) : [],
-      languages: validLanguages,
+      languages: processedTranslationLanguages,
       subjects: validSubjects,
       tags: validTags,
     },

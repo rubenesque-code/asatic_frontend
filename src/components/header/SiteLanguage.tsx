@@ -1,9 +1,12 @@
-import tw from 'twin.macro'
-import { TranslateIcon } from '^components/Icons'
-import { useSiteLanguageContext } from '^context/SiteLanguage'
+import tw from "twin.macro"
+import { TranslateIcon } from "^components/Icons"
+import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 const SiteLanguage = () => {
-  const { siteLanguage, toggleSiteLanguage } = useSiteLanguageContext()
+  const {
+    siteLanguageId: siteLanguage,
+    toggleSiteLanguage: toggleSiteLanguage,
+  } = useSiteLanguageContext()
 
   return (
     <div css={[tw`flex gap-xs`]}>
@@ -15,7 +18,7 @@ const SiteLanguage = () => {
         onClick={toggleSiteLanguage}
         type="button"
       >
-        <span>{siteLanguage === 'english' ? 'Tamil' : 'English'}</span>
+        <span>{siteLanguage === "english" ? "Tamil" : "English"}</span>
       </button>
     </div>
   )

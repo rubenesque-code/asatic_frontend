@@ -1,14 +1,14 @@
-import { TwStyle } from 'twin.macro'
+import { TwStyle } from "twin.macro"
+import { findTranslation } from "^helpers/data"
 
-import { Author } from '^types/author'
-import { Language } from '^types/language'
+import { Author, Language } from "^types/entities"
 
 export const Authors_ = ({
   authors,
-  selectedLanguage,
+  documentLanguage,
   styles,
 }: {
-  selectedLanguage: Language
+  documentLanguage: Language
   authors: Author[]
   styles: TwStyle
 }) => {
@@ -17,11 +17,9 @@ export const Authors_ = ({
   }
 
   const authorsForSelectedLanguage = authors
-    .map((author) =>
-      author.translations.find((t) => t.languageId === selectedLanguage.id)
-    )
+    .map((author) => findTranslation(author.translations, documentLanguage.id))
     .flatMap((authorTranslation) =>
-      authorTranslation?.name ? [authorTranslation] : []
+      authorTranslation?.name?.length ? [authorTranslation] : []
     )
 
   if (!authorsForSelectedLanguage.length) {
@@ -33,7 +31,7 @@ export const Authors_ = ({
       {authorsForSelectedLanguage.map((authorTranslation, i) => (
         <h4 key={authorTranslation.id}>
           {authorTranslation.name}
-          {i !== authorsForSelectedLanguage.length - 1 ? ',' : ''}
+          {i !== authorsForSelectedLanguage.length - 1 ? "," : ""}
         </h4>
       ))}
     </div>

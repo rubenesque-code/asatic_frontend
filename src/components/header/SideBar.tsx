@@ -52,7 +52,7 @@ const CloseButton = () => (
 )
 
 const Content = () => {
-  const { siteLanguage } = useSiteLanguageContext()
+  const { siteLanguageId: siteLanguage } = useSiteLanguageContext()
 
   const pageLinks = [
     {
