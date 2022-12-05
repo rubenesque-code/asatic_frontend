@@ -87,16 +87,13 @@ const Content = (subjectsProp: SubjectsProp) => {
 
 export default SideBar
 
+const $text = tw`font-serif-body capitalize text-lg text-gray-700 transition-colors ease-in-out`
+const $link = tw`hover:text-blue-900 cursor-pointer`
+
 const PageLink = ({ label, route }: { label: string; route: string }) => {
   return (
     <Link href={route}>
-      <div
-        css={[
-          tw`font-serif-body capitalize text-lg cursor-pointer text-gray-700 hover:text-blue-900 transition-colors`,
-        ]}
-      >
-        {label}
-      </div>
+      <div css={[$text, $link]}>{label}</div>
     </Link>
   )
 }
@@ -111,18 +108,18 @@ const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
         className="group"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span
-          css={[
-            tw`font-serif-body capitalize text-lg cursor-pointer text-gray-700 group-hover:text-gray-900 transition-colors`,
-          ]}
-        >
-          Subjects
-        </span>
+        <span css={[$text, tw`group-hover:text-gray-900`]}>Subjects</span>
         <span css={[tw`group-hover:bg-gray-50 rounded-full p-xxxs`]}>
           {isExpanded ? <CaretUp /> : <CaretDown />}
         </span>
       </div>
-      <div css={[tw`flex flex-col gap-sm`]}>
+      <div
+        css={[
+          tw`ml-sm flex flex-col gap-sm mt-md`,
+          !isExpanded ? tw`max-h-0 opacity-10` : tw`max-h-full opacity-100`,
+          tw`overflow-hidden transition-all ease-in-out duration-150`,
+        ]}
+      >
         {subjects.map((subject) => (
           <Subject subject={subject} key={subject.id} />
         ))}
@@ -148,7 +145,7 @@ const Subject = ({ subject }: { subject: SanitisedSubject }) => {
 
   return (
     <Link href={`/subjects/${subject.id}`} passHref>
-      <div>{translationForSiteLanguage.title}</div>
+      <div css={[$text, $link]}>{translationForSiteLanguage.title}</div>
     </Link>
   )
 }
