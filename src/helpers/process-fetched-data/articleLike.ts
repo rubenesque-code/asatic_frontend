@@ -1,6 +1,6 @@
 import produce from "immer"
 import {
-  Blog,
+  DbBlog,
   ArticleLikeTranslation,
   ArticleLikeChildEntitiesKeysTuple,
   ArticleLikeChildEntityFields,
@@ -47,7 +47,7 @@ function validateTranslation(
 }
 
 export function validateArticleLikeEntity<
-  TEntity extends SanitisedArticle | Blog
+  TEntity extends SanitisedArticle | DbBlog
 >(entity: TEntity, validLanguageIds: string[]): boolean {
   const validTranslation = entity.translations.find((translation) =>
     validateTranslation(translation, validLanguageIds)
@@ -76,7 +76,7 @@ const removeInvalidChildEntityIds = ({
 
 /**Used within getStaticProps after validation has occurred in getStaticPaths  */
 export function processValidatedArticleLikeEntity<
-  TEntity extends SanitisedArticle | Blog
+  TEntity extends SanitisedArticle | DbBlog
 >({
   entity,
   validRelatedEntitiesIds,

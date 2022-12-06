@@ -8,7 +8,6 @@ import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { findTranslation } from "^helpers/data"
-import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { SanitisedSubject } from "^types/entities"
 
 export type SideBarProps = SubjectsProp
@@ -100,6 +99,10 @@ const PageLink = ({ label, route }: { label: string; route: string }) => {
 
 const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
   const [isExpanded, setIsExpanded] = useState(false)
+
+  if (!subjects.length) {
+    return null
+  }
 
   return (
     <div>
