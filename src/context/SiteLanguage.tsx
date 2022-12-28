@@ -12,39 +12,32 @@ export type SiteLanguage = SiteLanguageHelper<
   { id: "english"; name: "English" } | { id: "tamil"; name: "Tamil" }
 >
 
+type RouterQuery = {
+  id: string
+  siteLanguageId?: SiteLanguageId
+}
+
 type Value = {
   siteLanguage: SiteLanguage
-  toggleSiteLanguage: () => void
 }
 
 const Context = createContext({} as Value)
 
 const SiteLanguageProvider = ({ children }: { children: ReactElement }) => {
   const router = useRouter()
-  const routerQueryLanguageId = router.query?.sitelang as
-    | undefined
-    | SiteLanguageId
+  console.log("router:", router)
+  const routerQuery = router.query as RouterQuery
 
-  const siteLanguage: SiteLanguage =
-    routerQueryLanguageId === "tamil"
+  // defaults to english
+  const currentSiteLanguage: SiteLanguage =
+    routerQuery.siteLanguageId === "tamil"
       ? { id: "tamil", name: "Tamil" }
       : { id: "english", name: "English" }
-
-  const toggleSiteLanguage = () => {
-    router.push({
-      ...router,
-      query: {
-        ...router.query,
-        siteLanguageId: siteLanguage.id,
-      },
-    })
-  }
 
   return (
     <Context.Provider
       value={{
-        toggleSiteLanguage,
-        siteLanguage,
+        siteLanguage: currentSiteLanguage,
       }}
     >
       {children}
