@@ -33,3 +33,12 @@ export function validateCollectionAsChild(
 
   return true
 }
+
+export function filterValidCollectionsAsChildren(
+  collections: Collection[],
+  validLanguageIds: string[]
+) {
+  return collections.filter(async (collection) =>
+    validateCollectionAsChild(collection, validLanguageIds)
+  )
+}

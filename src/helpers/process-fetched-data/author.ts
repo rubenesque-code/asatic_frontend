@@ -24,3 +24,12 @@ export function validateAuthorAsChild(
 
   return true
 }
+
+export function filterValidAuthorsAsChildren(
+  authors: Author[],
+  validLanguageIds: string[]
+) {
+  return authors.filter(async (author) =>
+    validateAuthorAsChild(author, validLanguageIds)
+  )
+}

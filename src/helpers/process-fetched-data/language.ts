@@ -6,3 +6,11 @@ export function validateLanguage(language: Language) {
   }
   return true
 }
+
+export function filterValidLanguages(languages: Language[]) {
+  const validLanguages = languages.filter((language) =>
+    validateLanguage(language)
+  )
+
+  return validLanguages
+}

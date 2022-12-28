@@ -2,26 +2,26 @@ import {
   EntityGlobalFields,
   EntityNameTupleSubset,
   RelatedDisplayEntityFields,
-} from "./entity";
-import { Translations } from "./entity-translation";
-import { TupleToUnion } from "./utilities";
+} from "./entity"
+import { Translations } from "./entity-translation"
+import { TupleToUnion } from "./utilities"
 
 export type RecordedEventTypeRelatedEntityTuple =
-  EntityNameTupleSubset<"recordedEvent">;
+  EntityNameTupleSubset<"recordedEvent">
 
 export type RecordedEventTypeRelatedEntity =
-  TupleToUnion<RecordedEventTypeRelatedEntityTuple>;
+  TupleToUnion<RecordedEventTypeRelatedEntityTuple>
 
 export type RecordedEventType = EntityGlobalFields<"recordedEventType"> &
   RelatedDisplayEntityFields<RecordedEventTypeRelatedEntity> &
-  Translations<RecordedEventTypeTranslationFields>;
+  Translations<RecordedEventTypeTranslationFields>
 
 type RecordedEventTypeTranslationFields = {
-  name?: string;
-};
+  name?: string
+}
 
 export type RecordedEventTypeTranslation =
-  RecordedEventType["translations"][number];
+  RecordedEventType["translations"][number]
 
 /*  const r: RecordedEventType = {
   id: "",
