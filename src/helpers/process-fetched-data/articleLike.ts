@@ -59,6 +59,14 @@ export function validateArticleLikeEntity<
 
   return true
 }
+export function filterValidArticleLikeEntity(
+  entities: (SanitisedArticle | SanitisedBlog)[],
+  validLanguageIds: string[]
+) {
+  return entities.filter((entity) =>
+    validateArticleLikeEntity(entity, validLanguageIds)
+  )
+}
 
 const removeInvalidChildEntityIds = ({
   childEntityIdArr,

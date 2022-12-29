@@ -1,3 +1,4 @@
+import { removeArrDuplicates } from "^helpers/general"
 import { mapLanguageIds } from "../data"
 
 export function mapEntitiesLanguageIds<
@@ -12,4 +13,15 @@ export function mapEntityLanguageIds<
   TEntity extends { translations: TTranslation[] }
 >(entity: TEntity) {
   return mapLanguageIds(entity.translations)
+}
+
+export function getUniqueChildEntityIdsOfParents<
+  TParent extends { [k in TKey]: TArr },
+  TKey extends keyof TParent,
+  TArr extends string[]
+>(parents: TParent[], key: TKey) {
+  const ids = parents.flatMap((parent) => parent[key])
+  const uniqueIds = removeArrDuplicates(ids)
+
+  return uniqueIds
 }

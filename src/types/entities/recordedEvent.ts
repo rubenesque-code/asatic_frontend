@@ -1,49 +1,67 @@
+import { MyOmit } from "^types/utilities"
 import {
   EntityGlobalFields,
+  EntityNameToChildKeyTuple,
   EntityNameTupleSubset,
   MediaFields,
   PublishFields,
   RelatedEntityFields,
   SaveFields,
-} from "./entity";
+} from "./entity"
 import {
   LandingCustomSectionImageField,
   SummaryImageField,
-} from "./entity-image";
-import { DisplayEntityStatus } from "./entity-status";
-import { RichText, TranslationField, Translations } from "./entity-translation";
-import { TupleToUnion } from "./utilities";
+} from "./entity-image"
+import { DisplayEntityStatus } from "./entity-status"
+import { RichText, TranslationField, Translations } from "./entity-translation"
+import { TupleToUnion } from "./utilities"
 
 type RecordedEventTranslationFields = TranslationField<"title"> & {
-  body?: RichText;
-};
+  body?: RichText
+}
 
-export type RecordedEvent = EntityGlobalFields<"recordedEvent"> &
+export type RecordedEventTranslation = DbRecordedEvent["translations"][number]
+
+export type RecordedEventRelatedEntityTuple = EntityNameTupleSubset<
+  "author" | "collection" | "recordedEventType" | "subject" | "tag"
+>
+export type RecordedEventRelatedEntity =
+  TupleToUnion<RecordedEventRelatedEntityTuple>
+
+export type MissingRecordedEventRequirement =
+  | "no video"
+  | "no valid translation"
+  | "no video type"
+
+export type RecordedEventStatus = DisplayEntityStatus<
+  RecordedEventRelatedEntity,
+  MissingRecordedEventRequirement
+>
+
+export type DbRecordedEvent = EntityGlobalFields<"recordedEvent"> &
   MediaFields<"youtubeId"> &
   RelatedEntityFields<RecordedEventRelatedEntity> &
   PublishFields &
   SaveFields &
   Translations<RecordedEventTranslationFields> &
   SummaryImageField<"isNotToggleable"> &
-  LandingCustomSectionImageField;
+  LandingCustomSectionImageField
 
-export type RecordedEventTranslation = RecordedEvent["translations"][number];
+export type FetchedRecordedEvent = MyOmit<DbRecordedEvent, "publishStatus">
 
-export type RecordedEventRelatedEntityTuple = EntityNameTupleSubset<
-  "author" | "collection" | "recordedEventType" | "subject" | "tag"
->;
-export type RecordedEventRelatedEntity =
-  TupleToUnion<RecordedEventRelatedEntityTuple>;
+export type SanitisedRecordedEvent = MyOmit<
+  FetchedRecordedEvent,
+  "lastSave" | "publishDate"
+> & { publishDate: string }
 
-export type MissingRecordedEventRequirement =
-  | "no video"
-  | "no valid translation"
-  | "no video type";
+export type RecordedEventChildEntityFields =
+  RelatedEntityFields<RecordedEventRelatedEntityUnion>
 
-export type RecordedEventStatus = DisplayEntityStatus<
-  RecordedEventRelatedEntity,
-  MissingRecordedEventRequirement
->;
+export type RecordedEventRelatedEntityUnion =
+  TupleToUnion<RecordedEventRelatedEntityTuple>
+
+export type RecordedEventChildEntitiesKeysTuple =
+  EntityNameToChildKeyTuple<RecordedEventRelatedEntityTuple>
 
 /*
 const r: RecordedEvent = {

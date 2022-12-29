@@ -73,3 +73,18 @@ export function validateSubject(
 
   return true
 }
+
+export function filterValidSubjects(
+  subjects: SanitisedSubject[],
+  validRelatedEntities: {
+    languageIds: string[]
+    articleIds: string[]
+    blogIds: string[]
+    collectionIds: string[]
+    recordedEventIds: string[]
+  }
+) {
+  return subjects.filter((subject) =>
+    validateSubject(subject, validRelatedEntities)
+  )
+}

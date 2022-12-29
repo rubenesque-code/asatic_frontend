@@ -1,37 +1,14 @@
 import produce from "immer"
 import {
-  ArticleLikeTranslation,
-  ArticleLikeChildEntitiesKeysTuple,
-  ArticleLikeChildEntityFields,
-  SanitisedArticle,
-  SanitisedBlog,
+  SanitisedRecordedEvent,
+  RecordedEventTranslation,
+  RecordedEventChildEntityFields,
+  RecordedEventChildEntitiesKeysTuple,
 } from "^types/entities"
-
-export function getArticleLikeDocumentImageIds(
-  articleLikeTranslations: ArticleLikeTranslation[]
-) {
-  const imageIds = articleLikeTranslations
-    .flatMap((t) => t.body)
-    .flatMap((s) => (s.type === "image" ? [s] : []))
-    .flatMap((s) => (s.image.imageId ? [s.image.imageId] : []))
-
-  const unique = Array.from(new Set(imageIds).values())
-
-  return unique
-}
-
-const checkTranslationHasText = (translation: ArticleLikeTranslation) => {
-  const textSections = translation.body.flatMap((section) =>
-    section.type === "text" ? [section] : []
-  )
-
-  const isSectionWithText = textSections.find((s) => s.text?.length)
-
-  return Boolean(isSectionWithText)
-}
+import { MyOmit } from "^types/utilities"
 
 function validateTranslation(
-  translation: ArticleLikeTranslation,
+  translation: RecordedEventTranslation,
   languageIds: string[]
 ) {
   if (!languageIds.includes(translation.languageId)) {
@@ -40,15 +17,20 @@ function validateTranslation(
   if (!translation.title?.length) {
     return false
   }
-  if (!checkTranslationHasText(translation)) {
-    return false
-  }
+
   return true
 }
 
-export function validateArticleLikeEntity<
-  TEntity extends SanitisedArticle | SanitisedBlog
->(entity: TEntity, validLanguageIds: string[]): boolean {
+export function validateRecordedEvent<TEntity extends SanitisedRecordedEvent>(
+  entity: TEntity,
+  validLanguageIds: string[]
+): boolean {
+  const isVideo = entity.youtubeId
+
+  if (!isVideo) {
+    return false
+  }
+
   const validTranslation = entity.translations.find((translation) =>
     validateTranslation(translation, validLanguageIds)
   )
@@ -59,24 +41,43 @@ export function validateArticleLikeEntity<
 
   return true
 }
+export function filterValidRecordedEvents(
+  recordedEvents: SanitisedRecordedEvent[],
+  validLanguageIds: string[]
+) {
+  return recordedEvents.filter((recordedEvent) =>
+    validateRecordedEvent(recordedEvent, validLanguageIds)
+  )
+}
 
 const removeInvalidChildEntityIds = ({
-  childEntityIdArr,
+  childEntityIdVals,
   validIdArr,
 }: {
-  childEntityIdArr: string[]
+  childEntityIdVals: string[] | string | null | undefined
   validIdArr: string[]
 }) => {
-  childEntityIdArr.forEach((id, i) => {
+  if (!Array.isArray(childEntityIdVals)) {
+    if (!childEntityIdVals) {
+      return
+    }
+    if (!validIdArr.includes(childEntityIdVals)) {
+      childEntityIdVals = null
+      return
+    }
+    return
+  }
+  childEntityIdVals.forEach((id, i) => {
     if (!validIdArr.includes(id)) {
-      childEntityIdArr.splice(i, 1)
+      const valsAsserted = childEntityIdVals as string[]
+      valsAsserted.splice(i, 1)
     }
   })
 }
 
 /**Used within getStaticProps after validation has occurred in getStaticPaths  */
-export function processValidatedArticleLikeEntity<
-  TEntity extends SanitisedArticle | SanitisedBlog
+export function processValidatedRecordedEvent<
+  TEntity extends SanitisedRecordedEvent
 >({
   entity,
   validRelatedEntitiesIds,
@@ -84,7 +85,9 @@ export function processValidatedArticleLikeEntity<
   entity: TEntity
   validRelatedEntitiesIds: {
     languagesIds: string[]
-  } & ArticleLikeChildEntityFields
+  } & MyOmit<RecordedEventChildEntityFields, "recordedEventTypeId"> & {
+      recordedEventTypeId: string[]
+    }
 }) {
   const processed = produce(entity, (draft) => {
     for (let i = 0; i < draft.translations.length; i++) {
@@ -104,16 +107,17 @@ export function processValidatedArticleLikeEntity<
       // remove invalid translations: end ---
     }
 
-    const articleLikeChildKeysArr: ArticleLikeChildEntitiesKeysTuple = [
+    const childKeysArr: RecordedEventChildEntitiesKeysTuple = [
       "authorsIds",
       "collectionsIds",
+      "recordedEventTypeId",
       "subjectsIds",
       "tagsIds",
     ]
 
-    articleLikeChildKeysArr.forEach((key) =>
+    childKeysArr.forEach((key) =>
       removeInvalidChildEntityIds({
-        childEntityIdArr: draft[key],
+        childEntityIdVals: draft[key],
         validIdArr: validRelatedEntitiesIds[key],
       })
     )

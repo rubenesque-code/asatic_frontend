@@ -1,4 +1,4 @@
-import { Collection, CollectionTranslation } from "^types/entities"
+import { SanitisedCollection, CollectionTranslation } from "^types/entities"
 
 const validateTranslation = (
   translation: CollectionTranslation,
@@ -12,13 +12,9 @@ const validateTranslation = (
 }
 
 export function validateCollectionAsChild(
-  collection: Collection,
+  collection: SanitisedCollection,
   validLanguageIds: string[]
 ) {
-  if (collection.publishStatus !== "published") {
-    return false
-  }
-
   if (!collection.bannerImage.imageId) {
     return false
   }
@@ -34,8 +30,8 @@ export function validateCollectionAsChild(
   return true
 }
 
-export function filterValidCollectionsAsChildren(
-  collections: Collection[],
+export function filterValidCollections(
+  collections: SanitisedCollection[],
   validLanguageIds: string[]
 ) {
   return collections.filter(async (collection) =>

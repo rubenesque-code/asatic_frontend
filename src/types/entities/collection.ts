@@ -1,57 +1,64 @@
-import { DisplayEntityStatus, EntityAsChildStatus } from "./entity-status";
+import { DisplayEntityStatus, EntityAsChildStatus } from "./entity-status"
 import {
   EntityGlobalFields,
   EntityNameTupleSubset,
   PublishFields,
   RelatedEntityFields,
   SaveFields,
-} from "./entity";
+} from "./entity"
 import {
   RichText,
   SummaryField,
   TranslationField,
   Translations,
-} from "./entity-translation";
-import { ImageFields, SummaryImageField } from "./entity-image";
-import { TupleToUnion } from "./utilities";
-
-export type Collection = EntityGlobalFields<"collection"> & {
-  bannerImage: ImageFields<"id" | "y-position">;
-} & RelatedEntityFields<CollectionRelatedEntity> &
-  PublishFields &
-  SaveFields &
-  Translations<CollectionTranslationFields> &
-  SummaryImageField<"isNotToggleable">;
+} from "./entity-translation"
+import { ImageFields, SummaryImageField } from "./entity-image"
+import { TupleToUnion } from "./utilities"
+import { MyOmit } from "^types/utilities"
 
 type CollectionTranslationFields = TranslationField<"title"> & {
-  description?: RichText;
-} & SummaryField<"general">;
+  description?: RichText
+} & SummaryField<"general">
 
-export type CollectionTranslation = Collection["translations"][number];
+export type CollectionTranslation = DbCollection["translations"][number]
 
 export type CollectionRelatedEntityTuple = EntityNameTupleSubset<
   "article" | "blog" | "recordedEvent" | "subject" | "tag"
->;
+>
 
-export type CollectionRelatedEntity =
-  TupleToUnion<CollectionRelatedEntityTuple>;
+export type CollectionRelatedEntity = TupleToUnion<CollectionRelatedEntityTuple>
 
 export type InvalidReason =
   | "no banner image"
   | "no valid translation"
-  | "no valid related diplay entity";
+  | "no valid related diplay entity"
 
 export type CollectionStatus = DisplayEntityStatus<
   CollectionRelatedEntity,
   InvalidReason
->;
+>
 
 export type ChildCollectionMissingRequirement =
   | "no banner image"
-  | "no valid translation";
+  | "no valid translation"
 
 export type CollectionAsChildStatus =
-  EntityAsChildStatus<ChildCollectionMissingRequirement>;
+  EntityAsChildStatus<ChildCollectionMissingRequirement>
+
+export type DbCollection = EntityGlobalFields<"collection"> & {
+  bannerImage: ImageFields<"id" | "y-position">
+} & RelatedEntityFields<CollectionRelatedEntity> &
+  PublishFields &
+  SaveFields &
+  Translations<CollectionTranslationFields> &
+  SummaryImageField<"isNotToggleable">
+
+export type FetchedCollection = MyOmit<DbCollection, "publishStatus">
+
+export type SanitisedCollection = MyOmit<
+  FetchedCollection,
+  "lastSave" | "publishDate"
+> & { publishDate: string }
 
 /*
 const collection: Collection = {

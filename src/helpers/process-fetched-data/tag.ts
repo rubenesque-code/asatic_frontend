@@ -7,3 +7,7 @@ export function validateTagAsChild(tag: Tag) {
 
   return true
 }
+
+export function filterValidTags(tags: Tag[]) {
+  return tags.filter((tag) => validateTagAsChild(tag))
+}

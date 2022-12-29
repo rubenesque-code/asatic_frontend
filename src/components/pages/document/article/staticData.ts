@@ -4,42 +4,37 @@ import {
   fetchArticle,
   fetchArticles,
   fetchAuthors,
-  fetchBlogs,
   fetchCollections,
   fetchImages,
   fetchLanguages,
-  fetchRecordedEvents,
   fetchSubjects,
   fetchTags,
 } from "^lib/firebase/firestore"
 
 import {
   Author,
-  Collection,
   Image,
   Language,
   SanitisedArticle,
+  SanitisedCollection,
   SanitisedSubject,
-  Tag,
 } from "^types/entities"
 
-import { mapIds, mapLanguageIds } from "^helpers/data"
+import { mapIds } from "^helpers/data"
 import {
   getArticleLikeDocumentImageIds,
   mapEntitiesLanguageIds,
   validateArticleLikeEntity,
   processValidatedArticleLikeEntity,
-  validateAuthorAsChild,
-  validateCollectionAsChild,
   validateLanguage,
-  validateSubjectAsChild,
-  validateTagAsChild,
   mapEntityLanguageIds,
   filterValidLanguages,
   filterValidAuthorsAsChildren,
-  filterValidCollectionsAsChildren,
+  filterValidCollections,
+  filterValidTags,
 } from "^helpers/process-fetched-data"
-import { removeArrDuplicates } from "^helpers/general"
+import { filterArrAgainstControl } from "^helpers/general"
+import { fetchAndValidateSubjects } from "^helpers/static-data/global"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const publishedArticles = await fetchArticles()
@@ -85,11 +80,11 @@ export type StaticData = {
   article: SanitisedArticle
   childEntities: {
     authors: Author[]
-    collections: Collection[]
+    collections: SanitisedCollection[]
     images: Image[]
     languages: Language[]
-    subjects: SanitisedSubject[]
-    tags: Tag[]
+    // subjects: SanitisedSubject[]
+    // tags: Tag[]
   }
   header: {
     subjects: SanitisedSubject[]
@@ -107,191 +102,89 @@ export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
+  // - Global data: START ---
+
+  const allValidSubjects = await fetchAndValidateSubjects()
+
+  // - Global data: END ---
+
+  // - Page specific data: START ---
   // * won't get to this point if article doesn't exist, so below workaround for fetching article is fine
   const fetchedArticle = await fetchArticle(params?.id || "")
 
-  const languages = {
-    article: {
-      fetched: await fetchLanguages(mapEntityLanguageIds(fetchedArticle)),
-      valid() {
-        return filterValidLanguages(this.fetched)
-      },
-      validIds() {
-        return mapIds(this.valid())
-      },
-    },
+  const articleChildrenIds = {
+    languages: mapEntityLanguageIds(fetchedArticle),
+    images: getArticleLikeDocumentImageIds(fetchedArticle.translations),
+    authors: fetchedArticle.authorsIds,
+    collections: fetchedArticle.collectionsIds,
+    subjects: fetchedArticle.subjectsIds,
+    tags: fetchedArticle.tagsIds,
   }
 
-  const images = {
-    article: {
-      ids: getArticleLikeDocumentImageIds(fetchedArticle.translations),
-      async fetched() {
-        return !this.ids.length ? [] : await fetchImages(this.ids)
-      },
-    },
+  const articleChildrenFetched = {
+    languages: await fetchLanguages(articleChildrenIds.languages),
+    images: !articleChildrenIds.images.length
+      ? []
+      : await fetchImages(articleChildrenIds.images),
+    authors: !articleChildrenIds.authors.length
+      ? []
+      : await fetchAuthors(articleChildrenIds.authors),
+    collections: !articleChildrenIds.collections.length
+      ? []
+      : await fetchCollections(articleChildrenIds.collections),
+    subjects: !articleChildrenIds.subjects.length
+      ? []
+      : await fetchSubjects(articleChildrenIds.subjects),
+    tags: !articleChildrenIds.tags.length
+      ? []
+      : await fetchTags(articleChildrenIds.tags),
   }
 
-  const authors = {
-    article: {
-      ids: fetchedArticle.authorsIds,
-      async fetched() {
-        return !this.ids.length ? [] : await fetchAuthors(this.ids)
-      },
-      async valid() {
-        return filterValidAuthorsAsChildren(
-          await this.fetched(),
-          languages.article.validIds()
-        )
-      },
-      async validIds() {
-        return mapIds(await this.valid())
-      },
-    },
+  const articleValidLanguages = filterValidLanguages(
+    articleChildrenFetched.languages
+  )
+  const articleValidLanguagesIds = mapIds(articleValidLanguages)
+
+  const articleChildrenValidated = {
+    authors: filterValidAuthorsAsChildren(
+      articleChildrenFetched.authors,
+      articleValidLanguagesIds
+    ),
+    collections: filterValidCollections(
+      articleChildrenFetched.collections,
+      articleValidLanguagesIds
+    ),
+    tags: filterValidTags(articleChildrenFetched.tags),
   }
 
-  const collections = {
-    article: {
-      ids: fetchedArticle.collectionsIds,
-      async fetched() {
-        return !this.ids.length ? [] : await fetchCollections(this.ids)
-      },
-      async valid() {
-        return filterValidCollectionsAsChildren(
-          await this.fetched(),
-          languages.article.validIds()
-        )
-      },
-      async validIds() {
-        return mapIds(await this.valid())
-      },
-    },
-  }
-
-  //
-  const subjects = {
-    all: {
-      fetched: await fetchSubjects(),
-      async languages() {
-        const ids = removeArrDuplicates(
-          this.fetched.flatMap((subject) =>
-            subject.translations.flatMap((t) => t.languageId)
-          )
-        )
-        const fetched = await fetchLanguages(ids)
-        const valid = filterValidLanguages(fetched)
-
-        return { valid, validIds: mapIds(valid) }
-      },
-      async articles() {
-        const ids = removeArrDuplicates(
-          this.fetched.flatMap((subject) => subject.articlesIds)
-        )
-        const fetched = await fetchArticles(ids)
-
-        const validLanguagesIds = (await this.languages()).validIds
-
-        const valid = fetched.filter(async (article) =>
-          validateArticleLikeEntity(article, validLanguagesIds)
-        )
-
-        return {
-          valid,
-          validIds: mapIds(valid),
-        }
-      },
-      async blogs() {
-        const ids = removeArrDuplicates(
-          this.fetched.flatMap((subject) => subject.blogsIds)
-        )
-        const fetched = await fetchBlogs(ids)
-
-        const validLanguagesIds = (await this.languages()).validIds
-
-        const valid = fetched.filter(async (blog) =>
-          validateArticleLikeEntity(blog, validLanguagesIds)
-        )
-
-        return {
-          valid,
-          validIds: mapIds(valid),
-        }
-      },
-      async collections() {
-        const ids = removeArrDuplicates(
-          this.fetched.flatMap((subject) => subject.collectionsIds)
-        )
-        const fetched = await fetchCollections(ids)
-
-        const validLanguagesIds = (await this.languages()).validIds
-
-        const valid = fetched.filter(async (blog) =>
-          validateCollectionAsChild(blog, validLanguagesIds)
-        )
-
-        return {
-          valid,
-          validIds: mapIds(valid),
-        }
-      },
-      async recordedEvents() {
-        const ids = removeArrDuplicates(
-          this.fetched.flatMap((subject) => subject.recordedEventsIds)
-        )
-        const fetched = await fetchRecordedEvents(ids)
-
-        const validLanguagesIds = (await this.languages()).validIds
-
-        const valid = fetched.filter(async (blog) =>
-          validrecord(blog, validLanguagesIds)
-        )
-
-        return {
-          valid,
-          validIds: mapIds(valid),
-        }
-      },
-    },
-  }
-
-  // todo: e.g. article.subjectIds doesn't necessarily map to a subject
-
-  /*   const tags = fetchedArticle.tagsIds.length
-    ? await fetchTags(fetchedArticle.tagsIds)
-    : []
-  const validTags = tags.filter((tag) => validateTagAsChild(tag)) */
-
+  // should remove invalid image sections too
   const processedArticle = processValidatedArticleLikeEntity({
     entity: fetchedArticle,
     validRelatedEntitiesIds: {
-      languagesIds: languages.article.validIds(),
-      authorsIds: await authors.article.validIds(),
-      collectionsIds: await collections.article.validIds(),
-      subjectsIds: mapIds(validArticleSubjects),
-      // tagsIds: mapIds(validTags),
+      languagesIds: articleValidLanguagesIds,
+      authorsIds: mapIds(articleChildrenValidated.authors),
+      collectionsIds: mapIds(articleChildrenValidated.collections),
+      subjectsIds: filterArrAgainstControl(
+        mapIds(articleChildrenFetched.subjects),
+        mapIds(allValidSubjects)
+      ),
+      tagsIds: mapIds(articleChildrenValidated.tags),
     },
   })
-
-  const processedTranslationLanguageIds = mapLanguageIds(
-    processedArticle.translations
-  )
-  const processedTranslationLanguages = processedTranslationLanguageIds.map(
-    (languageId) =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      languages.article.valid().find((language) => language.id === languageId)!
-  )
+  // - Page specific data: END ---
 
   const pageData: StaticData = {
     article: processedArticle,
     childEntities: {
-      authors: await authors.article.valid(),
-      collections: await collections.article.valid(),
-      images: await images.article.fetched(),
-      languages: processedTranslationLanguages,
+      authors: articleChildrenValidated.authors,
+      collections: articleChildrenValidated.collections,
+      images: articleChildrenFetched.images,
+      languages: articleValidLanguages,
       // subjects: validArticleSubjects,
       // tags: validTags,
     },
     header: {
-      subjects: validArticleSubjects,
+      subjects: allValidSubjects,
     },
   }
 
