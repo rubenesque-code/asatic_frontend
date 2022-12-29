@@ -3,7 +3,8 @@ import {
   SanitisedRecordedEvent,
   RecordedEventTranslation,
   RecordedEventChildEntityFields,
-  RecordedEventChildEntitiesKeysTuple,
+  EntityNameToChildKeyTuple,
+  EntityNameTupleSubset,
 } from "^types/entities"
 import { MyOmit } from "^types/utilities"
 
@@ -51,26 +52,15 @@ export function filterValidRecordedEvents(
 }
 
 const removeInvalidChildEntityIds = ({
-  childEntityIdVals,
+  childEntityIdArr,
   validIdArr,
 }: {
-  childEntityIdVals: string[] | string | null | undefined
+  childEntityIdArr: string[]
   validIdArr: string[]
 }) => {
-  if (!Array.isArray(childEntityIdVals)) {
-    if (!childEntityIdVals) {
-      return
-    }
-    if (!validIdArr.includes(childEntityIdVals)) {
-      childEntityIdVals = null
-      return
-    }
-    return
-  }
-  childEntityIdVals.forEach((id, i) => {
+  childEntityIdArr.forEach((id, i) => {
     if (!validIdArr.includes(id)) {
-      const valsAsserted = childEntityIdVals as string[]
-      valsAsserted.splice(i, 1)
+      childEntityIdArr.splice(i, 1)
     }
   })
 }
@@ -80,14 +70,17 @@ export function processValidatedRecordedEvent<
   TEntity extends SanitisedRecordedEvent
 >({
   entity,
+  validLanguageIds,
   validRelatedEntitiesIds,
+  recordedEventTypeIsValid,
 }: {
   entity: TEntity
-  validRelatedEntitiesIds: {
-    languagesIds: string[]
-  } & MyOmit<RecordedEventChildEntityFields, "recordedEventTypeId"> & {
-      recordedEventTypeId: string[]
-    }
+  validLanguageIds: string[]
+  validRelatedEntitiesIds: MyOmit<
+    RecordedEventChildEntityFields,
+    "recordedEventTypeId"
+  >
+  recordedEventTypeIsValid: boolean
 }) {
   const processed = produce(entity, (draft) => {
     for (let i = 0; i < draft.translations.length; i++) {
@@ -95,7 +88,7 @@ export function processValidatedRecordedEvent<
       // remove invalid translations: start ---
       const translationIsValid = validateTranslation(
         translation,
-        validRelatedEntitiesIds.languagesIds
+        validLanguageIds
       )
 
       if (!translationIsValid) {
@@ -107,17 +100,24 @@ export function processValidatedRecordedEvent<
       // remove invalid translations: end ---
     }
 
-    const childKeysArr: RecordedEventChildEntitiesKeysTuple = [
+    if (!recordedEventTypeIsValid) {
+      draft.recordedEventTypeId = null
+    }
+
+    type ChildKeysArr = EntityNameToChildKeyTuple<
+      EntityNameTupleSubset<"author" | "collection" | "subject" | "tag">
+    >
+
+    const childKeysArr: ChildKeysArr = [
       "authorsIds",
       "collectionsIds",
-      "recordedEventTypeId",
       "subjectsIds",
       "tagsIds",
     ]
 
     childKeysArr.forEach((key) =>
       removeInvalidChildEntityIds({
-        childEntityIdVals: draft[key],
+        childEntityIdArr: draft[key],
         validIdArr: validRelatedEntitiesIds[key],
       })
     )

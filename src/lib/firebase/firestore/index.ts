@@ -125,6 +125,9 @@ export const fetchCollections = async (ids?: string[]) => {
   return sanitised
 }
 
+export const fetchImage = async (id: string) =>
+  (await fetchFirestoreDocument("images", id)) as Image
+
 export const fetchImages = async (ids: string[]) =>
   (await fetchFirestoreDocuments("images", ids)) as Image[]
 
@@ -163,8 +166,14 @@ export const fetchRecordedEvents = async (ids?: string[]) => {
   return sanitised
 }
 
-export const fetchRecordedEventTypes = async () =>
-  (await fetchFirestoreCollection("recordedEventTypes")) as RecordedEventType[]
+export const fetchRecordedEventType = async (docId: string) => {
+  const firestoreDoc = (await fetchFirestoreDocument(
+    firestore_collection_key.recordedeventtypes,
+    docId
+  )) as RecordedEventType
+
+  return firestoreDoc
+}
 
 export const fetchSubject = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
