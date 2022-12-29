@@ -6,6 +6,7 @@ import { $BodyContainer_ } from "^page-presentation"
 import { Languages_ } from "^page-container"
 import Header from "^components/header"
 import ContributorHeader from "./body/Header"
+import ContributorBody from "./body/Body"
 
 const PageContent = ({ author, childEntities, header }: StaticData) => {
   const { documentLanguage, setDocumentLanguage } =
@@ -31,6 +32,7 @@ const PageContent = ({ author, childEntities, header }: StaticData) => {
             />
           }
         />
+        <ContributorBody />
         {/* <Body body={translation.body} images={childEntities.images} /> */}
       </$BodyContainer_>
     </div>

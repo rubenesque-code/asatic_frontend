@@ -1,9 +1,9 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
 import {
-  fetchArticle,
-  fetchArticles,
   fetchAuthors,
+  fetchBlog,
+  fetchBlogs,
   fetchCollections,
   fetchImages,
   fetchLanguages,
@@ -13,58 +13,60 @@ import {
 
 import {
   Author,
-  Collection,
   Image,
   Language,
-  SanitisedArticle,
+  SanitisedBlog,
+  SanitisedCollection,
   SanitisedSubject,
-  Tag,
 } from "^types/entities"
 
-import { mapIds, mapLanguageIds } from "^helpers/data"
+import { mapIds } from "^helpers/data"
 import {
   getArticleLikeDocumentImageIds,
   mapEntitiesLanguageIds,
-  validateArticleLikeEntity,
   processValidatedArticleLikeEntity,
-  validateAuthorAsChild,
-  validateCollectionAsChild,
-  validateLanguage,
-  validateSubjectAsChild,
-  validateTagAsChild,
+  filterValidAuthorsAsChildren,
+  filterValidCollections,
+  filterValidTags,
+  filterValidLanguages,
+  filterValidArticleLikeEntities,
+  mapEntityLanguageIds,
 } from "^helpers/process-fetched-data"
+import { filterArrAgainstControl } from "^helpers/general"
+import {
+  fetchAndValidateLanguages,
+  fetchAndValidateSubjects,
+} from "^helpers/static-data/global"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const publishedArticles = await fetchArticles()
+  const publishedBlogs = await fetchBlogs()
 
-  if (!publishedArticles.length) {
+  if (!publishedBlogs.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
-  const articleLanguages = await fetchLanguages(articleLanguageIds)
+  const blogLanguageIds = mapEntitiesLanguageIds(publishedBlogs)
+  const blogLanguages = await fetchLanguages(blogLanguageIds)
+  const blogValidLanguages = filterValidLanguages(blogLanguages)
 
-  const validLanguages = articleLanguages.filter((language) =>
-    validateLanguage(language)
+  const validBlogs = filterValidArticleLikeEntities(
+    publishedBlogs,
+    mapIds(blogValidLanguages)
   )
 
-  const validArticles = publishedArticles.filter((article) =>
-    validateArticleLikeEntity(article, mapIds(validLanguages))
-  )
-
-  if (!validArticles.length) {
+  if (!validBlogs.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const paths = validArticles.map((article) => ({
+  const paths = validBlogs.map((blog) => ({
     params: {
-      id: article.id,
+      id: blog.id,
     },
   }))
 
@@ -75,101 +77,104 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  article: SanitisedArticle
+  blog: SanitisedBlog
   childEntities: {
     authors: Author[]
-    collections: Collection[]
+    collections: SanitisedCollection[]
     images: Image[]
     languages: Language[]
-    subjects: SanitisedSubject[]
-    tags: Tag[]
+    // subjects: SanitisedSubject[]
+    // tags: Tag[]
   }
   header: {
     subjects: SanitisedSubject[]
   }
 }
 
-// todo: should process sub entities as well? e.g. remove author translations without a name with length. Then need an updated, processed Type.
-// todo: ...it's a bit confusing having to validate in different places. e.g. in authors component not sure if need to check if translation is valid.
-// todo: maybe come back to after building out subjects, etc.
-
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
-  // * won't get to this point if article doesn't exist (true?), so below workaround for fetching article is fine
-  const article = await fetchArticle(params?.id || "")
+  // - Global data: START ---
 
-  const articleLanguageIds = mapLanguageIds(article.translations)
-  console.log("articleLanguageIds:", articleLanguageIds)
-  const articleLanguages = await fetchLanguages(articleLanguageIds)
-  const validLanguages = articleLanguages.filter((language) =>
-    validateLanguage(language)
-  )
-  const validLanguageIds = mapIds(validLanguages)
+  const allValidSubjects = await fetchAndValidateSubjects()
+  const allValidLanguages = await fetchAndValidateLanguages()
+  const allValidLanguagesIds = mapIds(allValidLanguages)
 
-  const articleImageIds = getArticleLikeDocumentImageIds(article.translations)
+  // - Global data: END ---
 
-  const authors = article.authorsIds.length
-    ? await fetchAuthors(article.authorsIds)
-    : []
-  const validAuthors = authors.filter((author) =>
-    validateAuthorAsChild(author, validLanguageIds)
-  )
+  // - Page specific data: START ---
+  const fetchedBlog = await fetchBlog(params?.id || "")
 
-  const collections = article.collectionsIds.length
-    ? await fetchCollections(article.collectionsIds)
-    : []
-  const validCollections = collections.filter((collection) =>
-    validateCollectionAsChild(collection, validLanguageIds)
-  )
+  const blogChildrenIds = {
+    languages: mapEntityLanguageIds(fetchedBlog),
+    images: getArticleLikeDocumentImageIds(fetchedBlog.translations),
+    authors: fetchedBlog.authorsIds,
+    collections: fetchedBlog.collectionsIds,
+    subjects: fetchedBlog.subjectsIds,
+    tags: fetchedBlog.tagsIds,
+  }
 
-  // todo: e.g. article.subjectIds doesn't necessarily map to a subject
-  const allSubjects = await fetchSubjects()
-  const allValidSubjects = allSubjects.filter((subject) =>
-    validateSubjectAsChild(subject, validLanguageIds)
-  )
-  const validArticleSubjects = article.subjectsIds
-    .map((subjectId) =>
-      allValidSubjects.find((subject) => subject.id === subjectId)
-    )
-    .flatMap((subject) => (subject ? [subject] : []))
+  const blogChildrenFetched = {
+    images: !blogChildrenIds.images.length
+      ? []
+      : await fetchImages(blogChildrenIds.images),
+    authors: !blogChildrenIds.authors.length
+      ? []
+      : await fetchAuthors(blogChildrenIds.authors),
+    collections: !blogChildrenIds.collections.length
+      ? []
+      : await fetchCollections(blogChildrenIds.collections),
+    subjects: !blogChildrenIds.subjects.length
+      ? []
+      : await fetchSubjects(blogChildrenIds.subjects),
+    tags: !blogChildrenIds.tags.length
+      ? []
+      : await fetchTags(blogChildrenIds.tags),
+  }
 
-  const tags = article.tagsIds.length ? await fetchTags(article.tagsIds) : []
-  const validTags = tags.filter((tag) => validateTagAsChild(tag))
+  const blogChildrenValidated = {
+    languages: blogChildrenIds.languages
+      .filter((blogLanguageId) => allValidLanguagesIds.includes(blogLanguageId))
+      .map((blogLanguageId) =>
+        allValidLanguages.find((language) => language.id === blogLanguageId)
+      )
+      .flatMap((language) => (language ? [language] : [])),
+    authors: filterValidAuthorsAsChildren(
+      blogChildrenFetched.authors,
+      allValidLanguagesIds
+    ),
+    collections: filterValidCollections(
+      blogChildrenFetched.collections,
+      allValidLanguagesIds
+    ),
+    tags: filterValidTags(blogChildrenFetched.tags),
+  }
 
-  const processedArticle = processValidatedArticleLikeEntity({
-    entity: article,
+  // should remove invalid image sections too (without corresponding fetched image)
+  const processedBlog = processValidatedArticleLikeEntity({
+    entity: fetchedBlog,
+    validLanguageIds: allValidLanguagesIds,
     validRelatedEntitiesIds: {
-      languagesIds: validLanguageIds,
-      authorsIds: mapIds(validAuthors),
-      collectionsIds: mapIds(validCollections),
-      subjectsIds: mapIds(validArticleSubjects),
-      tagsIds: mapIds(validTags),
+      authorsIds: mapIds(blogChildrenValidated.authors),
+      collectionsIds: mapIds(blogChildrenValidated.collections),
+      subjectsIds: filterArrAgainstControl(
+        mapIds(blogChildrenFetched.subjects),
+        mapIds(allValidSubjects)
+      ),
+      tagsIds: mapIds(blogChildrenValidated.tags),
     },
   })
-
-  const processedTranslationLanguageIds = mapLanguageIds(
-    processedArticle.translations
-  )
-  const processedTranslationLanguages = processedTranslationLanguageIds.map(
-    (languageId) =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      validLanguages.find((language) => language.id === languageId)!
-  )
+  // - Page specific data: END ---
 
   const pageData: StaticData = {
-    article: processedArticle,
+    blog: processedBlog,
     childEntities: {
-      authors: validAuthors,
-      collections: validCollections,
-      images: articleImageIds.length ? await fetchImages(articleImageIds) : [],
-      languages: processedTranslationLanguages,
-      subjects: validArticleSubjects,
-      tags: validTags,
+      ...blogChildrenValidated,
+      images: blogChildrenFetched.images,
     },
     header: {
-      subjects: validArticleSubjects,
+      subjects: allValidSubjects,
     },
   }
 

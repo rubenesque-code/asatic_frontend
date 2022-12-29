@@ -7,6 +7,6 @@ export const $BodyContainer_ = ({
   children: ReactElement | ReactElement[]
 }) => (
   <div css={[tw`flex justify-center px-sm mt-2xl`]}>
-    <div css={[tw`max-w-[628.41px]`]}>{children}</div>
+    <div css={[tw`w-full max-w-[628.41px]`]}>{children}</div>
   </div>
 )

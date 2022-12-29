@@ -1,4 +1,5 @@
 import { ReactElement } from "react"
+import tw from "twin.macro"
 
 type Props = {
   languages: ReactElement
@@ -6,12 +7,15 @@ type Props = {
     name: string
   }
 }
+
+const $Name = tw.h1`text-3xl text-gray-900 font-documentTitle line-height[1.5em]`
+
 const ContributorHeader = ({ languages, contributor }: Props) => {
   return (
-    <div>
+    <div css={[tw`pb-xl`]}>
       <div>{languages}</div>
       <div>
-        <h2>{contributor.name}</h2>
+        <$Name>{contributor.name}</$Name>
       </div>
     </div>
   )
