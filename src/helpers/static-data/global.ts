@@ -1,8 +1,9 @@
 import { mapIds } from "^helpers/data"
 import { removeArrDuplicates } from "^helpers/general"
 import {
-  filterValidArticleLikeEntity,
+  filterValidArticleLikeEntities,
   filterValidCollections,
+  filterValidLanguages,
   filterValidSubjects,
   getUniqueChildEntityIdsOfParents,
 } from "^helpers/process-fetched-data"
@@ -55,11 +56,11 @@ export async function fetchAndValidateSubjects() {
   const validLanguageIds = mapIds(childrenFetched.languages)
 
   const childrenValidated = {
-    articles: filterValidArticleLikeEntity(
+    articles: filterValidArticleLikeEntities(
       childrenFetched.articles,
       validLanguageIds
     ),
-    blogs: filterValidArticleLikeEntity(
+    blogs: filterValidArticleLikeEntities(
       childrenFetched.blogs,
       validLanguageIds
     ),
@@ -82,4 +83,14 @@ export async function fetchAndValidateSubjects() {
   })
 
   return validSubjects
+}
+
+export async function fetchAndValidateLanguages() {
+  const fetched = await fetchLanguages()
+
+  if (!fetched.length) {
+    return []
+  }
+
+  return filterValidLanguages(fetched)
 }

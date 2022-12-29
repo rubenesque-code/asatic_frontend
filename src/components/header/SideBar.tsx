@@ -107,7 +107,7 @@ const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
   return (
     <div>
       <div
-        css={[tw`flex items-center justify-between`]}
+        css={[tw`flex items-center justify-between cursor-pointer`]}
         className="group"
         onClick={() => setIsExpanded(!isExpanded)}
       >

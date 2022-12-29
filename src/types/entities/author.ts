@@ -1,30 +1,37 @@
 import {
   EntityGlobalFields,
+  EntityNameToChildKeyTuple,
   EntityNameTupleSubset,
   RelatedDisplayEntityFields,
-} from "./entity";
-import { EntityAsChildStatus } from "./entity-status";
-import { TranslationField, Translations } from "./entity-translation";
-import { TupleToUnion } from "./utilities";
+} from "./entity"
+import { EntityAsChildStatus } from "./entity-status"
+import { TranslationField, Translations } from "./entity-translation"
+import { TupleToUnion } from "./utilities"
 
 export type Author = EntityGlobalFields<"author"> &
   Translations<AuthorTranslationFields> &
-  RelatedDisplayEntityFields<AuthorRelatedEntity>;
+  AuthorRelatedEntityFields
+
+export type AuthorRelatedEntityFields =
+  RelatedDisplayEntityFields<AuthorRelatedEntity>
 
 export type AuthorRelatedEntityTuple = EntityNameTupleSubset<
   "article" | "blog" | "recordedEvent"
->;
+>
 
-export type AuthorRelatedEntity = TupleToUnion<AuthorRelatedEntityTuple>;
+export type AuthorRelatedEntity = TupleToUnion<AuthorRelatedEntityTuple>
 
-type AuthorTranslationFields = TranslationField<"name">;
+type AuthorTranslationFields = TranslationField<"name">
 
-export type AuthorTranslation = Author["translations"][number];
+export type AuthorTranslation = Author["translations"][number]
 
-export type ChildAuthorMissingRequirement = "no valid translation";
+export type ChildAuthorMissingRequirement = "no valid translation"
 
 export type AuthorAsChildStatus =
-  EntityAsChildStatus<ChildAuthorMissingRequirement>;
+  EntityAsChildStatus<ChildAuthorMissingRequirement>
+
+export type AuthorChildEntitiesKeysTuple =
+  EntityNameToChildKeyTuple<AuthorRelatedEntityTuple>
 
 /* const author: Author = {
   articlesIds: [],

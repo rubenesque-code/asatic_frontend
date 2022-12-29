@@ -28,7 +28,9 @@
       "^lib/*": ["src/lib/*"],
       "^redux/*": ["src/redux/*"],
       "^styles/*": ["src/styles/*"],
-      "^types/*": ["src/types/*"]
+      "^types/*": ["src/types/*"],
+      "^page-presentation": ["src/components/pages/_presentation/index.ts"],
+      "^page-container": ["src/components/pages/_container/index.ts"]
     }
   },
   "include": [

@@ -58,8 +58,19 @@ export const fetchArticles = async (ids?: string[]) => {
   return sanitised
 }
 
-export const fetchAuthors = async (ids: string[]) =>
-  (await fetchFirestoreDocuments("authors", ids)) as Author[]
+export const fetchAuthor = async (docId: string) => {
+  const firestoreDoc = (await fetchFirestoreDocument(
+    firestore_collection_key.authors,
+    docId
+  )) as Author
+
+  return firestoreDoc
+}
+
+export const fetchAuthors = async (ids?: string[]) =>
+  (ids?.length
+    ? await fetchFirestoreDocuments("authors", ids)
+    : await fetchFirestoreCollection("authors")) as Author[]
 
 export const fetchBlog = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
@@ -117,11 +128,10 @@ export const fetchCollections = async (ids?: string[]) => {
 export const fetchImages = async (ids: string[]) =>
   (await fetchFirestoreDocuments("images", ids)) as Image[]
 
-export const fetchLanguages = async (ids: string[]) =>
-  (await fetchFirestoreDocuments(
-    firestore_collection_key.languages,
-    ids
-  )) as Language[]
+export const fetchLanguages = async (ids?: string[]) =>
+  (ids?.length
+    ? await fetchFirestoreDocuments("languages", ids)
+    : await fetchFirestoreCollection("languages")) as Language[]
 
 export const fetchLanding = async () =>
   (await fetchFirestoreCollection("landing")) as LandingSection[]

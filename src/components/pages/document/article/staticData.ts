@@ -24,17 +24,19 @@ import { mapIds } from "^helpers/data"
 import {
   getArticleLikeDocumentImageIds,
   mapEntitiesLanguageIds,
-  validateArticleLikeEntity,
   processValidatedArticleLikeEntity,
-  validateLanguage,
-  mapEntityLanguageIds,
-  filterValidLanguages,
   filterValidAuthorsAsChildren,
   filterValidCollections,
   filterValidTags,
+  filterValidLanguages,
+  filterValidArticleLikeEntities,
+  mapEntityLanguageIds,
 } from "^helpers/process-fetched-data"
 import { filterArrAgainstControl } from "^helpers/general"
-import { fetchAndValidateSubjects } from "^helpers/static-data/global"
+import {
+  fetchAndValidateLanguages,
+  fetchAndValidateSubjects,
+} from "^helpers/static-data/global"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const publishedArticles = await fetchArticles()
@@ -48,13 +50,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
   const articleLanguages = await fetchLanguages(articleLanguageIds)
+  const articleValidLanguages = filterValidLanguages(articleLanguages)
 
-  const validLanguages = articleLanguages.filter((language) =>
-    validateLanguage(language)
-  )
-
-  const validArticles = publishedArticles.filter((article) =>
-    validateArticleLikeEntity(article, mapIds(validLanguages))
+  const validArticles = filterValidArticleLikeEntities(
+    publishedArticles,
+    mapIds(articleValidLanguages)
   )
 
   if (!validArticles.length) {
@@ -105,6 +105,8 @@ export const getStaticProps: GetStaticProps<
   // - Global data: START ---
 
   const allValidSubjects = await fetchAndValidateSubjects()
+  const allValidLanguages = await fetchAndValidateLanguages()
+  const allValidLanguagesIds = mapIds(allValidLanguages)
 
   // - Global data: END ---
 
@@ -122,7 +124,6 @@ export const getStaticProps: GetStaticProps<
   }
 
   const articleChildrenFetched = {
-    languages: await fetchLanguages(articleChildrenIds.languages),
     images: !articleChildrenIds.images.length
       ? []
       : await fetchImages(articleChildrenIds.images),
@@ -140,28 +141,31 @@ export const getStaticProps: GetStaticProps<
       : await fetchTags(articleChildrenIds.tags),
   }
 
-  const articleValidLanguages = filterValidLanguages(
-    articleChildrenFetched.languages
-  )
-  const articleValidLanguagesIds = mapIds(articleValidLanguages)
-
   const articleChildrenValidated = {
+    languages: articleChildrenIds.languages
+      .filter((articleLanguageId) =>
+        allValidLanguagesIds.includes(articleLanguageId)
+      )
+      .map((articleLanguageId) =>
+        allValidLanguages.find((language) => language.id === articleLanguageId)
+      )
+      .flatMap((language) => (language ? [language] : [])),
     authors: filterValidAuthorsAsChildren(
       articleChildrenFetched.authors,
-      articleValidLanguagesIds
+      allValidLanguagesIds
     ),
     collections: filterValidCollections(
       articleChildrenFetched.collections,
-      articleValidLanguagesIds
+      allValidLanguagesIds
     ),
     tags: filterValidTags(articleChildrenFetched.tags),
   }
 
-  // should remove invalid image sections too
+  // should remove invalid image sections too (without corresponding fetched image)
   const processedArticle = processValidatedArticleLikeEntity({
     entity: fetchedArticle,
+    validLanguageIds: allValidLanguagesIds,
     validRelatedEntitiesIds: {
-      languagesIds: articleValidLanguagesIds,
       authorsIds: mapIds(articleChildrenValidated.authors),
       collectionsIds: mapIds(articleChildrenValidated.collections),
       subjectsIds: filterArrAgainstControl(
@@ -176,12 +180,8 @@ export const getStaticProps: GetStaticProps<
   const pageData: StaticData = {
     article: processedArticle,
     childEntities: {
-      authors: articleChildrenValidated.authors,
-      collections: articleChildrenValidated.collections,
+      ...articleChildrenValidated,
       images: articleChildrenFetched.images,
-      languages: articleValidLanguages,
-      // subjects: validArticleSubjects,
-      // tags: validTags,
     },
     header: {
       subjects: allValidSubjects,

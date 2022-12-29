@@ -59,10 +59,9 @@ export function validateArticleLikeEntity<
 
   return true
 }
-export function filterValidArticleLikeEntity(
-  entities: (SanitisedArticle | SanitisedBlog)[],
-  validLanguageIds: string[]
-) {
+export function filterValidArticleLikeEntities<
+  TEntity extends SanitisedArticle | SanitisedBlog
+>(entities: TEntity[], validLanguageIds: string[]) {
   return entities.filter((entity) =>
     validateArticleLikeEntity(entity, validLanguageIds)
   )
@@ -82,17 +81,17 @@ const removeInvalidChildEntityIds = ({
   })
 }
 
-/**Used within getStaticProps after validation has occurred in getStaticPaths  */
+/**Used within getStaticProps after validation has occurred in getStaticPaths; remove invalid translations and child entities.*/
 export function processValidatedArticleLikeEntity<
   TEntity extends SanitisedArticle | SanitisedBlog
 >({
   entity,
+  validLanguageIds,
   validRelatedEntitiesIds,
 }: {
   entity: TEntity
-  validRelatedEntitiesIds: {
-    languagesIds: string[]
-  } & ArticleLikeChildEntityFields
+  validLanguageIds: string[]
+  validRelatedEntitiesIds: ArticleLikeChildEntityFields
 }) {
   const processed = produce(entity, (draft) => {
     for (let i = 0; i < draft.translations.length; i++) {
@@ -100,7 +99,7 @@ export function processValidatedArticleLikeEntity<
       // remove invalid translations: start ---
       const translationIsValid = validateTranslation(
         translation,
-        validRelatedEntitiesIds.languagesIds
+        validLanguageIds
       )
 
       if (!translationIsValid) {
