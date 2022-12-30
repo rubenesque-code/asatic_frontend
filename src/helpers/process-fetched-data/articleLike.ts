@@ -5,7 +5,15 @@ import {
   ArticleLikeChildEntityFields,
   SanitisedArticle,
   SanitisedBlog,
+  Author,
+  SanitisedCollection,
+  SanitisedSubject,
+  Tag,
+  TextSection,
+  ImageSection,
+  VideoSection,
 } from "^types/entities"
+import { DeepRequired, MakeRequired, MyOmit } from "^types/utilities"
 
 export function getArticleLikeDocumentImageIds(
   articleLikeTranslations: ArticleLikeTranslation[]
@@ -125,6 +133,79 @@ export function processValidatedArticleLikeEntity<
       })
     )
   })
+
+  return processed
+}
+
+type ProcessedTranslationBody =
+  | MakeRequired<TextSection, "text">
+  | DeepRequired<ImageSection, ["image", "imageId"]>
+  | MakeRequired<VideoSection, "youtubeId">
+
+type ProcessedTranslation = MyOmit<ArticleLikeTranslation, "body"> & {
+  body: ProcessedTranslationBody[]
+}
+
+export function processArticleLikeEntityForOwnPage<
+  TEntity extends SanitisedArticle | SanitisedBlog
+>({
+  entity,
+  validLanguageIds,
+  validRelatedEntities,
+}: {
+  entity: TEntity
+  validLanguageIds: string[]
+  validRelatedEntities: {
+    authors: Author[]
+    collections: SanitisedCollection[]
+    subjects: SanitisedSubject[]
+    tags: Tag[]
+  }
+}) {
+  const processedTranslations = produce(entity.translations, (draft) => {
+    for (let i = 0; i < draft.length; i++) {
+      const translation = draft[i]
+
+      const translationIsValid = validateTranslation(
+        translation,
+        validLanguageIds
+      )
+
+      if (!translationIsValid) {
+        // const translationIndex = draft.findIndex((t) => t.id === translation.id)
+        draft.splice(i, 1)
+        break
+      }
+
+      for (let j = 0; j < translation.body.length; j++) {
+        const section = translation.body[j]
+        // const index = translation.body.findIndex((s) => s.id === section.id)
+        if (section.type === "image") {
+          if (!section.image.imageId) {
+            translation.body.splice(j, 1)
+          }
+          break
+        }
+        if (section.type === "text") {
+          if (!section.text?.length) {
+            translation.body.splice(j, 1)
+          }
+          break
+        }
+        if (section.type === "video") {
+          if (!section.youtubeId) {
+            translation.body.splice(j, 1)
+          }
+        }
+      }
+    }
+  }) as ProcessedTranslation[]
+
+  const processed = {
+    id: entity.id,
+    translations: processedTranslations,
+    ...validRelatedEntities,
+  }
 
   return processed
 }

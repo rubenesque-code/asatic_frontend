@@ -35,7 +35,6 @@ type PageEntity =
 type FetchedChildren = {
   authors?: Author[]
   collections?: SanitisedCollection[]
-  subjects?: SanitisedSubject[]
   tags?: Tag[]
   recordedEventType?: RecordedEventType
   images?: Image[]
@@ -60,9 +59,6 @@ export async function fetchChildren<TEntity extends PageEntity>(
       ? []
       : await fetchCollections(entity.collectionsIds)
 
-    obj.subjects = !entity.subjectsIds.length
-      ? []
-      : await fetchSubjects(entity.subjectsIds)
     obj.tags = !entity.tagsIds.length ? [] : await fetchTags(entity.tagsIds)
   }
   if (entity.type === "article" || entity.type === "blog") {
@@ -82,10 +78,10 @@ export async function fetchChildren<TEntity extends PageEntity>(
   type FetchedFields<TEntityType extends TEntity["type"]> =
     TEntityType extends "recordedEvent"
       ? FetchedChildrenUnionSubSet<
-          "authors" | "subjects" | "collections" | "tags" | "recordedEventType"
+          "authors" | "collections" | "tags" | "recordedEventType"
         >
       : FetchedChildrenUnionSubSet<
-          "authors" | "collections" | "subjects" | "tags" | "images"
+          "authors" | "collections" | "tags" | "images"
         >
 
   return obj as Required<Pick<FetchedChildren, FetchedFields<TEntity["type"]>>>

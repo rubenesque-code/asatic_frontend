@@ -22,3 +22,13 @@ export function findTranslation<TTranslation extends { languageId: string }>(
     (translation) => translation.languageId === languageId
   )
 }
+
+export function filterAndMapEntitiesById<TControlEntity extends { id: string }>(
+  ids: string[],
+  control: TControlEntity[]
+): TControlEntity[] {
+  return ids
+    .filter((id) => mapIds(control).includes(id))
+    .map((id) => control.find((controlEntity) => controlEntity.id === id))
+    .flatMap((entity) => (entity ? [entity] : []))
+}

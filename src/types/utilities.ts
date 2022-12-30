@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never
 
 export type ExpandRecursively<T> = T extends object
@@ -62,3 +63,27 @@ export type FilterTuple<
   : TTuple
 
 export type OverwriteInterface<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
+
+export type MakeRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
+
+export type DeepRequired<T, P extends string[]> = T extends object
+  ? Omit<T, Extract<keyof T, P[0]>> &
+      Required<{
+        [K in Extract<keyof T, P[0]>]: NonNullable<
+          DeepRequired<T[K], ShiftUnion<K, P>>
+        >
+      }>
+  : T
+
+type Shift<T extends any[]> = ((...t: T) => any) extends (
+  first: any,
+  ...rest: infer Rest
+) => any
+  ? Rest
+  : never
+
+type ShiftUnion<P extends PropertyKey, T extends any[]> = T extends any[]
+  ? T[0] extends P
+    ? Shift<T>
+    : never
+  : never
