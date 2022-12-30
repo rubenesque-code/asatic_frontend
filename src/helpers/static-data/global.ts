@@ -3,7 +3,6 @@ import { removeArrDuplicates } from "^helpers/general"
 import {
   filterValidArticleLikeEntities,
   filterValidCollections,
-  filterValidLanguages,
   filterValidSubjects,
   getUniqueChildEntityIdsOfParents,
 } from "^helpers/process-fetched-data"
@@ -16,12 +15,16 @@ import {
   fetchRecordedEvents,
   fetchSubjects,
 } from "^lib/firebase/firestore"
+import { fetchAndValidateLanguages } from "./languages"
 
 export async function fetchAndValidateSubjects() {
   const fetched = await fetchSubjects()
 
   if (!fetched.length) {
-    return []
+    return {
+      entities: [],
+      ids: [],
+    }
   }
 
   const childrenIds = {
@@ -82,15 +85,18 @@ export async function fetchAndValidateSubjects() {
     recordedEventIds: mapIds(childrenValidated.recordedEvents),
   })
 
-  return validSubjects
+  return {
+    entities: validSubjects,
+    ids: mapIds(validSubjects),
+  }
 }
 
-export async function fetchAndValidateLanguages() {
-  const fetched = await fetchLanguages()
+export async function fetchAndValidateGlobalData() {
+  const subjects = await fetchAndValidateSubjects()
+  const languages = await fetchAndValidateLanguages()
 
-  if (!fetched.length) {
-    return []
+  return {
+    subjects,
+    languages,
   }
-
-  return filterValidLanguages(fetched)
 }

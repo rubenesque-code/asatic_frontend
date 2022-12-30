@@ -74,7 +74,6 @@ export const getStaticProps: GetStaticProps<
   // - Global data: END ---
 
   // - Page specific data: START ---
-  // * won't get to this point if article doesn't exist, so below workaround for fetching article is fine
   const fetchedAuthor = await fetchAuthor(params?.id || "")
 
   const authorChildrenIds = {

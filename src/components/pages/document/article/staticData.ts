@@ -3,12 +3,7 @@ import { GetStaticPaths, GetStaticProps } from "next"
 import {
   fetchArticle,
   fetchArticles,
-  fetchAuthors,
-  fetchCollections,
   fetchImages,
-  fetchLanguages,
-  fetchSubjects,
-  fetchTags,
 } from "^lib/firebase/firestore"
 
 import {
@@ -28,33 +23,31 @@ import {
   filterValidAuthorsAsChildren,
   filterValidCollections,
   filterValidTags,
-  filterValidLanguages,
   filterValidArticleLikeEntities,
   mapEntityLanguageIds,
 } from "^helpers/process-fetched-data"
 import { filterArrAgainstControl } from "^helpers/general"
-import {
-  fetchAndValidateLanguages,
-  fetchAndValidateSubjects,
-} from "^helpers/static-data/global"
+import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
+import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
+import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const publishedArticles = await fetchArticles()
+  const fetchedArticles = await fetchArticles()
 
-  if (!publishedArticles.length) {
+  if (!fetchedArticles.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const articleLanguageIds = mapEntitiesLanguageIds(publishedArticles)
-  const articleLanguages = await fetchLanguages(articleLanguageIds)
-  const articleValidLanguages = filterValidLanguages(articleLanguages)
+  const languages = await fetchAndValidateLanguages(
+    mapEntitiesLanguageIds(fetchedArticles)
+  )
 
   const validArticles = filterValidArticleLikeEntities(
-    publishedArticles,
-    mapIds(articleValidLanguages)
+    fetchedArticles,
+    languages.ids
   )
 
   if (!validArticles.length) {
@@ -102,75 +95,59 @@ export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
-  // - Global data: START ---
-
-  const allValidSubjects = await fetchAndValidateSubjects()
-  const allValidLanguages = await fetchAndValidateLanguages()
-  const allValidLanguagesIds = mapIds(allValidLanguages)
-
-  // - Global data: END ---
+  const globalData = await fetchAndValidateGlobalData()
 
   // - Page specific data: START ---
   // * won't get to this point if article doesn't exist, so below workaround for fetching article is fine
   const fetchedArticle = await fetchArticle(params?.id || "")
 
+  const fetchedChildren = await fetchChildren(fetchedArticle)
+
+  const validatedChildren = validateChildren(
+    {
+      authors: fetchedChildren.authors,
+      collections: fetchedChildren.collections,
+      tags: fetchedChildren.tags,
+    },
+    globalData.languages.ids
+  )
+
   const articleChildrenIds = {
     languages: mapEntityLanguageIds(fetchedArticle),
-    images: getArticleLikeDocumentImageIds(fetchedArticle.translations),
-    authors: fetchedArticle.authorsIds,
-    collections: fetchedArticle.collectionsIds,
-    subjects: fetchedArticle.subjectsIds,
-    tags: fetchedArticle.tagsIds,
-  }
-
-  const articleChildrenFetched = {
-    images: !articleChildrenIds.images.length
-      ? []
-      : await fetchImages(articleChildrenIds.images),
-    authors: !articleChildrenIds.authors.length
-      ? []
-      : await fetchAuthors(articleChildrenIds.authors),
-    collections: !articleChildrenIds.collections.length
-      ? []
-      : await fetchCollections(articleChildrenIds.collections),
-    subjects: !articleChildrenIds.subjects.length
-      ? []
-      : await fetchSubjects(articleChildrenIds.subjects),
-    tags: !articleChildrenIds.tags.length
-      ? []
-      : await fetchTags(articleChildrenIds.tags),
   }
 
   const articleChildrenValidated = {
     languages: articleChildrenIds.languages
       .filter((articleLanguageId) =>
-        allValidLanguagesIds.includes(articleLanguageId)
+        globalData.languages.ids.includes(articleLanguageId)
       )
       .map((articleLanguageId) =>
-        allValidLanguages.find((language) => language.id === articleLanguageId)
+        globalData.languages.entities.find(
+          (language) => language.id === articleLanguageId
+        )
       )
       .flatMap((language) => (language ? [language] : [])),
     authors: filterValidAuthorsAsChildren(
-      articleChildrenFetched.authors,
-      allValidLanguagesIds
+      fetchedChildren.authors,
+      globalData.languages.ids
     ),
     collections: filterValidCollections(
-      articleChildrenFetched.collections,
-      allValidLanguagesIds
+      fetchedChildren.collections,
+      globalData.languages.ids
     ),
-    tags: filterValidTags(articleChildrenFetched.tags),
+    tags: filterValidTags(fetchedChildren.tags),
   }
 
   // should remove invalid image sections too (without corresponding fetched image)
   const processedArticle = processValidatedArticleLikeEntity({
     entity: fetchedArticle,
-    validLanguageIds: allValidLanguagesIds,
+    validLanguageIds: globalData.languages.ids,
     validRelatedEntitiesIds: {
       authorsIds: mapIds(articleChildrenValidated.authors),
       collectionsIds: mapIds(articleChildrenValidated.collections),
       subjectsIds: filterArrAgainstControl(
-        mapIds(articleChildrenFetched.subjects),
-        mapIds(allValidSubjects)
+        mapIds(fetchedChildren.subjects),
+        globalData.subjects.ids
       ),
       tagsIds: mapIds(articleChildrenValidated.tags),
     },
@@ -181,10 +158,10 @@ export const getStaticProps: GetStaticProps<
     article: processedArticle,
     childEntities: {
       ...articleChildrenValidated,
-      images: articleChildrenFetched.images,
+      images: fetchedChildren.images,
     },
     header: {
-      subjects: allValidSubjects,
+      subjects: globalData.subjects.entities,
     },
   }
 

@@ -1,6 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
 import {
+  fetchArticle,
   fetchAuthors,
   fetchCollections,
   fetchLanguages,
@@ -26,12 +27,11 @@ import {
   filterValidAuthorsAsChildren,
   filterValidCollections,
   filterValidTags,
-  filterValidLanguages,
   mapEntityLanguageIds,
 } from "^helpers/process-fetched-data"
 import { filterArrAgainstControl } from "^helpers/general"
 import {
-  fetchAndValidateLanguages,
+  fetchAndValidateGlobalData,
   fetchAndValidateSubjects,
 } from "^helpers/static-data/global"
 import {
@@ -39,6 +39,8 @@ import {
   processValidatedRecordedEvent,
 } from "^helpers/process-fetched-data/recordedEvent"
 import { validateRecordedEventTypeAsChild } from "^helpers/process-fetched-data/recordedEventType"
+import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
+import { fetchChildren } from "^helpers/static-data/helpers"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedRecordedEvents = await fetchRecordedEvents()
@@ -50,15 +52,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }
   }
 
-  const recordedEventLanguageIds = mapEntitiesLanguageIds(fetchedRecordedEvents)
-  const recordedEventLanguages = await fetchLanguages(recordedEventLanguageIds)
-  const recordedEventValidLanguages = filterValidLanguages(
-    recordedEventLanguages
+  const languages = await fetchAndValidateLanguages(
+    mapEntitiesLanguageIds(fetchedRecordedEvents)
   )
 
   const validRecordedEvents = filterValidRecordedEvents(
     fetchedRecordedEvents,
-    mapIds(recordedEventValidLanguages)
+    languages.ids
   )
 
   if (!validRecordedEvents.length) {
@@ -99,17 +99,13 @@ export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
-  // - Global data: START ---
-
-  const allValidSubjects = await fetchAndValidateSubjects()
-  const allValidLanguages = await fetchAndValidateLanguages()
-  const allValidLanguagesIds = mapIds(allValidLanguages)
-
-  // - Global data: END ---
+  const globalData = await fetchAndValidateGlobalData()
 
   // - Page specific data: START ---
 
   const fetchedRecordedEvent = await fetchRecordedEvent(params?.id || "")
+
+  const fetchedChildren = await fetchChildren(fetchedRecordedEvent)
 
   const recordedEventChildrenIds = {
     languages: mapEntityLanguageIds(fetchedRecordedEvent),
@@ -189,11 +185,9 @@ export const getStaticProps: GetStaticProps<
 
   const pageData: StaticData = {
     recordedEvent: processedRecordedEvent,
-    childEntities: {
-      ...recordedEventChildrenValidated,
-    },
+    childEntities: recordedEventChildrenValidated,
     header: {
-      subjects: allValidSubjects,
+      subjects: globalData.subjects.entities,
     },
   }
 
