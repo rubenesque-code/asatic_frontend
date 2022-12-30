@@ -1,17 +1,15 @@
 import produce from "immer"
+import { mapIds } from "^helpers/data"
 import {
   ArticleLikeTranslation,
   ArticleLikeChildEntitiesKeysTuple,
   ArticleLikeChildEntityFields,
   SanitisedArticle,
   SanitisedBlog,
-  Author,
-  SanitisedCollection,
-  SanitisedSubject,
-  Tag,
   TextSection,
   ImageSection,
   VideoSection,
+  Image,
 } from "^types/entities"
 import { DeepRequired, MakeRequired, MyOmit } from "^types/utilities"
 
@@ -151,17 +149,13 @@ export function processArticleLikeEntityForOwnPage<
 >({
   entity,
   validLanguageIds,
-  validRelatedEntities,
+  validImages,
 }: {
   entity: TEntity
   validLanguageIds: string[]
-  validRelatedEntities: {
-    authors: Author[]
-    collections: SanitisedCollection[]
-    subjects: SanitisedSubject[]
-    tags: Tag[]
-  }
+  validImages: Image[]
 }) {
+  // remove invalid translations; remove empty translation sections.
   const processedTranslations = produce(entity.translations, (draft) => {
     for (let i = 0; i < draft.length; i++) {
       const translation = draft[i]
@@ -181,7 +175,10 @@ export function processArticleLikeEntityForOwnPage<
         const section = translation.body[j]
         // const index = translation.body.findIndex((s) => s.id === section.id)
         if (section.type === "image") {
-          if (!section.image.imageId) {
+          if (
+            !section.image.imageId ||
+            !mapIds(validImages).includes(section.image.imageId)
+          ) {
             translation.body.splice(j, 1)
           }
           break
@@ -201,10 +198,37 @@ export function processArticleLikeEntityForOwnPage<
     }
   }) as ProcessedTranslation[]
 
+  const collatedTranslationsData = processedTranslations.map((translation) => {
+    const { body, ...restOfTranslation } = translation
+
+    const bodyCollated = body.map((section) => {
+      if (section.type !== "image") {
+        return section
+      }
+
+      const { image, ...restOfSection } = section
+      const { imageId, ...restOfImage } = image
+
+      return {
+        ...restOfSection,
+        image: {
+          ...restOfImage,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          image: validImages.find((image) => image.id === imageId)!,
+        },
+      }
+    })
+
+    return {
+      ...restOfTranslation,
+      body: bodyCollated,
+    }
+  })
+
   const processed = {
     id: entity.id,
-    translations: processedTranslations,
-    ...validRelatedEntities,
+    publishDate: entity.publishDate,
+    translations: collatedTranslationsData,
   }
 
   return processed

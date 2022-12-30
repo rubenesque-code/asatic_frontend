@@ -13,9 +13,9 @@ import Header from "^components/header"
 // article has been processed so only valid translations and child entities remain; invalid translations and child entities have been removed.
 // ...any child entity id of `article`, e.g. article.authorsIds[number], is within `childEntities`
 
-const PageContent = ({ article, childEntities, header }: StaticData) => {
+const PageContent = ({ article, header }: StaticData) => {
   const { documentLanguage, setDocumentLanguage } =
-    useDetermineDocumentLanguage(childEntities.languages)
+    useDetermineDocumentLanguage(article.languages)
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const translation = article.translations.find(
@@ -27,20 +27,20 @@ const PageContent = ({ article, childEntities, header }: StaticData) => {
       <Header {...header} />
       <$BodyContainer_>
         <$Header>
-          <Languages_
+          {/*           <Languages_
             documentLanguage={documentLanguage}
             documentLanguages={childEntities.languages}
             setDocumentLanguage={setDocumentLanguage}
-          />
+          /> */}
           <Date_ date={article.publishDate} />
           <$Title>{translation.title}</$Title>
           <Authors_
-            authors={childEntities.authors}
+            authors={article.authors}
             documentLanguage={documentLanguage}
             styles={$authors}
           />
         </$Header>
-        <Body body={translation.body} images={childEntities.images} />
+        {/* <Body body={translation.body} images={childEntities.images} /> */}
       </$BodyContainer_>
     </div>
   )
