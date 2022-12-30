@@ -2,14 +2,6 @@ import { GetStaticPaths, GetStaticProps } from "next"
 
 import { fetchArticle, fetchArticles } from "^lib/firebase/firestore"
 
-import {
-  Author,
-  Language,
-  SanitisedCollection,
-  SanitisedSubject,
-  Tag,
-} from "^types/entities"
-
 import { filterAndMapEntitiesById } from "^helpers/data"
 import {
   mapEntitiesLanguageIds,
@@ -20,6 +12,7 @@ import {
 import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
 import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
 import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
+import { StaticData } from "../_types/article-like"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedArticles = await fetchArticles()
@@ -56,19 +49,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths,
     fallback: false,
-  }
-}
-
-export type StaticData = {
-  article: ReturnType<typeof processArticleLikeEntityForOwnPage> & {
-    subjects: SanitisedSubject[]
-    languages: Language[]
-    authors: Author[]
-    collections: SanitisedCollection[]
-    tags: Tag[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
   }
 }
 

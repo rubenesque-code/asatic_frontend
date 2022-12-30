@@ -1,6 +1,6 @@
 import type { NextPage } from "next"
 
-import { StaticData } from "^components/pages/document/article/staticData"
+import { StaticData } from "^components/pages/document/_types/article-like"
 import PageContent from "^components/pages/document/article"
 
 export {

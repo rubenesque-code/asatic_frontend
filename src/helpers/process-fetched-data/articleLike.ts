@@ -214,7 +214,7 @@ export function processArticleLikeEntityForOwnPage<
         image: {
           ...restOfImage,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          image: validImages.find((image) => image.id === imageId)!,
+          storageImage: validImages.find((image) => image.id === imageId)!,
         },
       }
     })

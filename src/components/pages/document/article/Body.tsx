@@ -1,21 +1,18 @@
 import produce from "immer"
 import { Fragment } from "react"
 
-import { ArticleLikeTranslation, Image } from "^types/entities"
-
 import {
   TextSection_,
   ImageSection_,
   VideoSection_,
 } from "../_containers/article-like"
 import { $Body } from "../_styles/article-like"
+import { StaticData } from "../_types/article-like"
 
 const Body = ({
   body,
-  images,
 }: {
-  body: ArticleLikeTranslation["body"]
-  images: Image[]
+  body: StaticData["article"]["translations"][number]["body"]
 }) => {
   const ordered = produce(body, (draft) => {
     draft.sort((a, b) => a.index - b.index)
@@ -26,7 +23,7 @@ const Body = ({
       {ordered.map((section) => (
         <Fragment key={section.id}>
           {section.type === "image" ? (
-            <ImageSection_ section={section} fetchedImages={images} />
+            <ImageSection_ section={section} />
           ) : section.type === "text" ? (
             <TextSection_ data={section} />
           ) : (

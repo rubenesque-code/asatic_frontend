@@ -1,5 +1,3 @@
-import { StaticData } from "./staticData"
-
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 
 import { $BodyContainer_ } from "^page-presentation"
@@ -9,6 +7,7 @@ import { $Header, $Title, $authors } from "../_styles/article-like"
 import { Authors_ } from "../_containers"
 import Body from "./Body"
 import Header from "^components/header"
+import { StaticData } from "../_types/article-like"
 
 // article has been processed so only valid translations and child entities remain; invalid translations and child entities have been removed.
 // ...any child entity id of `article`, e.g. article.authorsIds[number], is within `childEntities`
@@ -27,11 +26,11 @@ const PageContent = ({ article, header }: StaticData) => {
       <Header {...header} />
       <$BodyContainer_>
         <$Header>
-          {/*           <Languages_
+          <Languages_
             documentLanguage={documentLanguage}
-            documentLanguages={childEntities.languages}
+            documentLanguages={article.languages}
             setDocumentLanguage={setDocumentLanguage}
-          /> */}
+          />
           <Date_ date={article.publishDate} />
           <$Title>{translation.title}</$Title>
           <Authors_
@@ -40,7 +39,7 @@ const PageContent = ({ article, header }: StaticData) => {
             styles={$authors}
           />
         </$Header>
-        {/* <Body body={translation.body} images={childEntities.images} /> */}
+        <Body body={translation.body} />
       </$BodyContainer_>
     </div>
   )
