@@ -5,9 +5,20 @@ import tw from "twin.macro"
 import { TranslateIcon } from "^components/Icons"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 
-const SiteLanguage = () => {
+export type SiteLanguageProps = {
+  documentLanguageIds: string[]
+}
+
+const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
   const { siteLanguage } = useSiteLanguageContext()
   const router = useRouter()
+
+  const siteLanguageIdOnToggle =
+    siteLanguage.id === "english" ? "tamil" : "english"
+
+  const changeDocLanguageIdToSiteLanguageId = documentLanguageIds.includes(
+    siteLanguageIdOnToggle
+  )
 
   return (
     <div css={[tw`flex gap-xs`]}>
@@ -19,9 +30,13 @@ const SiteLanguage = () => {
           pathname: router.pathname,
           query: {
             ...router.query,
-            siteLanguageId: siteLanguage.id === "english" ? "tamil" : "english",
+            siteLanguageId: siteLanguageIdOnToggle,
+            ...(changeDocLanguageIdToSiteLanguageId && {
+              documentLanguageId: siteLanguageIdOnToggle,
+            }),
           },
         }}
+        shallow={true}
         passHref
       >
         <span css={[tw`font-sans-2 font-light cursor-pointer`]}>

@@ -25,7 +25,6 @@ const Context = createContext({} as Value)
 
 const SiteLanguageProvider = ({ children }: { children: ReactElement }) => {
   const router = useRouter()
-  console.log("router:", router)
   const routerQuery = router.query as RouterQuery
 
   // defaults to english

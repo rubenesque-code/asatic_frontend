@@ -1,11 +1,11 @@
 import tw from "twin.macro"
 
 import SideBar, { SideBarProps } from "./SideBar"
-import SiteLanguage from "./SiteLanguage"
+import SiteLanguage, { SiteLanguageProps } from "./SiteLanguage"
 
-export type HeaderProps = SideBarProps
+export type HeaderProps = SideBarProps & SiteLanguageProps
 
-const Header = ({ subjects }: HeaderProps) => {
+const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
   return (
     <div
       css={[tw`flex justify-between items-center pt-md px-md pb-md border-b`]}
@@ -14,7 +14,7 @@ const Header = ({ subjects }: HeaderProps) => {
         <SideBar subjects={subjects} />
       </div>
       <div css={[tw`text-2xl font-bold font-documentTitle`]}>Asatic</div>
-      <SiteLanguage />
+      <SiteLanguage documentLanguageIds={documentLanguageIds} />
     </div>
   )
 }

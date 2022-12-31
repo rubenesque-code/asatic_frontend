@@ -1,39 +1,32 @@
-import { useEffect, useState } from "react"
-import { SiteLanguage, useSiteLanguageContext } from "^context/SiteLanguage"
-import { mapIds } from "^helpers/data"
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { useRouter } from "next/router"
+import { findEntityById, mapIds } from "^helpers/data"
 
 import { Language } from "^types/entities"
 
-const initDocumentLanguage = (
-  languages: Language[],
-  siteLanguage: SiteLanguage
-) => {
-  if (mapIds(languages).includes(siteLanguage.id)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return languages.find((language) => language.id === siteLanguage.id)!
-  }
+const siteLanguageIds = ["english", "tamil"] as const
+type SiteLanguageId = typeof siteLanguageIds[number]
 
-  return languages[0]
+type RouterQuery = {
+  id: string
+  siteLanguageId?: SiteLanguageId
+  documentLanguageId?: string
 }
 
 export const useDetermineDocumentLanguage = (documentLanguages: Language[]) => {
-  const { siteLanguage } = useSiteLanguageContext()
+  const router = useRouter()
+  const routerQuery = router.query as RouterQuery
 
-  const [documentLanguage, setDocumentLanguage] = useState(
-    initDocumentLanguage(documentLanguages, siteLanguage)
-  )
+  const documentLanguageIds = mapIds(documentLanguages)
 
-  useEffect(() => {
-    // update document language on site language change
-    if (siteLanguage.id === documentLanguage.id) {
-      return
-    }
+  const documentLanguage =
+    routerQuery.documentLanguageId &&
+    documentLanguageIds.includes(routerQuery.documentLanguageId)
+      ? findEntityById(documentLanguages, routerQuery.documentLanguageId)!
+      : routerQuery.siteLanguageId &&
+        documentLanguageIds.includes(routerQuery.siteLanguageId)
+      ? findEntityById(documentLanguages, routerQuery.siteLanguageId)!
+      : documentLanguages[0]
 
-    if (mapIds(documentLanguages).includes(siteLanguage.id)) {
-      setDocumentLanguage(siteLanguage)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteLanguage])
-
-  return { documentLanguage, setDocumentLanguage }
+  return { documentLanguage }
 }

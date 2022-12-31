@@ -32,3 +32,10 @@ export function filterAndMapEntitiesById<TControlEntity extends { id: string }>(
     .map((id) => control.find((controlEntity) => controlEntity.id === id))
     .flatMap((entity) => (entity ? [entity] : []))
 }
+
+export function findEntityById<TEntity extends { id: string }>(
+  entities: TEntity[],
+  findById: string
+) {
+  return entities.find((entity) => entity.id === findById)
+}
