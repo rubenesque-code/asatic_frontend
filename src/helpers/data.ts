@@ -39,3 +39,10 @@ export function findEntityById<TEntity extends { id: string }>(
 ) {
   return entities.find((entity) => entity.id === findById)
 }
+
+export function findEntityByLanguageId<TEntity extends { languageId: string }>(
+  entities: TEntity[],
+  findById: string
+) {
+  return entities.find((entity) => entity.languageId === findById)
+}

@@ -1,46 +1,30 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
 import {
-  fetchArticle,
-  fetchAuthors,
-  fetchCollections,
-  fetchLanguages,
   fetchRecordedEvent,
   fetchRecordedEvents,
-  fetchRecordedEventType,
-  fetchSubjects,
-  fetchTags,
 } from "^lib/firebase/firestore"
 
 import {
   Author,
   Language,
-  RecordedEventType,
   SanitisedCollection,
-  SanitisedRecordedEvent,
   SanitisedSubject,
+  Tag,
 } from "^types/entities"
 
-import { mapIds } from "^helpers/data"
+import { filterAndMapEntitiesById } from "^helpers/data"
 import {
   mapEntitiesLanguageIds,
-  filterValidAuthorsAsChildren,
-  filterValidCollections,
-  filterValidTags,
   mapEntityLanguageIds,
 } from "^helpers/process-fetched-data"
-import { filterArrAgainstControl } from "^helpers/general"
-import {
-  fetchAndValidateGlobalData,
-  fetchAndValidateSubjects,
-} from "^helpers/static-data/global"
+import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
 import {
   filterValidRecordedEvents,
-  processValidatedRecordedEvent,
+  processRecordedEventForOwnPage,
 } from "^helpers/process-fetched-data/recordedEvent"
-import { validateRecordedEventTypeAsChild } from "^helpers/process-fetched-data/recordedEventType"
 import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
-import { fetchChildren } from "^helpers/static-data/helpers"
+import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedRecordedEvents = await fetchRecordedEvents()
@@ -81,20 +65,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  recordedEvent: SanitisedRecordedEvent
-  childEntities: {
+  recordedEvent: ReturnType<typeof processRecordedEventForOwnPage> & {
+    subjects: SanitisedSubject[]
+    languages: Language[]
     authors: Author[]
     collections: SanitisedCollection[]
-    languages: Language[]
-    recordedEventType: RecordedEventType | undefined | null
-    // subjects: SanitisedSubject[]
-    // tags: Tag[]
+    tags: Tag[]
   }
   header: {
     subjects: SanitisedSubject[]
   }
 }
-
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
@@ -107,85 +88,35 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedChildren = await fetchChildren(fetchedRecordedEvent)
 
-  const recordedEventChildrenIds = {
-    languages: mapEntityLanguageIds(fetchedRecordedEvent),
-    authors: fetchedRecordedEvent.authorsIds,
-    collections: fetchedRecordedEvent.collectionsIds,
-    subjects: fetchedRecordedEvent.subjectsIds,
-    tags: fetchedRecordedEvent.tagsIds,
-    recordedEventType: fetchedRecordedEvent.recordedEventTypeId,
+  // ! validateChildren → recordedEventType typing works? It catches undefinde, null, invalid?
+  const validatedChildren = {
+    ...validateChildren(
+      {
+        authors: fetchedChildren.authors,
+        collections: fetchedChildren.collections,
+        tags: fetchedChildren.tags,
+        recordedEventType: fetchedChildren.recordedEventType,
+      },
+      globalData.languages.ids
+    ),
+    subjects: filterAndMapEntitiesById(
+      fetchedRecordedEvent.subjectsIds,
+      globalData.subjects.entities
+    ),
+    languages: filterAndMapEntitiesById(
+      mapEntityLanguageIds(fetchedRecordedEvent),
+      globalData.languages.entities
+    ),
   }
 
-  const recordedEventChildrenFetched = {
-    authors: !recordedEventChildrenIds.authors.length
-      ? []
-      : await fetchAuthors(recordedEventChildrenIds.authors),
-    collections: !recordedEventChildrenIds.collections.length
-      ? []
-      : await fetchCollections(recordedEventChildrenIds.collections),
-    subjects: !recordedEventChildrenIds.subjects.length
-      ? []
-      : await fetchSubjects(recordedEventChildrenIds.subjects),
-    tags: !recordedEventChildrenIds.tags.length
-      ? []
-      : await fetchTags(recordedEventChildrenIds.tags),
-    recordedEventType: !recordedEventChildrenIds.recordedEventType
-      ? null
-      : await fetchRecordedEventType(
-          recordedEventChildrenIds.recordedEventType
-        ),
-  }
-
-  const recordedEventChildrenValidated = {
-    languages: recordedEventChildrenIds.languages
-      .filter((recordedEventLanguageId) =>
-        allValidLanguagesIds.includes(recordedEventLanguageId)
-      )
-      .map((recordedEventLanguageId) =>
-        allValidLanguages.find(
-          (language) => language.id === recordedEventLanguageId
-        )
-      )
-      .flatMap((language) => (language ? [language] : [])),
-    authors: filterValidAuthorsAsChildren(
-      recordedEventChildrenFetched.authors,
-      allValidLanguagesIds
-    ),
-    collections: filterValidCollections(
-      recordedEventChildrenFetched.collections,
-      allValidLanguagesIds
-    ),
-    tags: filterValidTags(recordedEventChildrenFetched.tags),
-    recordedEventType: validateRecordedEventTypeAsChild(
-      recordedEventChildrenFetched.recordedEventType,
-      allValidLanguagesIds
-    )
-      ? recordedEventChildrenFetched.recordedEventType
-      : null,
-  }
-
-  // should remove invalid image sections too (without corresponding fetched image)
-  const processedRecordedEvent = processValidatedRecordedEvent({
-    entity: fetchedRecordedEvent,
-    validLanguageIds: allValidLanguagesIds,
-    validRelatedEntitiesIds: {
-      authorsIds: mapIds(recordedEventChildrenValidated.authors),
-      collectionsIds: mapIds(recordedEventChildrenValidated.collections),
-      subjectsIds: filterArrAgainstControl(
-        mapIds(recordedEventChildrenFetched.subjects),
-        mapIds(allValidSubjects)
-      ),
-      tagsIds: mapIds(recordedEventChildrenValidated.tags),
-    },
-    recordedEventTypeIsValid: Boolean(
-      recordedEventChildrenValidated.recordedEventType
-    ),
+  const processedRecordedEvent = processRecordedEventForOwnPage({
+    recordedEvent: fetchedRecordedEvent,
+    recordedEventType: validatedChildren.recordedEventType,
+    validLanguageIds: globalData.languages.ids,
   })
-  // - Page specific data: END ---
 
   const pageData: StaticData = {
-    recordedEvent: processedRecordedEvent,
-    childEntities: recordedEventChildrenValidated,
+    recordedEvent: { ...processedRecordedEvent, ...validatedChildren },
     header: {
       subjects: globalData.subjects.entities,
     },

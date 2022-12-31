@@ -6,7 +6,7 @@ import StorageImage from "^components/StorageImage"
 
 import { StaticData } from "../_types"
 
-import Video_ from "../../_containers/Video"
+import { Video_ } from "../../_containers"
 
 import { $TextSection, $Caption } from "../_styles"
 

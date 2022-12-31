@@ -1,46 +1,19 @@
-import { StaticData } from "./staticData"
-
-import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
+import { mapIds } from "^helpers/data"
 
 import { $BodyContainer_ } from "^page-presentation"
-import { Languages_ } from "^page-container"
-import { Date_ } from "../_containers/article-like"
-import { $DocumentHeader, $Title, $authors } from "../_styles/article-like"
-import { Authors_ } from "../_containers"
-import Body from "./Body"
 import Header from "^components/header"
+import { StaticData } from "./staticData"
+import Document from "./Document"
 
-// article has been processed so only valid translations and child entities remain; invalid translations and child entities have been removed.
-// ...any child entity id of `article`, e.g. article.authorsIds[number], is within `childEntities`
-
-const PageContent = ({ article, childEntities, header }: StaticData) => {
-  const { documentLanguage, setDocumentLanguage } =
-    useDetermineDocumentLanguage(childEntities.languages)
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const translation = article.translations.find(
-    (translation) => translation.languageId === documentLanguage.id
-  )!
-
+const PageContent = ({ header, recordedEvent }: StaticData) => {
   return (
     <div>
-      <Header {...header} />
+      <Header
+        {...header}
+        documentLanguageIds={mapIds(recordedEvent.languages)}
+      />
       <$BodyContainer_>
-        <$DocumentHeader>
-          <Languages_
-            documentLanguage={documentLanguage}
-            documentLanguages={childEntities.languages}
-            setDocumentLanguage={setDocumentLanguage}
-          />
-          <Date_ date={article.publishDate} />
-          <$Title>{translation.title}</$Title>
-          <Authors_
-            authors={childEntities.authors}
-            documentLanguage={documentLanguage}
-            styles={$authors}
-          />
-        </$DocumentHeader>
-        <Body body={translation.body} images={childEntities.images} />
+        <Document {...recordedEvent} />
       </$BodyContainer_>
     </div>
   )

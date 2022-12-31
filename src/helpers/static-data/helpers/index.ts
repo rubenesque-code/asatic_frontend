@@ -11,7 +11,6 @@ import {
   fetchCollections,
   fetchImages,
   fetchRecordedEventType,
-  fetchSubjects,
   fetchTags,
 } from "^lib/firebase/firestore"
 import {

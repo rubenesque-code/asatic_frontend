@@ -1,12 +1,14 @@
 import produce from "immer"
+
 import {
   SanitisedRecordedEvent,
   RecordedEventTranslation,
   RecordedEventChildEntityFields,
   EntityNameToChildKeyTuple,
   EntityNameTupleSubset,
+  RecordedEventType,
 } from "^types/entities"
-import { MyOmit } from "^types/utilities"
+import { MakeRequired, MyOmit } from "^types/utilities"
 
 function validateTranslation(
   translation: RecordedEventTranslation,
@@ -122,6 +124,53 @@ export function processValidatedRecordedEvent<
       })
     )
   })
+
+  return processed
+}
+
+type ProcessedTranslation = MakeRequired<
+  SanitisedRecordedEvent["translations"][number],
+  "title"
+>
+
+export function processRecordedEventForOwnPage({
+  recordedEvent,
+  validLanguageIds,
+  recordedEventType,
+}: {
+  recordedEvent: SanitisedRecordedEvent
+  validLanguageIds: string[]
+  recordedEventType: RecordedEventType | null | undefined
+}) {
+  // remove invalid translations; remove empty translation sections.
+  const processedTranslations = produce(recordedEvent.translations, (draft) => {
+    for (let i = 0; i < draft.length; i++) {
+      const translation = draft[i]
+
+      const translationIsValid = validateTranslation(
+        translation,
+        validLanguageIds
+      )
+
+      if (!translationIsValid) {
+        // const translationIndex = draft.findIndex((t) => t.id === translation.id)
+        draft.splice(i, 1)
+        break
+      }
+    }
+  }) as ProcessedTranslation[]
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { recordedEventTypeId, ...restRecordedEvent } = recordedEvent
+
+  const processed = {
+    id: recordedEvent.id,
+    publishDate: recordedEvent.publishDate,
+    translations: processedTranslations,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    youtubeId: recordedEvent.youtubeId!,
+    ...(recordedEventType && { recordedEventType }),
+  }
 
   return processed
 }

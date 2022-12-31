@@ -1,7 +1,7 @@
-import { ContainerWidth } from '^components/ContainerUtility'
-import { getYoutubeEmbedUrlFromId } from '^helpers/youtube'
+import { ContainerWidth } from "^components/ContainerUtility"
+import { getYoutubeEmbedUrlFromId } from "^helpers/youtube"
 
-const Video_ = ({ youtubeId }: { youtubeId: string }) => {
+export const Video_ = ({ youtubeId }: { youtubeId: string }) => {
   const url = getYoutubeEmbedUrlFromId(youtubeId)
 
   return (
@@ -12,8 +12,6 @@ const Video_ = ({ youtubeId }: { youtubeId: string }) => {
     </ContainerWidth>
   )
 }
-
-export default Video_
 
 const VideoIFrame = ({
   height,
