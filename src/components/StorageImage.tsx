@@ -1,18 +1,18 @@
-import NextImage, { ImageProps } from 'next/image'
+import NextImage, { ImageProps } from "next/image"
 
-import { Image } from '^types/image'
+import { Image } from "^types/entities/image"
 
 type FirestoreImageProps = {
   image: Image
-  layout?: ImageProps['layout']
-  objectFit?: ImageProps['objectFit']
+  layout?: ImageProps["layout"]
+  objectFit?: ImageProps["objectFit"]
   vertPosition?: number
 }
 
 const StorageImage = ({
   image,
-  layout = 'fill',
-  objectFit = 'cover',
+  layout = "fill",
+  objectFit = "cover",
   vertPosition,
 }: FirestoreImageProps) => {
   const position = `50% ${vertPosition}%`

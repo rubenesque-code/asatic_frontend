@@ -5,7 +5,7 @@ import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguag
 import { $BodyContainer_ } from "^page-presentation"
 import { Languages_ } from "^page-container"
 import { Date_ } from "../_containers/article-like"
-import { $Header, $Title, $authors } from "../_styles/article-like"
+import { $DocumentHeader, $Title, $authors } from "../_styles/article-like"
 import { Authors_ } from "../_containers"
 import Body from "./Body"
 import Header from "^components/header"
@@ -26,7 +26,7 @@ const PageContent = ({ article, childEntities, header }: StaticData) => {
     <div>
       <Header {...header} />
       <$BodyContainer_>
-        <$Header>
+        <$DocumentHeader>
           <Languages_
             documentLanguage={documentLanguage}
             documentLanguages={childEntities.languages}
@@ -39,7 +39,7 @@ const PageContent = ({ article, childEntities, header }: StaticData) => {
             documentLanguage={documentLanguage}
             styles={$authors}
           />
-        </$Header>
+        </$DocumentHeader>
         <Body body={translation.body} images={childEntities.images} />
       </$BodyContainer_>
     </div>

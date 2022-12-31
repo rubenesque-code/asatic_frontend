@@ -1,12 +1,12 @@
 import type { NextPage } from "next"
 
-import { StaticData } from "^components/pages/document/_types/article-like"
-import PageContent from "^components/pages/document/article"
+import { StaticData } from "^components/pages/document/article-like/_types"
+import PageContent from "^components/pages/document/article-like/article"
 
 export {
   getStaticPaths,
   getStaticProps,
-} from "^components/pages/document/article/staticData"
+} from "^components/pages/document/article-like/article/staticData"
 
 const ArticlePage: NextPage<StaticData> = (staticData) => {
   return <PageContent {...staticData} />

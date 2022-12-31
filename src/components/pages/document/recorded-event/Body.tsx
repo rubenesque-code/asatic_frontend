@@ -8,7 +8,7 @@ import {
   ImageSection_,
   VideoSection_,
 } from "../_containers/article-like"
-import { $Body } from "../_styles/article-like"
+import { $DocumentBody } from "../_styles/article-like"
 
 const Body = ({
   body,
@@ -22,7 +22,7 @@ const Body = ({
   })
 
   return (
-    <$Body>
+    <$DocumentBody>
       {ordered.map((section) => (
         <Fragment key={section.id}>
           {section.type === "image" ? (
@@ -34,7 +34,7 @@ const Body = ({
           )}
         </Fragment>
       ))}
-    </$Body>
+    </$DocumentBody>
   )
 }
 

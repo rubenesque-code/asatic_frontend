@@ -8,7 +8,7 @@ import {
 } from "^types/entities"
 
 export type StaticData = {
-  article: ReturnType<typeof processArticleLikeEntityForOwnPage> & {
+  entity: ReturnType<typeof processArticleLikeEntityForOwnPage> & {
     subjects: SanitisedSubject[]
     languages: Language[]
     authors: Author[]

@@ -12,7 +12,7 @@ import {
 import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
 import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
 import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
-import { StaticData } from "../_types/article-like"
+import { StaticData } from "../_types"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedArticles = await fetchArticles()
@@ -58,7 +58,6 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
-  // * won't get to this point if article doesn't exist, so below workaround for fetching article is fine
   const fetchedArticle = await fetchArticle(params?.id || "")
 
   const fetchedChildren = await fetchChildren(fetchedArticle)
@@ -82,7 +81,6 @@ export const getStaticProps: GetStaticProps<
     ),
   }
 
-  // should remove invalid image sections too (without corresponding fetched image)
   const processedArticle = processArticleLikeEntityForOwnPage({
     entity: fetchedArticle,
     validLanguageIds: globalData.languages.ids,
@@ -90,7 +88,7 @@ export const getStaticProps: GetStaticProps<
   })
 
   const pageData: StaticData = {
-    article: { ...processedArticle, ...validatedChildren },
+    entity: { ...processedArticle, ...validatedChildren },
     header: {
       subjects: globalData.subjects.entities,
     },

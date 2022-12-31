@@ -1,6 +1,6 @@
-import tw from 'twin.macro'
+import tw from "twin.macro"
 
-export const $Header = tw.div`pb-md border-b`
+export const $DocumentHeader = tw.div`pb-md border-b`
 
 export const $Date = tw.h4`tracking-wide font-light text-gray-600 font-date mb-xs`
 
@@ -8,7 +8,7 @@ export const $Title = tw.h1`text-3xl text-gray-900 font-documentTitle line-heigh
 
 export const $authors = tw`flex gap-xs text-2xl text-gray-600 font-documentTitle mt-xs line-height[1.5em] `
 
-export const $Body = tw.div`flex flex-col gap-sm mt-sm`
+export const $DocumentBody = tw.div`flex flex-col gap-sm mt-sm`
 
 export const $TextSection = tw.div`font-documentTitle flex flex-col gap-sm prose prose-lg`
 
