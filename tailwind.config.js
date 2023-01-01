@@ -8,10 +8,10 @@ module.exports = {
   darkMode: false,
   theme: {
     fontFamily: {
-      documentTitle: ["Nanum Myeongjo", "serif"],
-      "serif-body": ["Bitter", "serif"],
-      date: ["Montserrat", "sans-serif"],
-      "sans-2": ["Lato", "sans-serif"],
+      "serif-primary": ["Nanum Myeongjo", "serif"],
+      "serif-secondary": ["Bitter", "serif"],
+      "sans-primary": ["Lato", "sans-serif"],
+      "sans-document": ["Montserrat", "sans-serif"],
     },
     extend: {
       colors: {

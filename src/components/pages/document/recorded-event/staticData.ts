@@ -24,7 +24,7 @@ import {
   processRecordedEventForOwnPage,
 } from "^helpers/process-fetched-data/recordedEvent"
 import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
-import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
+import { fetchEntities, validateChildren } from "^helpers/static-data/helpers"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedRecordedEvents = await fetchRecordedEvents()
@@ -86,7 +86,7 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedRecordedEvent = await fetchRecordedEvent(params?.id || "")
 
-  const fetchedChildren = await fetchChildren(fetchedRecordedEvent)
+  const fetchedChildren = await fetchEntities(fetchedRecordedEvent)
 
   // ! validateChildren → recordedEventType typing works? It catches undefinde, null, invalid?
   const validatedChildren = {

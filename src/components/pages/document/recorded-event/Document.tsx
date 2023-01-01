@@ -12,15 +12,15 @@ import { Video_ } from "../_containers"
 
 const $DocumentHeader = tw.div`pb-md border-b`
 
-const $Type = tw.h2`text-lg uppercase font-documentTitle text-gray-700 mb-xs`
+const $Type = tw.h2`text-lg uppercase text-gray-700 mb-xs`
 
-const $Title = tw.h1`text-3xl text-gray-900 font-documentTitle line-height[1.5em]`
+const $Title = tw.h1`text-3xl text-gray-900 line-height[1.5em]`
 
-const $authors = tw`flex gap-xs text-2xl text-gray-600 font-documentTitle mt-xs line-height[1.5em] `
+const $authors = tw`flex gap-xs text-2xl text-gray-600 mt-xs line-height[1.5em] `
 
 const $DocumentBody = tw.div`py-md border-b`
 
-const $BodyText = tw.p`py-sm prose prose-lg`
+const $BodyText = tw.div`py-sm prose prose-lg`
 
 const Document = (recordedEvent: StaticData["recordedEvent"]) => {
   const { documentLanguage } = useDetermineDocumentLanguage(

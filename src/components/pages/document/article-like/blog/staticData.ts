@@ -11,7 +11,7 @@ import {
 } from "^helpers/process-fetched-data"
 import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
 import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
-import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
+import { fetchEntities, validateChildren } from "^helpers/static-data/helpers"
 import { StaticData } from "../_types"
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -57,7 +57,7 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedBlog = await fetchBlog(params?.id || "")
 
-  const fetchedChildren = await fetchChildren(fetchedBlog)
+  const fetchedChildren = await fetchEntities(fetchedBlog)
 
   const validatedChildren = {
     ...validateChildren(

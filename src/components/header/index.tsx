@@ -13,7 +13,7 @@ const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
       <div>
         <SideBar subjects={subjects} />
       </div>
-      <div css={[tw`text-2xl font-bold font-documentTitle`]}>Asatic</div>
+      <div css={[tw`text-2xl font-bold`]}>Asatic</div>
       <SiteLanguage documentLanguageIds={documentLanguageIds} />
     </div>
   )

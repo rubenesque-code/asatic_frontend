@@ -4,11 +4,13 @@ import { fetchArticle, fetchArticles } from "^lib/firebase/firestore"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
 import {
-  mapEntitiesLanguageIds,
   filterValidArticleLikeEntities,
-  mapEntityLanguageIds,
   processArticleLikeEntityForOwnPage,
-} from "^helpers/process-fetched-data"
+} from "^helpers/process-fetched-data/article-like"
+import {
+  mapEntitiesLanguageIds,
+  mapEntityLanguageIds,
+} from "^helpers/process-fetched-data/general"
 import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
 import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
 import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
@@ -62,15 +64,10 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedChildren = await fetchChildren(fetchedArticle)
 
+  const { images: fetchedImages, ...nonImageFetchedChildren } = fetchedChildren
+
   const validatedChildren = {
-    ...validateChildren(
-      {
-        authors: fetchedChildren.authors,
-        collections: fetchedChildren.collections,
-        tags: fetchedChildren.tags,
-      },
-      globalData.languages.ids
-    ),
+    ...validateChildren(nonImageFetchedChildren, globalData.languages.ids),
     subjects: filterAndMapEntitiesById(
       fetchedArticle.subjectsIds,
       globalData.subjects.entities
@@ -84,7 +81,7 @@ export const getStaticProps: GetStaticProps<
   const processedArticle = processArticleLikeEntityForOwnPage({
     entity: fetchedArticle,
     validLanguageIds: globalData.languages.ids,
-    validImages: fetchedChildren.images,
+    validImages: fetchedImages,
   })
 
   const pageData: StaticData = {

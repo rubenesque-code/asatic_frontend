@@ -39,7 +39,7 @@ export const Languages_ = ({
           >
             <div
               css={[
-                tw`py-0.5 px-2 border rounded-md text-sm font-serif-body tracking-wide text-gray-700 transition-colors ease-in-out`,
+                tw`py-0.5 px-2 border rounded-md text-sm font-serif-secondary tracking-wide text-gray-700 transition-colors ease-in-out`,
                 language.id !== documentLanguage.id &&
                   tw`text-gray-400 cursor-pointer border-gray-100`,
               ]}

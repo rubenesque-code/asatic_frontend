@@ -86,7 +86,7 @@ const Content = (subjectsProp: SubjectsProp) => {
 
 export default SideBar
 
-const $text = tw`font-serif-body capitalize text-lg text-gray-700 transition-colors ease-in-out`
+const $text = tw`font-sans-primary font-light tracking-wide capitalize text-lg text-gray-700 transition-colors ease-in-out`
 const $link = tw`hover:text-blue-900 cursor-pointer`
 
 const PageLink = ({ label, route }: { label: string; route: string }) => {

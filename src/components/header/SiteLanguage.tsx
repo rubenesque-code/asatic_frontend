@@ -39,7 +39,7 @@ const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
         shallow={true}
         passHref
       >
-        <span css={[tw`font-sans-2 font-light cursor-pointer`]}>
+        <span css={[tw`font-sans-primary font-light cursor-pointer`]}>
           {siteLanguage.id === "english" ? "Tamil" : "English"}
         </span>
       </Link>
