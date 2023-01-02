@@ -1,12 +1,14 @@
-// import
 import { Fragment } from "react"
+
 import { reorderSections } from "^helpers/manipulateEntity"
 
-import { $TextSection_, $ImageSection_, $VideoSection_ } from "../_presentation"
-import { $DocumentBody } from "../_styles"
 import { StaticData } from "../_types"
 
-const Body = ({
+import { $TextSection_, $ImageSection_, $VideoSection_ } from "../_presentation"
+
+import { $DocumentBody } from "../_styles"
+
+export const DocumentBody_ = ({
   body,
 }: {
   body: StaticData["entity"]["translations"][number]["body"]
@@ -29,5 +31,3 @@ const Body = ({
     </$DocumentBody>
   )
 }
-
-export default Body

@@ -1,6 +1,6 @@
 import { mapIds } from "^helpers/data"
 
-import { $BodyContainer_ } from "^page-presentation"
+import { $ContentContainer_ } from "^page-presentation"
 import Header from "^components/header"
 import { StaticData } from "./staticData"
 import Document from "./Document"
@@ -12,9 +12,9 @@ const PageContent = ({ header, recordedEvent }: StaticData) => {
         {...header}
         documentLanguageIds={mapIds(recordedEvent.languages)}
       />
-      <$BodyContainer_>
+      <$ContentContainer_>
         <Document {...recordedEvent} />
-      </$BodyContainer_>
+      </$ContentContainer_>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { processArticleLikeEntityForOwnPage } from "^helpers/process-fetched-data"
+import { processArticleLikeEntityForOwnPage } from "^helpers/process-fetched-data/article-like"
 import {
   Author,
   Language,

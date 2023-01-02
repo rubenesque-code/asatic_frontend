@@ -1,7 +1,5 @@
 import produce from "immer"
 import { filterValidAuthorsAsChildren } from "^helpers/process-fetched-data/author"
-import { filterValidRecordedEvents } from "^helpers/process-fetched-data/recordedEvent"
-import { validateRecordedEventTypeAsChild } from "^helpers/process-fetched-data/recordedEventType"
 import {
   Author,
   Image,
@@ -15,6 +13,8 @@ import {
 } from "^types/entities"
 import { filterValidArticleLikeEntities } from "./article-like"
 import { filterValidCollections } from "./collection"
+import { validateRecordedEventTypeAsChild } from "./recorded-event-type/validate"
+import { filterValidRecordedEvents } from "./recorded-event/validate"
 import { filterValidTags } from "./tag"
 
 type ValidateChildrenArgs = {

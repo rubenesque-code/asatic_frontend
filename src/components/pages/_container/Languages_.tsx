@@ -5,13 +5,15 @@ import { TranslateIcon } from "^components/Icons"
 
 import { Language } from "^types/entities"
 
+export type Languages_Props = {
+  documentLanguages: Language[]
+  documentLanguage: Language
+}
+
 export const Languages_ = ({
   documentLanguages,
   documentLanguage,
-}: {
-  documentLanguages: Language[]
-  documentLanguage: Language
-}) => {
+}: Languages_Props) => {
   const router = useRouter()
 
   if (!documentLanguages.length || documentLanguages.length < 2) {
@@ -19,7 +21,7 @@ export const Languages_ = ({
   }
 
   return (
-    <div css={[tw`flex items-center gap-sm mb-md`]}>
+    <div css={[tw`flex items-center gap-sm`]}>
       <div css={[tw`text-gray-400`]}>
         <TranslateIcon weight="light" />
       </div>

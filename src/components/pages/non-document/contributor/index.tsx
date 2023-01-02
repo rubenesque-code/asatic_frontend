@@ -2,7 +2,7 @@ import { StaticData } from "./staticData"
 
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 
-import { $BodyContainer_ } from "^page-presentation"
+import { $ContentContainer_ } from "^page-presentation"
 import { Languages_ } from "^page-container"
 import Header from "^components/header"
 import ContributorHeader from "./body/Header"
@@ -20,7 +20,7 @@ const PageContent = ({ author, childEntities, header }: StaticData) => {
   return (
     <div>
       <Header {...header} />
-      <$BodyContainer_>
+      <$ContentContainer_>
         <ContributorHeader
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           contributor={{ name: translation.name! }}
@@ -34,7 +34,7 @@ const PageContent = ({ author, childEntities, header }: StaticData) => {
         />
         <ContributorBody />
         {/* <Body body={translation.body} images={childEntities.images} /> */}
-      </$BodyContainer_>
+      </$ContentContainer_>
     </div>
   )
 }
