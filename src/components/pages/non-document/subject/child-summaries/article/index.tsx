@@ -21,10 +21,10 @@ const Article = ({
     article.translations[0]
 
   return (
-    <div css={[tw`max-w-full `]}>
-      <h3 css={[tw`text-xl`]}>{translation.title}</h3>
+    <div css={[tw`max-w-full max-h-full flex flex-col`]}>
+      <h3 css={[tw`text-xl pb-xs`]}>{translation.title}</h3>
       <div
-        css={[tw`max-w-none prose`]}
+        css={[tw`flex-grow  overflow-hidden`]}
         className="custom-prose"
         style={{
           width: "auto",
