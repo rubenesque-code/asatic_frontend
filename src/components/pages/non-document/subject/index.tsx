@@ -27,7 +27,12 @@ const PageContent = ({ header, subject }: StaticData) => {
             documentLanguage={documentLanguage}
             documentLanguages={subject.languages}
           />
-          <DocumentBody />
+          <DocumentBody
+            articles={subject.articles}
+            blogs={subject.blogs}
+            documentLanguage={documentLanguage}
+            recordedEvents={subject.recordedEvents}
+          />
         </$DocumentContainer_>
       </$PageBody>
     </>

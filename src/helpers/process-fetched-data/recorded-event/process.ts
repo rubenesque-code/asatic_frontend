@@ -110,6 +110,7 @@ export function processRecordedEventAsSummary({
   const processed = {
     id: recordedEvent.id,
     publishDate: recordedEvent.publishDate,
+    type: recordedEvent.type,
     summaryImage: summaryImage
       ? {
           vertPosition: recordedEvent.summaryImage.vertPosition,

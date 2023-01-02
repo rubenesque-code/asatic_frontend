@@ -179,6 +179,7 @@ export function processArticleLikeEntityAsSummary<
   const processed = {
     id: entity.id,
     publishDate: entity.publishDate,
+    type: entity.type,
     summaryImage: summaryImage
       ? {
           vertPosition: entity.summaryImage.vertPosition,

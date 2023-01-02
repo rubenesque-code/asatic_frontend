@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useRouter } from "next/router"
+import { siteLanguageIds } from "^constants/languages"
 import { findEntityById, mapIds } from "^helpers/data"
 
 import { Language } from "^types/entities"
 
-const siteLanguageIds = ["english", "tamil"] as const
 type SiteLanguageId = typeof siteLanguageIds[number]
 
 type RouterQuery = {
