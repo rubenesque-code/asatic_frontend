@@ -14,17 +14,16 @@ import {
 } from "^types/entities"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
+import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
+import { filterValidRecordedEvents } from "^helpers/process-fetched-data/recorded-event/validate"
+import { processRecordedEventForOwnPage } from "^helpers/process-fetched-data/recorded-event/process"
+import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
+import { fetchChildEntities } from "^helpers/fetch-data"
+import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
 import {
   mapEntitiesLanguageIds,
   mapEntityLanguageIds,
-} from "^helpers/process-fetched-data"
-import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
-import {
-  filterValidRecordedEvents,
-  processRecordedEventForOwnPage,
-} from "^helpers/process-fetched-data/recordedEvent"
-import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
-import { fetchEntities, validateChildren } from "^helpers/static-data/helpers"
+} from "^helpers/process-fetched-data/general"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedRecordedEvents = await fetchRecordedEvents()
@@ -86,7 +85,7 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedRecordedEvent = await fetchRecordedEvent(params?.id || "")
 
-  const fetchedChildren = await fetchEntities(fetchedRecordedEvent)
+  const fetchedChildren = await fetchChildEntities(fetchedRecordedEvent)
 
   // ! validateChildren → recordedEventType typing works? It catches undefinde, null, invalid?
   const validatedChildren = {

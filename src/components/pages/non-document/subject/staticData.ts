@@ -1,20 +1,27 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
 import {
-  Author,
   Language,
   SanitisedCollection,
   SanitisedSubject,
   Tag,
 } from "^types/entities"
 
-import { filterAndMapEntitiesById } from "^helpers/data"
-import { processRecordedEventForOwnPage } from "^helpers/process-fetched-data/recordedEvent"
+import { filterAndMapEntitiesById, mapIds } from "^helpers/data"
 import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { fetchChildren } from "^helpers/fetch-data"
+import { fetchChildEntities } from "^helpers/fetch-data"
 import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
 import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
+import { getSubjectChildImages } from "^helpers/process-fetched-data/subject/query"
+import {
+  fetchAuthors,
+  fetchImages,
+  fetchRecordedEventTypes,
+} from "^lib/firebase/firestore"
+import { filterValidAuthorsAsChildren } from "^helpers/process-fetched-data/author"
+import { processSubjectForOwnPage } from "^helpers/process-fetched-data/subject/process"
+import { filterValidRecordedEventTypesAsChildren } from "^helpers/process-fetched-data/recorded-event-type/validate"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validSubjects = await fetchAndValidateSubjects()
@@ -39,10 +46,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  recordedEvent: ReturnType<typeof processRecordedEventForOwnPage> & {
-    subjects: SanitisedSubject[]
+  subject: ReturnType<typeof processSubjectForOwnPage> & {
     languages: Language[]
-    authors: Author[]
     collections: SanitisedCollection[]
     tags: Tag[]
   }
@@ -56,17 +61,45 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
-  // - Page specific data: START ---
-
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const subject = globalData.subjects.entities.find(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     (subject) => subject.id === params!.id
   )!
 
-  const fetchedChildren = await fetchChildren(subject)
+  const fetchedChildren = await fetchChildEntities(subject)
 
-  // need to fetch images of articles, blogs, etc.
+  const imageIds = getSubjectChildImages({
+    articles: fetchedChildren.articles,
+    blogs: fetchedChildren.blogs,
+    recordedEvents: fetchedChildren.recordedEvents,
+  })
+  const fetchedImages = await fetchImages(imageIds)
+
+  const authorIds = [
+    ...fetchedChildren.articles,
+    ...fetchedChildren.blogs,
+    ...fetchedChildren.recordedEvents,
+  ].flatMap((entity) => entity.authorsIds)
+  const fetchedAuthors = await fetchAuthors(authorIds)
+  const validAuthors = filterValidAuthorsAsChildren(
+    fetchedAuthors,
+    globalData.languages.ids
+  )
+
+  const recordedEventTypeIds = fetchedChildren.recordedEvents.flatMap(
+    (recordedEvent) =>
+      recordedEvent.recordedEventTypeId
+        ? [recordedEvent.recordedEventTypeId]
+        : []
+  )
+  const fetchedRecordedEventTypes = await fetchRecordedEventTypes(
+    recordedEventTypeIds
+  )
+  const validRecordedEventTypes = filterValidRecordedEventTypesAsChildren(
+    fetchedRecordedEventTypes,
+    globalData.languages.ids
+  )
 
   const validatedChildren = {
     ...validateChildren(fetchedChildren, globalData.languages.ids),
@@ -76,14 +109,26 @@ export const getStaticProps: GetStaticProps<
     ),
   }
 
-  const processedRecordedEvent = processRecordedEventForOwnPage({
-    recordedEvent: fetchedRecordedEvent,
-    recordedEventType: validatedChildren.recordedEventType,
+  const processedSubject = processSubjectForOwnPage({
+    subject,
+    validAuthorIds: mapIds(validAuthors),
+    validChildren: {
+      articles: validatedChildren.articles,
+      blogs: validatedChildren.blogs,
+      recordedEvents: validatedChildren.recordedEvents,
+    },
+    validImages: fetchedImages,
     validLanguageIds: globalData.languages.ids,
+    validRecordedEventTypes,
   })
 
   const pageData: StaticData = {
-    recordedEvent: { ...processedRecordedEvent, ...validatedChildren },
+    subject: {
+      ...processedSubject,
+      languages: validatedChildren.languages,
+      collections: validatedChildren.collections,
+      tags: validatedChildren.tags,
+    },
     header: {
       subjects: globalData.subjects.entities,
     },

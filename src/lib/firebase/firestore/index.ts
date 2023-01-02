@@ -175,6 +175,13 @@ export const fetchRecordedEventType = async (docId: string) => {
   return firestoreDoc
 }
 
+export const fetchRecordedEventTypes = async (ids?: string[]) =>
+  (ids?.length
+    ? await fetchFirestoreDocuments("recordedEventTypes", ids)
+    : await fetchFirestoreCollection(
+        "recordedEventTypes"
+      )) as RecordedEventType[]
+
 export const fetchSubject = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
     firestore_collection_key.articles,

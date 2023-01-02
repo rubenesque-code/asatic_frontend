@@ -1,50 +1,32 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import { fetchArticle, fetchArticles } from "^lib/firebase/firestore"
+import { fetchArticle, fetchImages } from "^lib/firebase/firestore"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
 import {
-  filterValidArticleLikeEntities,
+  getArticleLikeDocumentImageIds,
   processArticleLikeEntityForOwnPage,
 } from "^helpers/process-fetched-data/article-like"
-import {
-  mapEntitiesLanguageIds,
-  mapEntityLanguageIds,
-} from "^helpers/process-fetched-data/general"
-import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
-import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
-import { fetchChildren, validateChildren } from "^helpers/static-data/helpers"
+import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
 import { StaticData } from "../_types"
+import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
+import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
+import { fetchChildEntities } from "^helpers/fetch-data"
+import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const fetchedArticles = await fetchArticles()
+  const fetchedArticles = await fetchAndValidateArticles()
 
-  if (!fetchedArticles.length) {
+  if (!fetchedArticles.entities) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const languages = await fetchAndValidateLanguages(
-    mapEntitiesLanguageIds(fetchedArticles)
-  )
-
-  const validArticles = filterValidArticleLikeEntities(
-    fetchedArticles,
-    languages.ids
-  )
-
-  if (!validArticles.length) {
-    return {
-      paths: [],
-      fallback: false,
-    }
-  }
-
-  const paths = validArticles.map((article) => ({
+  const paths = fetchedArticles.ids.map((id) => ({
     params: {
-      id: article.id,
+      id,
     },
   }))
 
@@ -62,12 +44,13 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedArticle = await fetchArticle(params?.id || "")
 
-  const fetchedChildren = await fetchChildren(fetchedArticle)
+  const fetchedChildren = await fetchChildEntities(fetchedArticle)
 
-  const { images: fetchedImages, ...nonImageFetchedChildren } = fetchedChildren
+  const imageIds = getArticleLikeDocumentImageIds(fetchedArticle.translations)
+  const fetchedImages = await fetchImages(imageIds)
 
   const validatedChildren = {
-    ...validateChildren(nonImageFetchedChildren, globalData.languages.ids),
+    ...validateChildren(fetchedChildren, globalData.languages.ids),
     subjects: filterAndMapEntitiesById(
       fetchedArticle.subjectsIds,
       globalData.subjects.entities

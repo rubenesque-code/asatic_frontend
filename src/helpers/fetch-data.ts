@@ -3,7 +3,6 @@ import {
   fetchAuthors,
   fetchBlogs,
   fetchCollections,
-  fetchImages,
   fetchRecordedEvents,
   fetchRecordedEventType,
   fetchTags,
@@ -11,7 +10,6 @@ import {
 
 import {
   Author,
-  Image,
   RecordedEventType,
   SanitisedArticle,
   SanitisedBlog,
@@ -20,8 +18,6 @@ import {
   SanitisedSubject,
   Tag,
 } from "^types/entities"
-
-import { getArticleLikeDocumentImageIds } from "./process-fetched-data/article-like"
 
 type PageEntity =
   | SanitisedArticle
@@ -35,13 +31,11 @@ type FetchedChildren = {
   collections?: SanitisedCollection[]
   tags?: Tag[]
   recordedEventType?: RecordedEventType
-  images?: Image[]
-  image?: Image
   articles?: SanitisedArticle[]
   blogs?: SanitisedBlog[]
   recordedEvents?: SanitisedRecordedEvent[]
 }
-export async function fetchChildren<TEntity extends PageEntity>(
+export async function fetchChildEntities<TEntity extends PageEntity>(
   entity: TEntity
 ) {
   const obj: FetchedChildren = {}
@@ -74,10 +68,6 @@ export async function fetchChildren<TEntity extends PageEntity>(
       ? []
       : await fetchAuthors(entity.authorsIds)
   }
-  if (entity.type === "article" || entity.type === "blog") {
-    const images = getArticleLikeDocumentImageIds(entity.translations)
-    obj.images = !images.length ? [] : await fetchImages(images)
-  }
   if (entity.type === "recordedEvent") {
     obj.recordedEventType = !entity.recordedEventTypeId
       ? undefined
@@ -91,9 +81,6 @@ export async function fetchChildren<TEntity extends PageEntity>(
     obj.recordedEvents = !entity.recordedEventsIds.length
       ? []
       : await fetchRecordedEvents(entity.recordedEventsIds)
-
-    // □ Should handle fetching child images here? WHy not...
-    // const articlesImages = []
   }
 
   type FetchedChildrenUnionSubSet<
@@ -106,13 +93,9 @@ export async function fetchChildren<TEntity extends PageEntity>(
           "authors" | "collections" | "tags" | "recordedEventType"
         >
       : TEntityType extends "article"
-      ? FetchedChildrenUnionSubSet<
-          "authors" | "collections" | "tags" | "images"
-        >
+      ? FetchedChildrenUnionSubSet<"authors" | "collections" | "tags">
       : TEntityType extends "blog"
-      ? FetchedChildrenUnionSubSet<
-          "authors" | "collections" | "tags" | "images"
-        >
+      ? FetchedChildrenUnionSubSet<"authors" | "collections" | "tags">
       : TEntityType extends "subject"
       ? FetchedChildrenUnionSubSet<
           "tags" | "collections" | "articles" | "blogs" | "recordedEvents"

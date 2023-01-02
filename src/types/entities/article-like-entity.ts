@@ -74,3 +74,8 @@ export type ArticleLikeStatus = DisplayEntityStatus<
 
 export type ArticleLikeChildEntitiesKeysTuple =
   EntityNameToChildKeyTuple<ArticleLikeRelatedEntityTuple>
+
+export type ArticleLikeSummaryType =
+  | "default"
+  | "collection"
+  | "landing-user-section"

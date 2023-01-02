@@ -14,6 +14,7 @@ const checkTranslationHasText = (translation: ArticleLikeTranslation) => {
   return Boolean(isSectionWithText)
 }
 
+/** Requires: valid language id, title, body with text.  */
 export function validateTranslation(
   translation: ArticleLikeTranslation,
   languageIds: string[]
