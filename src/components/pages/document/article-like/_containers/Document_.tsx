@@ -2,7 +2,7 @@ import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguag
 
 import { StaticData } from "../_types"
 
-import { Languages_ } from "^page-container"
+import { Languages_ } from "^components/pages/_containers"
 import { Authors_ } from "../../_containers"
 import { DocumentBody_ } from "./DocumentBody_"
 
@@ -27,7 +27,7 @@ export const Document_ = (article: StaticData["entity"]) => {
         <$Title>{translation.title}</$Title>
         <Authors_
           authors={article.authors}
-          documentLanguage={documentLanguage}
+          documentLanguageId={documentLanguage.id}
           styles={$authors}
         />
       </$DocumentHeader>

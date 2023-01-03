@@ -7,7 +7,7 @@ import {
   Tag,
 } from "^types/entities"
 
-import { filterAndMapEntitiesById, mapIds } from "^helpers/data"
+import { filterAndMapEntitiesById } from "^helpers/data"
 import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { fetchChildEntities } from "^helpers/fetch-data"
@@ -111,7 +111,7 @@ export const getStaticProps: GetStaticProps<
 
   const processedSubject = processSubjectForOwnPage({
     subject,
-    validAuthorIds: mapIds(validAuthors),
+    validAuthors,
     validChildren: {
       articles: validatedChildren.articles,
       blogs: validatedChildren.blogs,

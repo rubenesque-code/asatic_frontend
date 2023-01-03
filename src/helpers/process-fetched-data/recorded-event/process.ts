@@ -1,7 +1,8 @@
 import produce from "immer"
 
-import { findEntityById, mapIds } from "^helpers/data"
+import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import {
+  Author,
   Image,
   RecordedEventType,
   SanitisedRecordedEvent,
@@ -61,17 +62,21 @@ type AsSummaryValidTranslation = MakeRequired<
   "title"
 >
 
+export type RecordedEventAsSummary = ReturnType<
+  typeof processRecordedEventAsSummary
+>
+
 export function processRecordedEventAsSummary({
   recordedEvent,
   validLanguageIds,
   validImages,
-  validAuthorIds,
+  validAuthors,
   validRecordedEventTypes,
 }: {
   recordedEvent: SanitisedRecordedEvent
   validLanguageIds: string[]
   validImages: Image[]
-  validAuthorIds: string[]
+  validAuthors: Author[]
   validRecordedEventTypes: RecordedEventType[]
 }) {
   let summaryImage: Image | null = null
@@ -118,9 +123,7 @@ export function processRecordedEventAsSummary({
         }
       : null,
     translations: processedTranslations,
-    authors: recordedEvent.authorsIds.filter((authorId) =>
-      validAuthorIds.includes(authorId)
-    ),
+    authors: filterAndMapEntitiesById(recordedEvent.authorsIds, validAuthors),
     recordedEventType,
   }
 

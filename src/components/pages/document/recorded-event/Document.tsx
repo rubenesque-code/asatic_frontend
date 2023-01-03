@@ -3,7 +3,7 @@ import tw from "twin.macro"
 import { StaticData } from "./staticData"
 
 import HtmlStrToJSX from "^components/HtmlStrToJSX"
-import { Languages_ } from "^page-container"
+import { Languages_ } from "^components/pages/_containers"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { findEntityByLanguageId } from "^helpers/data"
 import { Authors_ } from "../_containers"
@@ -49,7 +49,7 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
         <$Title>{translation.title}</$Title>
         <Authors_
           authors={recordedEvent.authors}
-          documentLanguage={documentLanguage}
+          documentLanguageId={documentLanguage.id}
           styles={$authors}
         />
       </$DocumentHeader>

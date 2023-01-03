@@ -1,6 +1,6 @@
 import tw from "twin.macro"
 
-import { Languages_, Languages_Props } from "^page-container"
+import { Languages_, Languages_Props } from "^components/pages/_containers"
 
 const DocumentHeader = ({
   title,

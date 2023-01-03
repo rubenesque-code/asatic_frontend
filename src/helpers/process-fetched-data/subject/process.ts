@@ -1,5 +1,8 @@
 import produce from "immer"
+import { pipe } from "ramda"
+
 import {
+  Author,
   Image,
   RecordedEventType,
   SanitisedArticle,
@@ -9,8 +12,16 @@ import {
 } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
 import { validateTranslation } from "./validate"
-import { processArticleLikeEntityAsSummary } from "../article-like"
-import { processRecordedEventAsSummary } from "../recorded-event/process"
+import {
+  ArticleLikeEntityAsSummary,
+  processArticleLikeEntityAsSummary,
+} from "../article-like"
+import {
+  processRecordedEventAsSummary,
+  RecordedEventAsSummary,
+} from "../recorded-event/process"
+import { sortEntitiesByDate, unshiftFirstEntityWithImage } from "../_helpers"
+import { DocumentEntitiesAsSummaries } from "../_types"
 
 type ProcessedTranslation = MakeRequired<
   SanitisedSubject["translations"][number],
@@ -23,13 +34,13 @@ export function processSubjectForOwnPage({
   validLanguageIds,
   validImages,
   validChildren,
-  validAuthorIds,
+  validAuthors,
   validRecordedEventTypes,
 }: {
   subject: SanitisedSubject
   validLanguageIds: string[]
   validImages: Image[]
-  validAuthorIds: string[]
+  validAuthors: Author[]
   validRecordedEventTypes: RecordedEventType[]
   validChildren: {
     articles: SanitisedArticle[]
@@ -54,38 +65,62 @@ export function processSubjectForOwnPage({
     }
   }) as ProcessedTranslation[]
 
-  const childEntities = {
-    articles: validChildren.articles.map((article) =>
+  // □ could be cleaned up
+  const childDocumentEntities = [
+    ...validChildren.articles.map((article) =>
       processArticleLikeEntityAsSummary({
         entity: article,
         validImages,
         validLanguageIds,
-        validAuthorIds,
+        validAuthors,
       })
     ),
-    blogs: validChildren.blogs.map((blog) =>
+    ...validChildren.blogs.map((blog) =>
       processArticleLikeEntityAsSummary({
         entity: blog,
         validImages,
         validLanguageIds,
-        validAuthorIds,
+        validAuthors,
       })
     ),
-    recordedEvents: validChildren.recordedEvents.map((recordedEvent) =>
+    ...validChildren.recordedEvents.map((recordedEvent) =>
       processRecordedEventAsSummary({
         recordedEvent,
-        validAuthorIds,
+        validAuthors,
         validImages,
         validLanguageIds,
         validRecordedEventTypes,
       })
     ),
-  }
+  ]
+
+  const orderedChildDocumentEntities = orderChildDocumentEntities(
+    childDocumentEntities
+  )
 
   return {
     id: subject.id,
     publishDate: subject.publishDate,
     translations: processedTranslations,
-    ...childEntities,
+    childDocumentEntities: orderedChildDocumentEntities,
   }
+}
+
+function splitChildEntitiesIntoSections(entities: DocumentEntitiesAsSummaries) {
+  return {
+    first: entities.slice(0, 5),
+    second: entities.slice(5, entities.length),
+  }
+}
+
+export function orderChildDocumentEntities(
+  entities: (ArticleLikeEntityAsSummary | RecordedEventAsSummary)[]
+) {
+  const order = pipe(
+    sortEntitiesByDate,
+    unshiftFirstEntityWithImage,
+    splitChildEntitiesIntoSections
+  )
+
+  return order(entities)
 }

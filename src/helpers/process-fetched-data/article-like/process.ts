@@ -1,5 +1,5 @@
 import produce from "immer"
-import { findEntityById, mapIds } from "^helpers/data"
+import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import {
   SanitisedArticle,
   SanitisedBlog,
@@ -8,6 +8,7 @@ import {
   ImageSection,
   VideoSection,
   ArticleLikeSummaryType,
+  Author,
 } from "^types/entities"
 import { DeepRequired, MakeRequired, MyOmit } from "^types/utilities"
 import { getArticleLikeDocumentImageIds, getArticleLikeSummary } from "./query"
@@ -120,6 +121,10 @@ type AsSummaryValidTranslation = MakeRequired<
   "title"
 >
 
+export type ArticleLikeEntityAsSummary = ReturnType<
+  typeof processArticleLikeEntityAsSummary
+>
+
 export function processArticleLikeEntityAsSummary<
   TEntity extends SanitisedArticle | SanitisedBlog
 >({
@@ -127,12 +132,12 @@ export function processArticleLikeEntityAsSummary<
   validLanguageIds,
   validImages,
   summaryType = "default",
-  validAuthorIds,
+  validAuthors,
 }: {
   entity: TEntity
   validLanguageIds: string[]
   validImages: Image[]
-  validAuthorIds: string[]
+  validAuthors: Author[]
   summaryType?: ArticleLikeSummaryType
 }) {
   let summaryImage: Image | null = null
@@ -187,9 +192,7 @@ export function processArticleLikeEntityAsSummary<
         }
       : null,
     translations: processedTranslations,
-    authors: entity.authorsIds.filter((authorId) =>
-      validAuthorIds.includes(authorId)
-    ),
+    authors: filterAndMapEntitiesById(entity.authorsIds, validAuthors),
   }
 
   return processed

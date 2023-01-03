@@ -28,10 +28,8 @@ const PageContent = ({ header, subject }: StaticData) => {
             documentLanguages={subject.languages}
           />
           <DocumentBody
-            articles={subject.articles}
-            blogs={subject.blogs}
             documentLanguage={documentLanguage}
-            recordedEvents={subject.recordedEvents}
+            childDocumentEntities={subject.childDocumentEntities}
           />
         </$DocumentContainer_>
       </$PageBody>

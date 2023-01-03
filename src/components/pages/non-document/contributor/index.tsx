@@ -3,7 +3,7 @@ import { StaticData } from "./staticData"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 
 import { $ContentContainer_ } from "^page-presentation"
-import { Languages_ } from "^page-container"
+import { Languages_ } from "^components/pages/_containers"
 import Header from "^components/header"
 import ContributorHeader from "./body/Header"
 import ContributorBody from "./body/Body"
