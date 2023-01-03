@@ -142,7 +142,7 @@ export function processArticleLikeEntityAsSummary<
 }) {
   let summaryImage: Image | null = null
 
-  if (entity.summaryImage.useImage) {
+  if (entity.summaryImage.useImage !== false) {
     if (entity.summaryImage.imageId) {
       const storageImage = findEntityById(
         validImages,

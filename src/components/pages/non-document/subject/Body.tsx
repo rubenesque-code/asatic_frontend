@@ -1,6 +1,7 @@
 import tw from "twin.macro"
 import { Language } from "^types/entities"
 import Article from "./child-summaries/article"
+import Blog from "./child-summaries/blog"
 
 import { StaticData } from "./staticData"
 
@@ -29,6 +30,13 @@ const DocumentBody = ({
             <Article
               article={entity}
               parentCurrentLanguageId={documentLanguage.id}
+              showImage={i === 0}
+            />
+          ) : entity.type === "blog" ? (
+            <Blog
+              blog={entity}
+              parentCurrentLanguageId={documentLanguage.id}
+              showImage={i === 0}
             />
           ) : (
             <div>Not Article</div>

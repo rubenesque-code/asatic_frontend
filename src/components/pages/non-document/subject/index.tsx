@@ -2,9 +2,10 @@ import { mapIds } from "^helpers/data"
 
 import { StaticData } from "./staticData"
 
+import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
+
 import Header from "^components/header"
 import { $PageBody } from "^components/pages/_styles"
-import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import DocumentHeader from "./Header"
 import { $DocumentContainer_ } from "./_presentation"
 import DocumentBody from "./Body"
