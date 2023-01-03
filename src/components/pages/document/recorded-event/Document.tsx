@@ -57,7 +57,7 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
         <Video_ youtubeId={recordedEvent.youtubeId} />
         {translation.body?.length ? (
           <$BodyText className="custom-prose">
-            <HtmlStrToJSX text={translation.body} />
+            <HtmlStrToJSX htmlStr={translation.body} />
           </$BodyText>
         ) : null}
       </$DocumentBody>

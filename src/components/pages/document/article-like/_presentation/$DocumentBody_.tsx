@@ -18,7 +18,7 @@ type VideoSection = Extract<Section, { type: "video" }>
 
 export const $TextSection_ = ({ data }: { data: TextSection }) => (
   <$TextSection className="custom-prose">
-    <HtmlStrToJSX text={data.text} />
+    <HtmlStrToJSX htmlStr={data.text} />
   </$TextSection>
 )
 

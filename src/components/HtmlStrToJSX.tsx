@@ -1,12 +1,15 @@
 import parse from "html-react-parser"
 import { useEffect, useRef, useState } from "react"
+import { truncateText } from "^helpers/document"
 
 const HtmlStrToJSX = ({
-  text,
-  flattenContent = false,
+  htmlStr,
+  flattenContent,
 }: {
-  text: string
-  flattenContent?: boolean
+  htmlStr: string
+  flattenContent?: {
+    numChars: number
+  }
 }) => {
   const [flattenedTextContent, setFlattenedTextContent] = useState<
     string | null
@@ -27,13 +30,13 @@ const HtmlStrToJSX = ({
   }, [textRef, flattenContent])
 
   if (!flattenContent) {
-    return <div>{parse(text)}</div>
+    return <div>{parse(htmlStr)}</div>
   }
 
   return !flattenedTextContent ? (
-    <div ref={textRef}>{parse(text)}</div>
+    <div ref={textRef}>{parse(htmlStr)}</div>
   ) : (
-    <p>{flattenedTextContent}</p>
+    <p>{truncateText(flattenedTextContent, flattenContent.numChars)}</p>
   )
 }
 

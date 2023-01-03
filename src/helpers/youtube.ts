@@ -3,3 +3,6 @@ export const getYoutubeEmbedUrlFromId = (id: string) => {
 
   return embedUrl
 }
+
+export const getYoutubeThumbnailFromId = (id: string): string =>
+  `https://img.youtube.com/vi/${id}/0.jpg`

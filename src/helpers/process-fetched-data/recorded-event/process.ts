@@ -116,6 +116,8 @@ export function processRecordedEventAsSummary({
     id: recordedEvent.id,
     publishDate: recordedEvent.publishDate,
     type: recordedEvent.type,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    youtubeId: recordedEvent.youtubeId!,
     summaryImage: summaryImage
       ? {
           vertPosition: recordedEvent.summaryImage.vertPosition,
