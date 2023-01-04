@@ -9,6 +9,7 @@ function processTranslationForSummary(
   return {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     title: translation.title!,
+    languageId: translation.languageId,
     summaryText: getCollectionSummaryText(translation),
   }
 }
@@ -46,7 +47,12 @@ export function processCollectionAsSummary(
     id: collection.id,
     type: collection.type,
     publishDate: collection.publishDate,
-    summaryImage,
+    summaryImage: summaryImage
+      ? {
+          vertPosition: collection.summaryImage.vertPosition,
+          storageImage: summaryImage,
+        }
+      : null,
     translations: processedTranslations,
   }
 }

@@ -63,7 +63,7 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
-  const validLanguageIds = globalData.languages.ids
+  const allValidLanguageIds = globalData.languages.ids
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const subject = globalData.subjects.entities.find(
@@ -73,15 +73,15 @@ export const getStaticProps: GetStaticProps<
 
   const validArticles = await fetchAndValidateArticles({
     ids: subject.articlesIds,
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
   const validBlogs = await fetchAndValidateBlogs({
     ids: subject.blogsIds,
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: subject.recordedEventsIds,
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
   const validTags = await fetchAndValidateTags({
     ids: subject.tagsIds,
@@ -90,7 +90,7 @@ export const getStaticProps: GetStaticProps<
   const validCollections = await fetchAndValidateCollections({
     collectionIds: subject.collectionsIds,
     collectionRelation: "default",
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
 
   const imageIds = getSubjectChildImageIds({
@@ -111,7 +111,7 @@ export const getStaticProps: GetStaticProps<
   ).authorsIds
   const validAuthors = await fetchAndValidateAuthors({
     ids: authorIds,
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
 
   const recordedEventTypeIds = getRecordedEventTypeIds(
@@ -119,7 +119,7 @@ export const getStaticProps: GetStaticProps<
   )
   const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
     ids: recordedEventTypeIds,
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
 
   const processedArticles = validArticles.entities.map((article) =>
@@ -127,7 +127,7 @@ export const getStaticProps: GetStaticProps<
       entity: article,
       validAuthors: validAuthors.entities,
       validImages: fetchedImages,
-      validLanguageIds,
+      validLanguageIds: allValidLanguageIds,
     })
   )
   const processedBlogs = validBlogs.entities.map((blog) =>
@@ -135,7 +135,7 @@ export const getStaticProps: GetStaticProps<
       entity: blog,
       validAuthors: validAuthors.entities,
       validImages: fetchedImages,
-      validLanguageIds,
+      validLanguageIds: allValidLanguageIds,
     })
   )
   const processedRecordedEvents = validRecordedEvents.entities.map(
@@ -144,14 +144,14 @@ export const getStaticProps: GetStaticProps<
         recordedEvent,
         validAuthors: validAuthors.entities,
         validImages: fetchedImages,
-        validLanguageIds,
+        validLanguageIds: allValidLanguageIds,
         validRecordedEventTypes: validRecordedEventTypes.entities,
       })
   )
   const processedCollections = validCollections.entities.map((collection) =>
     processCollectionAsSummary(collection, {
       validImages: fetchedImages,
-      validLanguageIds,
+      validLanguageIds: allValidLanguageIds,
     })
   )
 
@@ -161,7 +161,7 @@ export const getStaticProps: GetStaticProps<
       blogs: processedBlogs,
       recordedEvents: processedRecordedEvents,
     },
-    validLanguageIds,
+    validLanguageIds: allValidLanguageIds,
   })
 
   const pageData: StaticData = {

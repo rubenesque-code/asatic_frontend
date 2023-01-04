@@ -1,10 +1,13 @@
 import tw from "twin.macro"
 
-import HtmlStrToJSX from "^components/HtmlStrToJSX"
-import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
-import { Authors_ } from "^components/pages/_containers"
-import StorageImage from "^components/StorageImage"
 import { determineChildTranslation } from "^helpers/document"
+import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
+
+import { Authors_ } from "^components/pages/_containers"
+import {
+  SummaryImage,
+  SummaryText,
+} from "^components/pages/_collections/DocumentSummary"
 
 export const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
@@ -22,12 +25,16 @@ const ArticleLikeEntity = ({
     parentCurrentLanguageId
   )
 
-  // can do crude calculation of max chars for summary. Should then have max chars for title, authors?
   const maxBodyCharacters = isFirst ? 800 : 200
 
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
-      {isFirst ? <SummaryImage image={articleLikeEntity.summaryImage} /> : null}
+      {isFirst ? (
+        <SummaryImage
+          image={articleLikeEntity.summaryImage}
+          styles={tw`mb-xs`}
+        />
+      ) : null}
       <h3 css={[tw`text-xl mb-xxs`]}>{translation.title}</h3>
       <Authors_
         authors={articleLikeEntity.authors}
@@ -41,41 +48,13 @@ const ArticleLikeEntity = ({
       >
         {articleLikeEntity.publishDate}
       </p>
-      <div
-        css={[tw`overflow-hidden prose pb-sm flex-shrink`]}
-        className="custom-prose"
-        style={{
-          width: "auto",
-          maxWidth: "100%",
-        }}
-      >
-        <HtmlStrToJSX
-          htmlStr={translation.summaryText}
-          flattenContent={{ numChars: maxBodyCharacters }}
-          key={translation.languageId}
-        />
-      </div>
+      <SummaryText
+        htmlStr={translation.summaryText}
+        languageId={translation.languageId}
+        maxCharacters={maxBodyCharacters}
+      />
     </div>
   )
 }
 
 export default ArticleLikeEntity
-
-const SummaryImage = ({
-  image,
-}: {
-  image: ArticleLikeEntityAsSummary["summaryImage"]
-}) => {
-  if (!image) {
-    return null
-  }
-
-  return (
-    <div css={[tw`relative aspect-ratio[16 / 9] w-full mb-xs flex-grow`]}>
-      <StorageImage
-        image={image.storageImage}
-        vertPosition={image.vertPosition}
-      />
-    </div>
-  )
-}

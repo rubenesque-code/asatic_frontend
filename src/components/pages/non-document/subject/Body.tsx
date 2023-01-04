@@ -1,12 +1,13 @@
 import tw from "twin.macro"
+
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { Language } from "^types/entities"
-import ArticleLikeEntity from "./child-summaries/ArticleLike"
-import RecordedEvent from "./child-summaries/RecordedEvent"
-
 import { StaticData } from "./staticData"
 
-const $ChildSummaryContainer = tw.div`p-sm`
+import ArticleLikeEntity from "./child-summaries/ArticleLike"
+import RecordedEvent from "./child-summaries/RecordedEvent"
+import CollectionSwiper from "./CollectionSwiper"
+import { $ChildSummaryContainer } from "^components/pages/_collections/DocumentSummary"
 
 const DocumentBody = ({
   documentLanguage,
@@ -46,9 +47,10 @@ const DocumentBody = ({
           </$ChildSummaryContainer>
         ))}
       </div>
-      {collections.map((collection) => (
-        <$ChildSummaryContainer key={collection.id}></$ChildSummaryContainer>
-      ))}
+      <CollectionSwiper
+        collections={collections}
+        parentCurrentLanguageId={documentLanguage.id}
+      />
       <div css={[tw`grid grid-cols-12 lg:grid-rows-2 border-l border-r mx-md`]}>
         {childDocumentEntities.second.map((entity, i) => (
           <$ChildSummaryContainer
