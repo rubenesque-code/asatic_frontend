@@ -11,9 +11,11 @@ const $ChildSummaryContainer = tw.div`p-sm`
 const DocumentBody = ({
   documentLanguage,
   childDocumentEntities,
+  collections,
 }: {
   documentLanguage: Language
   childDocumentEntities: StaticData["subject"]["childDocumentEntities"]
+  collections: StaticData["subject"]["collections"]
 }) => {
   return (
     <div css={[tw`grid grid-cols-12 lg:grid-rows-2 border-l border-r mx-md`]}>
@@ -40,6 +42,9 @@ const DocumentBody = ({
             />
           )}
         </$ChildSummaryContainer>
+      ))}
+      {collections.map((collection) => (
+        <$ChildSummaryContainer key={collection.id}></$ChildSummaryContainer>
       ))}
       {childDocumentEntities.second.map((entity, i) => (
         <$ChildSummaryContainer

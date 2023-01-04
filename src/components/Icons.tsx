@@ -1,3 +1,3 @@
-import { Translate } from 'phosphor-react'
+import { Translate, Play } from "phosphor-react"
 
-export { Translate as TranslateIcon }
+export { Translate as TranslateIcon, Play as PlayIcon }

@@ -46,3 +46,10 @@ export function findEntityByLanguageId<TEntity extends { languageId: string }>(
 ) {
   return entities.find((entity) => entity.languageId === findById)
 }
+
+/** filter arr1 items if arr2 includes them */
+export function filterArr1ByArr2<
+  TEntity extends string | Record<string, unknown> | number
+>(arr1: TEntity[], arr2: TEntity[]) {
+  return arr1.filter((arr1Item) => arr2.includes(arr1Item))
+}

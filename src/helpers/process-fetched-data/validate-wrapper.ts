@@ -12,7 +12,7 @@ import {
   Tag,
 } from "^types/entities"
 import { filterValidArticleLikeEntities } from "./article-like"
-import { filterValidCollections } from "./collection"
+import { filterValidCollections } from "./collection/validate"
 import { validateRecordedEventTypeAsChild } from "./recorded-event-type/validate"
 import { filterValidRecordedEvents } from "./recorded-event/validate"
 import { filterValidTags } from "./tag"

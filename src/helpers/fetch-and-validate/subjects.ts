@@ -8,7 +8,7 @@ import {
 
 import { mapIds } from "^helpers/data"
 import { fetchAndValidateLanguages } from "./languages"
-import { getUniqueChildEntityIdsOfParents } from "^helpers/process-fetched-data/general"
+import { getUniqueChildEntityIdsOfParentsOld } from "^helpers/process-fetched-data/general"
 import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
 import { filterValidSubjects } from "^helpers/process-fetched-data/subject/validate"
 
@@ -25,10 +25,10 @@ export async function fetchAndValidateSubjects() {
   const languages = await fetchAndValidateLanguages()
 
   const childrenIds = {
-    articles: getUniqueChildEntityIdsOfParents(fetched, "articlesIds"),
-    blogs: getUniqueChildEntityIdsOfParents(fetched, "blogsIds"),
-    collections: getUniqueChildEntityIdsOfParents(fetched, "collectionsIds"),
-    recordedEvents: getUniqueChildEntityIdsOfParents(
+    articles: getUniqueChildEntityIdsOfParentsOld(fetched, "articlesIds"),
+    blogs: getUniqueChildEntityIdsOfParentsOld(fetched, "blogsIds"),
+    collections: getUniqueChildEntityIdsOfParentsOld(fetched, "collectionsIds"),
+    recordedEvents: getUniqueChildEntityIdsOfParentsOld(
       fetched,
       "recordedEventsIds"
     ),

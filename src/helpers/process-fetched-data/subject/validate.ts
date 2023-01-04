@@ -1,3 +1,4 @@
+import { filterArr1ByArr2 } from "^helpers/data"
 import { SanitisedSubject, SubjectTranslation } from "^types/entities"
 
 /** requires: valid language id and title. */
@@ -29,7 +30,7 @@ export function validateSubjectAsChild(
 export function validateSubject(
   subject: SanitisedSubject,
   validLanguageIds: string[],
-  validChildEntityIds: {
+  validDocumentEntityIds: {
     articles: string[]
     blogs: string[]
     collections: string[]
@@ -44,9 +45,28 @@ export function validateSubject(
     return false
   }
 
-  const isPopulated = Object.values(validChildEntityIds).flatMap(
-    (arr) => arr
-  ).length
+  const validChildArticles = filterArr1ByArr2(
+    subject.articlesIds,
+    validDocumentEntityIds.articles
+  )
+  const validChildBlogs = filterArr1ByArr2(
+    subject.blogsIds,
+    validDocumentEntityIds.blogs
+  )
+  const validChildRecordedEvents = filterArr1ByArr2(
+    subject.recordedEventsIds,
+    validDocumentEntityIds.recordedEvents
+  )
+  const validChildCollections = filterArr1ByArr2(
+    subject.collectionsIds,
+    validDocumentEntityIds.collections
+  )
+
+  const isPopulated =
+    validChildArticles.length ||
+    validChildBlogs.length ||
+    validChildRecordedEvents.length ||
+    validChildCollections.length
 
   if (!isPopulated) {
     return false

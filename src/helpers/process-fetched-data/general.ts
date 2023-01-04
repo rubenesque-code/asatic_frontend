@@ -15,13 +15,17 @@ export function mapEntityLanguageIds<
   return mapLanguageIds(entity.translations)
 }
 
-export function getUniqueChildEntityIdsOfParents<
+export function getUniqueChildEntityIds<
   TParent extends { [k in TKey]: TArr },
   TKey extends keyof TParent,
   TArr extends string[]
->(parents: TParent[], key: TKey) {
-  const ids = parents.flatMap((parent) => parent[key])
-  const uniqueIds = removeArrDuplicates(ids)
+>(parents: TParent[], keys: TKey[]) {
+  const ids = keys.map((key) => {
+    const ids = parents.flatMap((parent) => parent[key])
+    const uniqueIds = removeArrDuplicates(ids)
 
-  return uniqueIds
+    return [key, uniqueIds]
+  })
+
+  return Object.fromEntries(ids) as { [k in TKey]: TArr }
 }

@@ -16,10 +16,10 @@ function filterAuthorsForLanguage(authors: Author[], languageId: string) {
 
 export const Authors_ = ({
   authors,
-  documentLanguageId,
+  parentLanguageId,
   styles,
 }: {
-  documentLanguageId: string
+  parentLanguageId: string
   authors: Author[]
   styles: TwStyle
 }) => {
@@ -29,7 +29,7 @@ export const Authors_ = ({
 
   const validAuthorsForLanguage = filterAuthorsForLanguage(
     authors,
-    documentLanguageId
+    parentLanguageId
   )
 
   if (!validAuthorsForLanguage.length) {
@@ -40,7 +40,7 @@ export const Authors_ = ({
     id: author.id,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     translation: author.translations.find(
-      (translation) => translation.languageId === documentLanguageId
+      (translation) => translation.languageId === parentLanguageId
     )!,
   }))
 

@@ -31,7 +31,7 @@ const ArticleLikeEntity = ({
       <h3 css={[tw`text-xl mb-xxs`]}>{translation.title}</h3>
       <Authors_
         authors={articleLikeEntity.authors}
-        documentLanguageId={parentCurrentLanguageId}
+        parentLanguageId={translation.languageId}
         styles={$authors}
       />
       <p
@@ -52,6 +52,7 @@ const ArticleLikeEntity = ({
         <HtmlStrToJSX
           htmlStr={translation.summaryText}
           flattenContent={{ numChars: maxBodyCharacters }}
+          key={translation.languageId}
         />
       </div>
     </div>

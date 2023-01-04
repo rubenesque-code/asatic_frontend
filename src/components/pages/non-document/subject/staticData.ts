@@ -1,27 +1,28 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import {
-  Language,
-  SanitisedCollection,
-  SanitisedSubject,
-  Tag,
-} from "^types/entities"
+import { Language, SanitisedSubject, Tag } from "^types/entities"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
 import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { fetchChildEntities } from "^helpers/fetch-data"
-import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
-import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
-import { getSubjectChildImages } from "^helpers/process-fetched-data/subject/query"
 import {
-  fetchAuthors,
-  fetchImages,
-  fetchRecordedEventTypes,
-} from "^lib/firebase/firestore"
-import { filterValidAuthorsAsChildren } from "^helpers/process-fetched-data/author"
+  getUniqueChildEntityIds,
+  mapEntityLanguageIds,
+} from "^helpers/process-fetched-data/general"
+import { getSubjectChildImageIds } from "^helpers/process-fetched-data/subject/query"
+import { fetchImages } from "^lib/firebase/firestore"
 import { processSubjectForOwnPage } from "^helpers/process-fetched-data/subject/process"
-import { filterValidRecordedEventTypesAsChildren } from "^helpers/process-fetched-data/recorded-event-type/validate"
+import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
+import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
+import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
+import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
+import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
+import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
+import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
+import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
+import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
+import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
+import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validSubjects = await fetchAndValidateSubjects()
@@ -48,7 +49,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export type StaticData = {
   subject: ReturnType<typeof processSubjectForOwnPage> & {
     languages: Language[]
-    collections: SanitisedCollection[]
+    collections: ReturnType<typeof processCollectionAsSummary>[]
     tags: Tag[]
   }
   header: {
@@ -61,73 +62,116 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
+  const validLanguageIds = globalData.languages.ids
+
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const subject = globalData.subjects.entities.find(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     (subject) => subject.id === params!.id
   )!
 
-  const fetchedChildren = await fetchChildEntities(subject)
+  const validArticles = await fetchAndValidateArticles({
+    ids: subject.articlesIds,
+    validLanguageIds,
+  })
+  const validBlogs = await fetchAndValidateBlogs({
+    ids: subject.blogsIds,
+    validLanguageIds,
+  })
+  const validRecordedEvents = await fetchAndValidateRecordedEvents({
+    ids: subject.recordedEventsIds,
+    validLanguageIds,
+  })
+  const validTags = await fetchAndValidateTags({
+    ids: subject.tagsIds,
+  })
 
-  const imageIds = getSubjectChildImages({
-    articles: fetchedChildren.articles,
-    blogs: fetchedChildren.blogs,
-    recordedEvents: fetchedChildren.recordedEvents,
+  const validCollections = await fetchAndValidateCollections({
+    collectionIds: subject.collectionsIds,
+    collectionRelation: "default",
+    validLanguageIds,
+  })
+
+  const imageIds = getSubjectChildImageIds({
+    articles: validArticles.entities,
+    blogs: validBlogs.entities,
+    recordedEvents: validRecordedEvents.entities,
+    collections: validCollections.entities,
   })
   const fetchedImages = await fetchImages(imageIds)
 
-  const authorIds = [
-    ...fetchedChildren.articles,
-    ...fetchedChildren.blogs,
-    ...fetchedChildren.recordedEvents,
-  ].flatMap((entity) => entity.authorsIds)
-  const fetchedAuthors = await fetchAuthors(authorIds)
-  const validAuthors = filterValidAuthorsAsChildren(
-    fetchedAuthors,
-    globalData.languages.ids
-  )
+  const authorIds = getUniqueChildEntityIds(
+    [
+      ...validArticles.entities,
+      ...validBlogs.entities,
+      ...validRecordedEvents.entities,
+    ],
+    ["authorsIds"]
+  ).authorsIds
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: authorIds,
+    validLanguageIds,
+  })
 
-  const recordedEventTypeIds = fetchedChildren.recordedEvents.flatMap(
+  const recordedEventTypeIds = getRecordedEventTypeIds(
+    validRecordedEvents.entities
+  )
+  const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
+    ids: recordedEventTypeIds,
+    validLanguageIds,
+  })
+
+  const processedArticles = validArticles.entities.map((article) =>
+    processArticleLikeEntityAsSummary({
+      entity: article,
+      validAuthors: validAuthors.entities,
+      validImages: fetchedImages,
+      validLanguageIds,
+    })
+  )
+  const processedBlogs = validBlogs.entities.map((blog) =>
+    processArticleLikeEntityAsSummary({
+      entity: blog,
+      validAuthors: validAuthors.entities,
+      validImages: fetchedImages,
+      validLanguageIds,
+    })
+  )
+  const processedRecordedEvents = validRecordedEvents.entities.map(
     (recordedEvent) =>
-      recordedEvent.recordedEventTypeId
-        ? [recordedEvent.recordedEventTypeId]
-        : []
+      processRecordedEventAsSummary({
+        recordedEvent,
+        validAuthors: validAuthors.entities,
+        validImages: fetchedImages,
+        validLanguageIds,
+        validRecordedEventTypes: validRecordedEventTypes.entities,
+      })
   )
-  const fetchedRecordedEventTypes = await fetchRecordedEventTypes(
-    recordedEventTypeIds
-  )
-  const validRecordedEventTypes = filterValidRecordedEventTypesAsChildren(
-    fetchedRecordedEventTypes,
-    globalData.languages.ids
+  const processedCollections = validCollections.entities.map((collection) =>
+    processCollectionAsSummary(collection, {
+      validImages: fetchedImages,
+      validLanguageIds,
+    })
   )
 
-  const validatedChildren = {
-    ...validateChildren(fetchedChildren, globalData.languages.ids),
-    languages: filterAndMapEntitiesById(
-      mapEntityLanguageIds(subject),
-      globalData.languages.entities
-    ),
-  }
-
-  const processedSubject = processSubjectForOwnPage({
-    subject,
-    validAuthors,
-    validChildren: {
-      articles: validatedChildren.articles,
-      blogs: validatedChildren.blogs,
-      recordedEvents: validatedChildren.recordedEvents,
+  const processedSubject = processSubjectForOwnPage(subject, {
+    processedChildDocumentEntities: {
+      articles: processedArticles,
+      blogs: processedBlogs,
+      recordedEvents: processedRecordedEvents,
     },
-    validImages: fetchedImages,
-    validLanguageIds: globalData.languages.ids,
-    validRecordedEventTypes,
+    validLanguageIds,
   })
 
   const pageData: StaticData = {
     subject: {
       ...processedSubject,
-      languages: validatedChildren.languages,
-      collections: validatedChildren.collections,
-      tags: validatedChildren.tags,
+      languages: filterAndMapEntitiesById(
+        mapEntityLanguageIds(processedSubject),
+        globalData.languages.entities
+      ),
+      collections: processedCollections,
+      tags: validTags.entities,
     },
     header: {
       subjects: globalData.subjects.entities,

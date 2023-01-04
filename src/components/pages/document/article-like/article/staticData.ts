@@ -15,7 +15,7 @@ import { fetchChildEntities } from "^helpers/fetch-data"
 import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const fetchedArticles = await fetchAndValidateArticles()
+  const fetchedArticles = await fetchAndValidateArticles({ ids: "all" })
 
   if (!fetchedArticles.entities) {
     return {

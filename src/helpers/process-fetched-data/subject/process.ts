@@ -1,107 +1,45 @@
-import produce from "immer"
 import { pipe } from "ramda"
 
-import {
-  Author,
-  Image,
-  RecordedEventType,
-  SanitisedArticle,
-  SanitisedBlog,
-  SanitisedRecordedEvent,
-  SanitisedSubject,
-} from "^types/entities"
+import { SanitisedSubject } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
 import { validateTranslation } from "./validate"
-import {
-  ArticleLikeEntityAsSummary,
-  processArticleLikeEntityAsSummary,
-} from "../article-like"
-import {
-  processRecordedEventAsSummary,
-  RecordedEventAsSummary,
-} from "../recorded-event/process"
+import { ArticleLikeEntityAsSummary } from "../article-like"
+import { RecordedEventAsSummary } from "../recorded-event/process"
 import { sortEntitiesByDate, unshiftFirstEntityWithImage } from "../_helpers"
 import { DocumentEntitiesAsSummaries } from "../_types"
 
-type ProcessedTranslation = MakeRequired<
+type ValidTranslation = MakeRequired<
   SanitisedSubject["translations"][number],
   "title"
 >
 
 /** Invoked after validation so has required fields. */
-export function processSubjectForOwnPage({
-  subject,
-  validLanguageIds,
-  validImages,
-  validChildren,
-  validAuthors,
-  validRecordedEventTypes,
-}: {
-  subject: SanitisedSubject
-  validLanguageIds: string[]
-  validImages: Image[]
-  validAuthors: Author[]
-  validRecordedEventTypes: RecordedEventType[]
-  validChildren: {
-    articles: SanitisedArticle[]
-    blogs: SanitisedBlog[]
-    recordedEvents: SanitisedRecordedEvent[]
-  }
-}) {
-  // remove invalid translations; remove empty translation sections.
-  const processedTranslations = produce(subject.translations, (draft) => {
-    for (let i = 0; i < draft.length; i++) {
-      const translation = draft[i]
-
-      const translationIsValid = validateTranslation(
-        translation,
-        validLanguageIds
-      )
-
-      if (!translationIsValid) {
-        draft.splice(i, 1)
-        break
-      }
+export function processSubjectForOwnPage(
+  subject: SanitisedSubject,
+  {
+    validLanguageIds,
+    processedChildDocumentEntities,
+  }: {
+    validLanguageIds: string[]
+    processedChildDocumentEntities: {
+      articles: ArticleLikeEntityAsSummary[]
+      blogs: ArticleLikeEntityAsSummary[]
+      recordedEvents: RecordedEventAsSummary[]
     }
-  }) as ProcessedTranslation[]
-
-  // □ could be cleaned up
-  const childDocumentEntities = [
-    ...validChildren.articles.map((article) =>
-      processArticleLikeEntityAsSummary({
-        entity: article,
-        validImages,
-        validLanguageIds,
-        validAuthors,
-      })
-    ),
-    ...validChildren.blogs.map((blog) =>
-      processArticleLikeEntityAsSummary({
-        entity: blog,
-        validImages,
-        validLanguageIds,
-        validAuthors,
-      })
-    ),
-    ...validChildren.recordedEvents.map((recordedEvent) =>
-      processRecordedEventAsSummary({
-        recordedEvent,
-        validAuthors,
-        validImages,
-        validLanguageIds,
-        validRecordedEventTypes,
-      })
-    ),
-  ]
+  }
+) {
+  const validTranslations = subject.translations.filter((translation) =>
+    validateTranslation(translation, validLanguageIds)
+  ) as ValidTranslation[]
 
   const orderedChildDocumentEntities = orderChildDocumentEntities(
-    childDocumentEntities
+    Object.values(processedChildDocumentEntities).flat()
   )
 
   return {
     id: subject.id,
     publishDate: subject.publishDate,
-    translations: processedTranslations,
+    translations: validTranslations,
     childDocumentEntities: orderedChildDocumentEntities,
   }
 }
@@ -113,7 +51,7 @@ function splitChildEntitiesIntoSections(entities: DocumentEntitiesAsSummaries) {
   }
 }
 
-export function orderChildDocumentEntities(
+function orderChildDocumentEntities(
   entities: (ArticleLikeEntityAsSummary | RecordedEventAsSummary)[]
 ) {
   const order = pipe(

@@ -31,6 +31,7 @@ const PageContent = ({ header, subject }: StaticData) => {
           <DocumentBody
             documentLanguage={documentLanguage}
             childDocumentEntities={subject.childDocumentEntities}
+            collections={subject.collections}
           />
         </$DocumentContainer_>
       </$PageBody>

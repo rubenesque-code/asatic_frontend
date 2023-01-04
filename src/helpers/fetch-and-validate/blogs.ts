@@ -1,19 +1,19 @@
-import { fetchArticles } from "^lib/firebase/firestore"
+import { fetchBlogs } from "^lib/firebase/firestore"
 
 import { mapIds } from "^helpers/data"
 import { fetchAndValidateLanguages } from "./languages"
 import { filterValidArticleLikeEntities } from "^helpers/process-fetched-data/article-like"
 
-export async function fetchAndValidateArticles({
+export async function fetchAndValidateBlogs({
   ids,
   validLanguageIds: passedValidLanguageIds,
 }: {
   ids: string[] | "all"
   validLanguageIds?: string[]
 }) {
-  const fetched = await fetchArticles(ids)
+  const fetchedBlogs = await fetchBlogs(ids)
 
-  if (!fetched.length) {
+  if (!fetchedBlogs.length) {
     return {
       entities: [],
       ids: [],
@@ -24,13 +24,13 @@ export async function fetchAndValidateArticles({
     ? passedValidLanguageIds
     : (await fetchAndValidateLanguages()).ids
 
-  const validArticles = filterValidArticleLikeEntities(
-    fetched,
+  const validBlogs = filterValidArticleLikeEntities(
+    fetchedBlogs,
     validLanguageIds
   )
 
   return {
-    entities: validArticles,
-    ids: mapIds(validArticles),
+    entities: validBlogs,
+    ids: mapIds(validBlogs),
   }
 }
