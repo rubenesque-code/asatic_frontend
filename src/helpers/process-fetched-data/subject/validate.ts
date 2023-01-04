@@ -77,15 +77,24 @@ export function validateSubject(
 
 export function filterValidSubjects(
   subjects: SanitisedSubject[],
-  validLanguageIds: string[],
-  validChildEntityIds: {
-    articles: string[]
-    blogs: string[]
-    collections: string[]
-    recordedEvents: string[]
+  {
+    subjectRelation,
+    validChildEntityIds,
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
+    validChildEntityIds: {
+      articles: string[]
+      blogs: string[]
+      collections: string[]
+      recordedEvents: string[]
+    }
+    subjectRelation: "child-of-document" | "default"
   }
 ) {
   return subjects.filter((subject) =>
-    validateSubject(subject, validLanguageIds, validChildEntityIds)
+    subjectRelation === "default"
+      ? validateSubject(subject, validLanguageIds, validChildEntityIds)
+      : validateSubjectAsChild(subject, validLanguageIds)
   )
 }

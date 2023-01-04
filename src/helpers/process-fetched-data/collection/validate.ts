@@ -124,7 +124,7 @@ export function filterValidCollections({
   }
   collectionRelation: "child-of-document" | "default"
 }) {
-  return collections.filter(async (collection) =>
+  return collections.filter((collection) =>
     collectionRelation === "default"
       ? validateCollection({
           collection,

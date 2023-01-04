@@ -25,7 +25,8 @@ import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/rec
 import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const validSubjects = await fetchAndValidateSubjects()
+  const validSubjects = await fetchAndValidateSubjects({ subjectIds: "all" })
+  console.log("validSubjects:", validSubjects)
 
   if (!validSubjects.entities.length) {
     return {

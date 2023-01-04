@@ -28,7 +28,7 @@ export async function fetchAndValidateCollections({
 
   const validLanguageIds = passedValidLanguageIds
     ? passedValidLanguageIds
-    : (await fetchAndValidateLanguages()).ids
+    : (await fetchAndValidateLanguages("all")).ids
 
   const ids = getUniqueChildEntityIds(fetchedCollections, [
     "articlesIds",
@@ -38,15 +38,15 @@ export async function fetchAndValidateCollections({
 
   const validArticles = await fetchAndValidateArticles({
     ids: ids.articlesIds,
-    validLanguageIds: passedValidLanguageIds,
+    validLanguageIds,
   })
   const validBlogs = await fetchAndValidateBlogs({
     ids: ids.blogsIds,
-    validLanguageIds: passedValidLanguageIds,
+    validLanguageIds,
   })
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: ids.blogsIds,
-    validLanguageIds: passedValidLanguageIds,
+    validLanguageIds,
   })
 
   const validCollections = filterValidCollections({
