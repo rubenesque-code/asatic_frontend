@@ -20,7 +20,7 @@ export const Document_ = (article: StaticData["entity"]) => {
   return (
     <>
       <$DocumentHeader>
-        <div css={[tw`mb-md`]}>
+        <div css={[tw`mb-sm sm:mb-md`]}>
           <Languages_
             documentLanguage={documentLanguage}
             documentLanguages={article.languages}
