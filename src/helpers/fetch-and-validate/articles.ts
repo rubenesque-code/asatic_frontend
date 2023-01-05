@@ -22,7 +22,7 @@ export async function fetchAndValidateArticles({
 
   const validLanguageIds = passedValidLanguageIds
     ? passedValidLanguageIds
-    : (await fetchAndValidateLanguages()).ids
+    : (await fetchAndValidateLanguages("all")).ids
 
   const validArticles = filterValidArticleLikeEntities(
     fetched,

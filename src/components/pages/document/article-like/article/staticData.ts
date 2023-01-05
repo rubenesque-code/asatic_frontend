@@ -11,13 +11,14 @@ import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
 import { StaticData } from "../_types"
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { fetchChildEntities } from "^helpers/fetch-data"
-import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
+import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
+import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
+import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedArticles = await fetchAndValidateArticles({ ids: "all" })
 
-  if (!fetchedArticles.entities) {
+  if (!fetchedArticles.entities.length) {
     return {
       paths: [],
       fallback: false,
@@ -44,22 +45,21 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedArticle = await fetchArticle(params?.id || "")
 
-  const fetchedChildren = await fetchChildEntities(fetchedArticle)
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: fetchedArticle.authorsIds,
+    validLanguageIds: globalData.languages.ids,
+  })
+  const validCollections = await fetchAndValidateCollections({
+    collectionIds: fetchedArticle.collectionsIds,
+    collectionRelation: "child-of-document",
+    validLanguageIds: globalData.languages.ids,
+  })
+  const validTags = await fetchAndValidateTags({
+    ids: fetchedArticle.tagsIds,
+  })
 
   const imageIds = getArticleLikeDocumentImageIds(fetchedArticle.translations)
   const fetchedImages = await fetchImages(imageIds)
-
-  const validatedChildren = {
-    ...validateChildren(fetchedChildren, globalData.languages.ids),
-    subjects: filterAndMapEntitiesById(
-      fetchedArticle.subjectsIds,
-      globalData.subjects.entities
-    ),
-    languages: filterAndMapEntitiesById(
-      mapEntityLanguageIds(fetchedArticle),
-      globalData.languages.entities
-    ),
-  }
 
   const processedArticle = processArticleLikeEntityForOwnPage({
     entity: fetchedArticle,
@@ -68,7 +68,20 @@ export const getStaticProps: GetStaticProps<
   })
 
   const pageData: StaticData = {
-    entity: { ...processedArticle, ...validatedChildren },
+    entity: {
+      ...processedArticle,
+      authors: validAuthors.entities,
+      collections: validCollections.entities,
+      languages: filterAndMapEntitiesById(
+        mapEntityLanguageIds(processedArticle),
+        globalData.languages.entities
+      ),
+      subjects: filterAndMapEntitiesById(
+        fetchedArticle.subjectsIds,
+        globalData.subjects.entities
+      ),
+      tags: validTags.entities,
+    },
     header: {
       subjects: globalData.subjects.entities,
     },

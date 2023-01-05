@@ -5,6 +5,22 @@ body {
   font-family: Nanum Myeongjo, serif !important;
 }
 
+html::-webkit-scrollbar {
+  width: 4px;
+}
+html::-webkit-scrollbar-track {
+  background: rgb(249, 250, 251);
+  border-radius: 2px;
+}
+html::-webkit-scrollbar-thumb {
+  background: rgb(209 213 219);
+  border-radius: 2px;
+  width: 4px;
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: rgb(156 163 175);
+}
+
 a {
   color: inherit;
   text-decoration: none;

@@ -26,7 +26,6 @@ import { processCollectionAsSummary } from "^helpers/process-fetched-data/collec
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validSubjects = await fetchAndValidateSubjects({ subjectIds: "all" })
-  console.log("validSubjects:", validSubjects)
 
   if (!validSubjects.entities.length) {
     return {

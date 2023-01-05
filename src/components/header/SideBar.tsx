@@ -9,6 +9,7 @@ import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { findTranslation } from "^helpers/data"
 import { SanitisedSubject } from "^types/entities"
+import { $link } from "^styles/global"
 
 export type SideBarProps = SubjectsProp
 
@@ -67,13 +68,13 @@ const Content = (subjectsProp: SubjectsProp) => {
         <div css={[tw`pt-md border-t`]}>
           <PageLink
             label={siteTranslations.home[siteLanguage.id]}
-            route={routes.landing}
+            pathname={routes.landing}
           />
         </div>
         <div css={[tw`pt-md border-t`]}>
           <PageLink
             label={siteTranslations.articles[siteLanguage.id]}
-            route={routes.articles}
+            pathname={routes.articles}
           />
         </div>
         <div css={[tw`pt-md border-t`]}>
@@ -86,12 +87,13 @@ const Content = (subjectsProp: SubjectsProp) => {
 
 export default SideBar
 
-const $text = tw`font-sans-primary font-light tracking-wide capitalize text-lg text-gray-700 transition-colors ease-in-out`
-const $link = tw`hover:text-blue-900 cursor-pointer`
+const $text = tw`font-sans-primary font-light tracking-wide capitalize text-lg text-gray-700 `
 
-const PageLink = ({ label, route }: { label: string; route: string }) => {
+const PageLink = ({ label, pathname }: { label: string; pathname: string }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   return (
-    <Link href={route}>
+    <Link href={{ pathname, query: { siteLanguageId: siteLanguage.id } }}>
       <div css={[$text, $link]}>{label}</div>
     </Link>
   )

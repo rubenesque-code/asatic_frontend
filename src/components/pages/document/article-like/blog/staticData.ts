@@ -1,45 +1,33 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import { fetchBlog, fetchBlogs } from "^lib/firebase/firestore"
+import { fetchBlog, fetchImages } from "^lib/firebase/firestore"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
 import {
-  mapEntitiesLanguageIds,
-  filterValidArticleLikeEntities,
-  mapEntityLanguageIds,
+  getArticleLikeDocumentImageIds,
   processArticleLikeEntityForOwnPage,
-} from "^helpers/process-fetched-data"
-import { fetchAndValidateGlobalData } from "^helpers/static-data/global"
-import { fetchAndValidateLanguages } from "^helpers/static-data/languages"
-import { fetchEntities, validateChildren } from "^helpers/static-data/helpers"
+} from "^helpers/process-fetched-data/article-like"
+import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
 import { StaticData } from "../_types"
+import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
+import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
+import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
+import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
+import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const fetchedBlogs = await fetchBlogs()
+  const fetchedBlogs = await fetchAndValidateBlogs({ ids: "all" })
 
-  if (!fetchedBlogs.length) {
+  if (!fetchedBlogs.entities.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const languages = await fetchAndValidateLanguages(
-    mapEntitiesLanguageIds(fetchedBlogs)
-  )
-
-  const validBlogs = filterValidArticleLikeEntities(fetchedBlogs, languages.ids)
-
-  if (!validBlogs.length) {
-    return {
-      paths: [],
-      fallback: false,
-    }
-  }
-
-  const paths = validBlogs.map((blog) => ({
+  const paths = fetchedBlogs.ids.map((id) => ({
     params: {
-      id: blog.id,
+      id,
     },
   }))
 
@@ -57,35 +45,43 @@ export const getStaticProps: GetStaticProps<
 
   const fetchedBlog = await fetchBlog(params?.id || "")
 
-  const fetchedChildren = await fetchEntities(fetchedBlog)
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: fetchedBlog.authorsIds,
+    validLanguageIds: globalData.languages.ids,
+  })
+  const validCollections = await fetchAndValidateCollections({
+    collectionIds: fetchedBlog.collectionsIds,
+    collectionRelation: "child-of-document",
+    validLanguageIds: globalData.languages.ids,
+  })
+  const validTags = await fetchAndValidateTags({
+    ids: fetchedBlog.tagsIds,
+  })
 
-  const validatedChildren = {
-    ...validateChildren(
-      {
-        authors: fetchedChildren.authors,
-        collections: fetchedChildren.collections,
-        tags: fetchedChildren.tags,
-      },
-      globalData.languages.ids
-    ),
-    subjects: filterAndMapEntitiesById(
-      fetchedBlog.subjectsIds,
-      globalData.subjects.entities
-    ),
-    languages: filterAndMapEntitiesById(
-      mapEntityLanguageIds(fetchedBlog),
-      globalData.languages.entities
-    ),
-  }
+  const imageIds = getArticleLikeDocumentImageIds(fetchedBlog.translations)
+  const fetchedImages = await fetchImages(imageIds)
 
   const processedBlog = processArticleLikeEntityForOwnPage({
     entity: fetchedBlog,
     validLanguageIds: globalData.languages.ids,
-    validImages: fetchedChildren.images,
+    validImages: fetchedImages,
   })
 
   const pageData: StaticData = {
-    entity: { ...processedBlog, ...validatedChildren },
+    entity: {
+      ...processedBlog,
+      authors: validAuthors.entities,
+      collections: validCollections.entities,
+      languages: filterAndMapEntitiesById(
+        mapEntityLanguageIds(processedBlog),
+        globalData.languages.entities
+      ),
+      subjects: filterAndMapEntitiesById(
+        fetchedBlog.subjectsIds,
+        globalData.subjects.entities
+      ),
+      tags: validTags.entities,
+    },
     header: {
       subjects: globalData.subjects.entities,
     },

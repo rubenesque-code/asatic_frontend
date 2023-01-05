@@ -5,7 +5,7 @@ import { StaticData } from "../_types"
 import Header from "^components/header"
 import { $PageBody } from "^components/pages/_styles"
 import { Document_ } from "../_containers"
-import { $DocumentContainer_ } from "../_presentation"
+import { $DocumentContainer_ } from "../../_presentation"
 
 const PageContent = ({ entity: blog, header }: StaticData) => {
   return (

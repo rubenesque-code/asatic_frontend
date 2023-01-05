@@ -8,6 +8,10 @@ import {
   SummaryImage,
   SummaryText,
 } from "^components/pages/_collections/DocumentSummary"
+import Link from "next/link"
+import { routes } from "^constants/routes"
+import { useRouter } from "next/router"
+import { $link } from "^styles/global"
 
 export const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
@@ -27,6 +31,12 @@ const ArticleLikeEntity = ({
 
   const maxBodyCharacters = isFirst ? 800 : 200
 
+  const router = useRouter()
+
+  const routeRoot =
+    articleLikeEntity.type === "article" ? routes.articles : routes.blogs
+  const pathname = `${routeRoot}/${articleLikeEntity.id}`
+
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
       {isFirst ? (
@@ -35,7 +45,20 @@ const ArticleLikeEntity = ({
           styles={tw`mb-xs`}
         />
       ) : null}
-      <h3 css={[tw`text-xl mb-xxs`]}>{translation.title}</h3>
+      <Link
+        href={{
+          pathname,
+          query: {
+            ...router.query,
+            documentLanguageId: translation.languageId,
+          },
+        }}
+        passHref
+      >
+        <h3 css={[tw`text-xl mb-xxs cursor-pointer`, $link]}>
+          {translation.title}
+        </h3>
+      </Link>
       <Authors_
         authors={articleLikeEntity.authors}
         parentLanguageId={translation.languageId}

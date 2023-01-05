@@ -1,14 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
+import Link from "next/link"
+import { useRouter } from "next/router"
 import { ReactElement } from "react"
 import tw from "twin.macro"
 import { PlayIcon } from "^components/Icons"
 
 import { Authors_ } from "^components/pages/_containers"
 import StorageImage from "^components/StorageImage"
+import { routes } from "^constants/routes"
 import { findEntityByLanguageId } from "^helpers/data"
 import { determineChildTranslation } from "^helpers/document"
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { getYoutubeThumbnailFromId } from "^helpers/youtube"
+import { $link } from "^styles/global"
 
 export const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
@@ -24,7 +28,8 @@ const RecordedEvent = ({
     parentCurrentLanguageId
   )
 
-  // can do crude calculation of max chars for summary. Should then have max chars for title, authors?
+  const router = useRouter()
+  const pathname = `${routes.recordedEvents}/${recordedEvent.id}`
 
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
@@ -36,7 +41,18 @@ const RecordedEvent = ({
         type={recordedEvent.recordedEventType}
         parentLanguageId={translation.languageId}
       />
-      <h3 css={[tw`text-xl mb-xxs`]}>{translation.title}</h3>
+      <Link
+        href={{
+          pathname,
+          query: {
+            ...router.query,
+            documentLanguageId: translation.languageId,
+          },
+        }}
+        passHref
+      >
+        <h3 css={[tw`text-xl mb-xxs`, $link]}>{translation.title}</h3>
+      </Link>
       <Authors_
         authors={recordedEvent.authors}
         parentLanguageId={translation.languageId}
@@ -75,7 +91,9 @@ const Type = ({
     return null
   }
 
-  return <h4 css={[tw`uppercase text-sm`]}>{translation.name}</h4>
+  return (
+    <h4 css={[tw`uppercase tracking-wider text-sm`]}>{translation.name}</h4>
+  )
 }
 
 const PlayIconOverlay = () => (

@@ -7,6 +7,7 @@ import { Authors_ } from "../../_containers"
 import { DocumentBody_ } from "./DocumentBody_"
 
 import { $DocumentHeader, $Title, $authors, $Date } from "../_styles"
+import tw from "twin.macro"
 
 export const Document_ = (article: StaticData["entity"]) => {
   const { documentLanguage } = useDetermineDocumentLanguage(article.languages)
@@ -19,10 +20,12 @@ export const Document_ = (article: StaticData["entity"]) => {
   return (
     <>
       <$DocumentHeader>
-        <Languages_
-          documentLanguage={documentLanguage}
-          documentLanguages={article.languages}
-        />
+        <div css={[tw`mb-md`]}>
+          <Languages_
+            documentLanguage={documentLanguage}
+            documentLanguages={article.languages}
+          />
+        </div>
         <$Date>{article.publishDate}</$Date>
         <$Title>{translation.title}</$Title>
         <Authors_
