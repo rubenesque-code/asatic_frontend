@@ -9,18 +9,23 @@ import { findEntityByLanguageId } from "^helpers/data"
 import { Authors_ } from "../_containers"
 import { RecordedEventType } from "^types/entities"
 import { Video_ } from "../_containers"
+import { $CenterMaxWidth_ } from "../_presentation"
+import { $textSectionMaxWidth } from "^styles/global"
+import { useWindowSize } from "react-use"
 
-const $DocumentHeader = tw.div`pb-md border-b`
+const $DocumentHeader = tw.div`sm:pb-xs`
 
-const $Type = tw.h2`text-lg uppercase text-gray-700 mb-xs`
+const $Type = tw.h2`text-sm sm:text-base uppercase text-gray-700 mb-xxs sm:mb-xs`
 
-const $Title = tw.h1`text-3xl text-gray-900 line-height[1.5em]`
+const $Title = tw.h1`text-3xl sm:text-4xl text-gray-900`
 
-const $authors = tw`flex gap-xs text-2xl text-gray-600 mt-xs line-height[1.5em] `
+const $authors = tw`flex gap-xs text-xl sm:text-2xl text-gray-600 mt-xxs sm:mt-xs line-height[1.5em] `
 
-const $DocumentBody = tw.div`py-md border-b`
+const $DocumentBody = tw.div`py-sm sm:py-md`
 
-const $BodyText = tw.div`py-sm prose prose-lg`
+const $BodyText = tw.div`py-sm sm:py-md border-l pl-sm sm:pl-md`
+
+const $textSectionPadding = tw`px-sm sm:px-md`
 
 const Document = (recordedEvent: StaticData["recordedEvent"]) => {
   const { documentLanguage } = useDetermineDocumentLanguage(
@@ -33,32 +38,57 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
     documentLanguage.id
   )!
 
+  const windowSize = useWindowSize()
+
   return (
     <>
-      <$DocumentHeader>
-        <Languages_
-          documentLanguage={documentLanguage}
-          documentLanguages={recordedEvent.languages}
-        />
-        <$Type>
-          <Type_
-            parentRecordedEventLanguageId={translation.languageId}
-            recordedEventType={recordedEvent.recordedEventType}
+      <$CenterMaxWidth_
+        maxWidth={$textSectionMaxWidth}
+        styles={$textSectionPadding}
+      >
+        <$DocumentHeader>
+          <div css={[tw`mb-md`]}>
+            <Languages_
+              documentLanguage={documentLanguage}
+              documentLanguages={recordedEvent.languages}
+            />
+          </div>
+          <$Type>
+            <Type_
+              parentRecordedEventLanguageId={translation.languageId}
+              recordedEventType={recordedEvent.recordedEventType}
+            />
+          </$Type>
+          <$Title>{translation.title}</$Title>
+          <Authors_
+            authors={recordedEvent.authors}
+            documentLanguageId={documentLanguage.id}
+            styles={$authors}
           />
-        </$Type>
-        <$Title>{translation.title}</$Title>
-        <Authors_
-          authors={recordedEvent.authors}
-          documentLanguageId={documentLanguage.id}
-          styles={$authors}
-        />
-      </$DocumentHeader>
+        </$DocumentHeader>
+      </$CenterMaxWidth_>
       <$DocumentBody>
-        <Video_ youtubeId={recordedEvent.youtubeId} />
+        <$CenterMaxWidth_
+          maxWidth={tw`max-w-[1000px]`}
+          styles={tw`border-t border-b py-md px-xxs`}
+        >
+          <Video_ youtubeId={recordedEvent.youtubeId} />
+        </$CenterMaxWidth_>
         {translation.body?.length ? (
-          <$BodyText className="custom-prose">
-            <HtmlStrToJSX htmlStr={translation.body} />
-          </$BodyText>
+          <$CenterMaxWidth_
+            maxWidth={$textSectionMaxWidth}
+            styles={$textSectionPadding}
+          >
+            <$BodyText
+              css={[windowSize.width >= 640 ? tw`prose prose-lg` : tw`prose`]}
+              className="custom-prose"
+              style={{
+                width: " auto",
+              }}
+            >
+              <HtmlStrToJSX htmlStr={translation.body} />
+            </$BodyText>
+          </$CenterMaxWidth_>
         ) : null}
       </$DocumentBody>
     </>

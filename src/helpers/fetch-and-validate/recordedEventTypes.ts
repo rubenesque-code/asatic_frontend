@@ -22,7 +22,7 @@ export async function fetchAndValidateRecordedEventTypes({
 
   const validLanguageIds = passedValidLanguageIds
     ? passedValidLanguageIds
-    : (await fetchAndValidateLanguages()).ids
+    : (await fetchAndValidateLanguages("all")).ids
 
   const validRecordedEventTypes = filterValidRecordedEventTypesAsChildren(
     fetchedRecordedEventTypes,

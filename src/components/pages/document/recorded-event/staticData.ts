@@ -1,9 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import {
-  fetchRecordedEvent,
-  fetchRecordedEvents,
-} from "^lib/firebase/firestore"
+import { fetchRecordedEvent } from "^lib/firebase/firestore"
 
 import {
   Author,
@@ -14,46 +11,30 @@ import {
 } from "^types/entities"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
-import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
-import { filterValidRecordedEvents } from "^helpers/process-fetched-data/recorded-event/validate"
 import { processRecordedEventForOwnPage } from "^helpers/process-fetched-data/recorded-event/process"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { fetchChildEntities } from "^helpers/fetch-data"
-import { validateChildren } from "^helpers/process-fetched-data/validate-wrapper"
-import {
-  mapEntitiesLanguageIds,
-  mapEntityLanguageIds,
-} from "^helpers/process-fetched-data/general"
+import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
+import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
+import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
+import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
+import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
+import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const fetchedRecordedEvents = await fetchRecordedEvents()
+  const validRecordedEvents = await fetchAndValidateRecordedEvents({
+    ids: "all",
+  })
 
-  if (!fetchedRecordedEvents.length) {
+  if (!validRecordedEvents.entities.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const languages = await fetchAndValidateLanguages(
-    mapEntitiesLanguageIds(fetchedRecordedEvents)
-  )
-
-  const validRecordedEvents = filterValidRecordedEvents(
-    fetchedRecordedEvents,
-    languages.ids
-  )
-
-  if (!validRecordedEvents.length) {
-    return {
-      paths: [],
-      fallback: false,
-    }
-  }
-
-  const paths = validRecordedEvents.map((recordedEvent) => ({
+  const paths = validRecordedEvents.ids.map((id) => ({
     params: {
-      id: recordedEvent.id,
+      id,
     },
   }))
 
@@ -81,41 +62,50 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
-  // - Page specific data: START ---
-
   const fetchedRecordedEvent = await fetchRecordedEvent(params?.id || "")
 
-  const fetchedChildren = await fetchChildEntities(fetchedRecordedEvent)
-
-  // ! validateChildren → recordedEventType typing works? It catches undefinde, null, invalid?
-  const validatedChildren = {
-    ...validateChildren(
-      {
-        authors: fetchedChildren.authors,
-        collections: fetchedChildren.collections,
-        tags: fetchedChildren.tags,
-        recordedEventType: fetchedChildren.recordedEventType,
-      },
-      globalData.languages.ids
-    ),
-    subjects: filterAndMapEntitiesById(
-      fetchedRecordedEvent.subjectsIds,
-      globalData.subjects.entities
-    ),
-    languages: filterAndMapEntitiesById(
-      mapEntityLanguageIds(fetchedRecordedEvent),
-      globalData.languages.entities
-    ),
-  }
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: fetchedRecordedEvent.authorsIds,
+    validLanguageIds: globalData.languages.ids,
+  })
+  const validCollections = await fetchAndValidateCollections({
+    collectionIds: fetchedRecordedEvent.collectionsIds,
+    collectionRelation: "child-of-document",
+    validLanguageIds: globalData.languages.ids,
+  })
+  const validTags = await fetchAndValidateTags({
+    ids: fetchedRecordedEvent.tagsIds,
+  })
+  const validRecordedEventType = !fetchedRecordedEvent.recordedEventTypeId
+    ? null
+    : (
+        await fetchAndValidateRecordedEventTypes({
+          ids: [fetchedRecordedEvent.recordedEventTypeId],
+          validLanguageIds: globalData.languages.ids,
+        })
+      ).entities[0]
 
   const processedRecordedEvent = processRecordedEventForOwnPage({
     recordedEvent: fetchedRecordedEvent,
-    recordedEventType: validatedChildren.recordedEventType,
+    recordedEventType: validRecordedEventType,
     validLanguageIds: globalData.languages.ids,
   })
 
   const pageData: StaticData = {
-    recordedEvent: { ...processedRecordedEvent, ...validatedChildren },
+    recordedEvent: {
+      ...processedRecordedEvent,
+      authors: validAuthors.entities,
+      collections: validCollections.entities,
+      languages: filterAndMapEntitiesById(
+        mapEntityLanguageIds(processedRecordedEvent),
+        globalData.languages.entities
+      ),
+      subjects: filterAndMapEntitiesById(
+        fetchedRecordedEvent.subjectsIds,
+        globalData.subjects.entities
+      ),
+      tags: validTags.entities,
+    },
     header: {
       subjects: globalData.subjects.entities,
     },
