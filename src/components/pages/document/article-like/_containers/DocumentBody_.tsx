@@ -4,9 +4,10 @@ import { reorderSections } from "^helpers/manipulateEntity"
 
 import { StaticData } from "../_types"
 
-import { $TextSection_, $ImageSection_, $VideoSection_ } from "../_presentation"
+import { $ImageSection_, $VideoSection_ } from "../_presentation"
 
 import { $DocumentBody } from "../_styles"
+import Prose_ from "../../_containers/Prose_"
 
 export const DocumentBody_ = ({
   body,
@@ -22,7 +23,7 @@ export const DocumentBody_ = ({
           {section.type === "image" ? (
             <$ImageSection_ section={section} />
           ) : section.type === "text" ? (
-            <$TextSection_ data={section} />
+            <Prose_ htmlStr={section.text} />
           ) : (
             <$VideoSection_ section={section} />
           )}

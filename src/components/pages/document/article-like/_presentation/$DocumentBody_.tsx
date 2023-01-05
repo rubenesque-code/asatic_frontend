@@ -1,26 +1,18 @@
 // imports
 import tw from "twin.macro"
 
-import HtmlStrToJSX from "^components/HtmlStrToJSX"
 import StorageImage from "^components/StorageImage"
 
 import { StaticData } from "../_types"
 
 import { Video_ } from "../../_containers"
 
-import { $TextSection, $Caption } from "../_styles"
+import { $Caption } from "../_styles"
 
 type Section = StaticData["entity"]["translations"][number]["body"][number]
 
-type TextSection = Extract<Section, { type: "text" }>
 type ImageSection = Extract<Section, { type: "image" }>
 type VideoSection = Extract<Section, { type: "video" }>
-
-export const $TextSection_ = ({ data }: { data: TextSection }) => (
-  <$TextSection className="custom-prose">
-    <HtmlStrToJSX htmlStr={data.text} />
-  </$TextSection>
-)
 
 export const $ImageSection_ = ({ section }: { section: ImageSection }) => (
   <div>

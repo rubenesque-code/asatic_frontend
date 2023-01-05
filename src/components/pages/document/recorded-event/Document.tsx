@@ -2,7 +2,6 @@ import tw from "twin.macro"
 
 import { StaticData } from "./staticData"
 
-import HtmlStrToJSX from "^components/HtmlStrToJSX"
 import { Languages_ } from "^components/pages/_containers"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { findEntityByLanguageId } from "^helpers/data"
@@ -11,7 +10,7 @@ import { RecordedEventType } from "^types/entities"
 import { Video_ } from "../_containers"
 import { $CenterMaxWidth_ } from "../_presentation"
 import { $textSectionMaxWidth } from "^styles/global"
-import { useWindowSize } from "react-use"
+import Prose_ from "../_containers/Prose_"
 
 const $DocumentHeader = tw.div`sm:pb-xs`
 
@@ -23,7 +22,7 @@ const $authors = tw`flex gap-xs text-xl sm:text-2xl text-gray-600 mt-xxs sm:mt-x
 
 const $DocumentBody = tw.div`py-sm sm:py-md`
 
-const $BodyText = tw.div`py-sm sm:py-md border-l pl-sm sm:pl-md`
+const $bodyText = tw`py-sm sm:py-md border-l pl-sm sm:pl-md`
 
 const $textSectionPadding = tw`px-sm sm:px-md`
 
@@ -37,8 +36,6 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
     recordedEvent.translations,
     documentLanguage.id
   )!
-
-  const windowSize = useWindowSize()
 
   return (
     <>
@@ -79,15 +76,7 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
             maxWidth={$textSectionMaxWidth}
             styles={$textSectionPadding}
           >
-            <$BodyText
-              css={[windowSize.width >= 640 ? tw`prose prose-lg` : tw`prose`]}
-              className="custom-prose"
-              style={{
-                width: " auto",
-              }}
-            >
-              <HtmlStrToJSX htmlStr={translation.body} />
-            </$BodyText>
+            <Prose_ htmlStr={translation.body} styles={$bodyText} />
           </$CenterMaxWidth_>
         ) : null}
       </$DocumentBody>
