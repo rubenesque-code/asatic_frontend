@@ -1,4 +1,8 @@
-import { ArticleLikeSummaryType, SanitisedArticle } from "^types/entities"
+import {
+  ArticleLikeSummaryType,
+  SanitisedArticle,
+  SanitisedBlog,
+} from "^types/entities"
 
 type Translation = SanitisedArticle["translations"][number]
 
@@ -13,6 +17,14 @@ export function getArticleLikeDocumentImageIds(
   const unique = Array.from(new Set(imageIds).values())
 
   return unique
+}
+
+export function getArticleLikeEntitiesImageIds(
+  entities: (SanitisedArticle | SanitisedBlog)[]
+) {
+  return entities.flatMap((entity) =>
+    getArticleLikeDocumentImageIds(entity.translations)
+  )
 }
 
 export const getArticleLikeSummary = (

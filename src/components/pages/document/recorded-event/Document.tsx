@@ -8,7 +8,7 @@ import { findEntityByLanguageId } from "^helpers/data"
 import { Authors_ } from "../_containers"
 import { RecordedEventType } from "^types/entities"
 import { Video_ } from "../_containers"
-import { $CenterMaxWidth_ } from "../_presentation"
+import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import { $textSectionMaxWidth } from "^styles/global"
 import Prose_ from "../_containers/Prose_"
 

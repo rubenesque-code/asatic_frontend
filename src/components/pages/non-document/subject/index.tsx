@@ -7,8 +7,9 @@ import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguag
 import Header from "^components/header"
 import { $PageBody } from "^components/pages/_styles"
 import DocumentHeader from "./Header"
-import { $DocumentContainer_ } from "./_presentation"
+import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import DocumentBody from "./Body"
+import { $nonDocumentMaxWidth } from "^styles/global"
 
 const PageContent = ({ header, subject }: StaticData) => {
   const { documentLanguage } = useDetermineDocumentLanguage(subject.languages)
@@ -22,19 +23,21 @@ const PageContent = ({ header, subject }: StaticData) => {
     <>
       <Header {...header} documentLanguageIds={mapIds(subject.languages)} />
       <$PageBody>
-        <$DocumentContainer_>
-          <DocumentHeader
-            title={translation.title}
-            documentLanguage={documentLanguage}
-            documentLanguages={subject.languages}
-          />
-          <DocumentBody
-            documentLanguage={documentLanguage}
-            childDocumentEntities={subject.childDocumentEntities}
-            collections={subject.collections}
-            subjectTitle={translation.title}
-          />
-        </$DocumentContainer_>
+        <$CenterMaxWidth_ maxWidth={$nonDocumentMaxWidth}>
+          <div>
+            <DocumentHeader
+              title={translation.title}
+              documentLanguage={documentLanguage}
+              documentLanguages={subject.languages}
+            />
+            <DocumentBody
+              documentLanguage={documentLanguage}
+              childDocumentEntities={subject.childDocumentEntities}
+              collections={subject.collections}
+              subjectTitle={translation.title}
+            />
+          </div>
+        </$CenterMaxWidth_>
       </$PageBody>
     </>
   )

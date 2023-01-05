@@ -6,7 +6,7 @@ import { TranslateIcon } from "^components/Icons"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 export type SiteLanguageProps = {
-  documentLanguageIds: string[]
+  documentLanguageIds?: string[]
 }
 
 const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
@@ -16,7 +16,7 @@ const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
   const siteLanguageIdOnToggle =
     siteLanguage.id === "english" ? "tamil" : "english"
 
-  const changeDocLanguageIdToSiteLanguageId = documentLanguageIds.includes(
+  const changeDocLanguageIdToSiteLanguageId = documentLanguageIds?.includes(
     siteLanguageIdOnToggle
   )
 

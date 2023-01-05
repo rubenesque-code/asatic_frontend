@@ -1,8 +1,12 @@
-// features: languages comp as filter? (of all languages); tags?; subjects?
-// languages: click on to show those articles at the top
+import type { NextPage } from "next"
 
-const ArticlesPage = () => {
-  return <div>Articles Page</div>
+import { StaticData } from "^components/pages/non-document/article-like/_types"
+import PageContent from "^components/pages/non-document/article-like/articles"
+
+export { getStaticProps } from "^components/pages/non-document/article-like/articles/staticData"
+
+const ArticlesPage: NextPage<StaticData> = (staticData) => {
+  return <PageContent {...staticData} />
 }
 
 export default ArticlesPage
