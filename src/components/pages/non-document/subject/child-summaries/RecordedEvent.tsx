@@ -75,7 +75,7 @@ const Type = ({
     return null
   }
 
-  return <h4>{translation.name}</h4>
+  return <h4 css={[tw`uppercase text-sm`]}>{translation.name}</h4>
 }
 
 const PlayIconOverlay = () => (

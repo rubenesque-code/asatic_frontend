@@ -25,7 +25,8 @@ export const Swiper_ = ({
 
   const windowSize = useWindowSize()
 
-  const numSlidesPerView = windowSize.width >= 1024 ? 3 : 2
+  const numSlidesPerView =
+    windowSize.width >= 1024 ? 3 : windowSize.width >= 768 ? 2 : 1
   const navigationIsShowing = swiper && slides.length > numSlidesPerView
 
   return (
