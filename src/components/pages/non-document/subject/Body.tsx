@@ -22,8 +22,6 @@ const DocumentBody = ({
   collections: StaticData["subject"]["collections"]
   subjectTitle: string
 }) => {
-  console.log("length", childDocumentEntities.second.length)
-
   const windowSize = useWindowSize()
   return (
     <div css={[tw`pb-xl`]}>

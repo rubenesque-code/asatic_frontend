@@ -9,7 +9,7 @@ const DocumentHeader = ({
   return (
     <div css={[tw`pb-sm border-b`]}>
       <h2 css={[tw`text-center text-3xl`]}>{title}</h2>
-      <div css={[tw`mt-lg`]}>
+      <div css={[tw`mt-lg pl-sm md:pl-md`]}>
         <Languages_ {...languages_props} />
       </div>
     </div>
