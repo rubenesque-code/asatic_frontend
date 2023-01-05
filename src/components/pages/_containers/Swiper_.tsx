@@ -7,7 +7,7 @@ import { CaretLeft, CaretRight } from "phosphor-react"
 import tw from "twin.macro"
 
 import { sectionColorThemes, SectionColorTheme } from "^constants/colours"
-import { ContainerWidth } from "^components/ContainerUtility"
+import { useWindowSize } from "react-use"
 
 export const Swiper_ = ({
   colorTheme,
@@ -23,31 +23,25 @@ export const Swiper_ = ({
     swipeRight: () => swiper?.slideNext(),
   }
 
-  return (
-    <ContainerWidth>
-      {(containerWidth) => {
-        const numSlidesPerView = containerWidth > 900 ? 3 : 2
-        const navigationIsShowing = swiper && slides.length > numSlidesPerView
+  const windowSize = useWindowSize()
 
-        return (
-          <Swiper
-            spaceBetween={0}
-            slidesPerView={numSlidesPerView}
-            onSwiper={(swiper) => setSwiper(swiper)}
-          >
-            {slides.map((slide, i) => (
-              // `SwiperSlide`, as it's imported from swiper/react, needs to be a direct child of `Swiper`; can't be within another component.
-              <SwiperSlide key={i}>
-                <div css={[tw`p-sm border-r h-full`]}>{slide}</div>
-              </SwiperSlide>
-            ))}
-            {navigationIsShowing ? (
-              <Navigation_ colorTheme={colorTheme} {...navButtonsFuncs} />
-            ) : null}
-          </Swiper>
-        )
-      }}
-    </ContainerWidth>
+  const numSlidesPerView = windowSize.width >= 1024 ? 3 : 2
+  const navigationIsShowing = swiper && slides.length > numSlidesPerView
+
+  return (
+    <Swiper
+      spaceBetween={0}
+      slidesPerView={numSlidesPerView}
+      onSwiper={(swiper) => setSwiper(swiper)}
+    >
+      {slides.map((slide, i) => (
+        // `SwiperSlide`, as it's imported from swiper/react, needs to be a direct child of `Swiper`; can't be within another component.
+        <SwiperSlide key={i}>{slide}</SwiperSlide>
+      ))}
+      {navigationIsShowing ? (
+        <Navigation_ colorTheme={colorTheme} {...navButtonsFuncs} />
+      ) : null}
+    </Swiper>
   )
 }
 

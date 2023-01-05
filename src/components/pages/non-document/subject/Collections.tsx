@@ -5,8 +5,9 @@ import { StaticData } from "./staticData"
 import { Swiper_ } from "^page-container"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import Collection from "./child-summaries/Collection"
+import { $SectionContent, $SectionHeader } from "./_styles"
 
-const CollectionSwiper = ({
+const Collections = ({
   collections,
   parentCurrentLanguageId,
 }: {
@@ -21,25 +22,22 @@ const CollectionSwiper = ({
 
   return (
     <div css={[tw`border-b`]}>
-      <div
-        css={[
-          tw`text-2xl text-gray-700 mb-sm border-b pl-xs pb-sm pt-md border-t`,
-        ]}
-      >
-        Collections
-      </div>
-      <Swiper_
-        colorTheme="white"
-        slides={orderedCollections.map((collection) => (
-          <Collection
-            collection={collection}
-            parentCurrentLanguageId={parentCurrentLanguageId}
-            key={collection.id}
-          />
-        ))}
-      />
+      <$SectionHeader>Collections</$SectionHeader>
+      <$SectionContent>
+        <Swiper_
+          colorTheme="white"
+          slides={orderedCollections.map((collection, i) => (
+            <Collection
+              collection={collection}
+              parentCurrentLanguageId={parentCurrentLanguageId}
+              index={i}
+              key={collection.id}
+            />
+          ))}
+        />
+      </$SectionContent>
     </div>
   )
 }
 
-export default CollectionSwiper
+export default Collections
