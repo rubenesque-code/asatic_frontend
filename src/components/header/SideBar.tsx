@@ -83,6 +83,12 @@ const Content = (subjectsProp: SubjectsProp) => {
             pathname={routes.blogs}
           />
         </div>
+        <div css={[tw`pt-md border-t`]}>
+          <PageLink
+            label={siteTranslations.recordedEvents[siteLanguage.id]}
+            pathname={routes.recordedEvents}
+          />
+        </div>
         {!subjectsProp.subjects.length ? null : (
           <div css={[tw`pt-md border-t`]}>
             <Subjects {...subjectsProp} />

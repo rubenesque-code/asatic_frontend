@@ -11,6 +11,10 @@ export const siteTranslations = {
     english: "blogs",
     tamil: "Tblogs",
   },
+  recordedEvents: {
+    english: "videos",
+    tamil: "TVideos",
+  },
   subjects: {
     english: "subjects",
     tamil: "Tsubjects",
