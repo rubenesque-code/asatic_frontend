@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { mapIds } from "^helpers/data"
-import { LanguageSort_ } from "../_containers"
-import DocumentBody from "./DocumentBody"
-import DocumentHeader from "./DocumentHeader"
-import { StaticData } from "./staticData"
+import { LanguageSort_ } from "../../_containers"
+import { StaticData } from "../_types"
+import DocumentBody from "../../_containers/DocumentBody_"
+import DocumentHeader from "./DocumentHeader_"
 
-const PageBody = ({
-  languages,
-  recordedEvents,
-}: StaticData["recordedEvents"]) => {
+export const PageBody_ = ({
+  articleLikeEntities,
+}: {
+  articleLikeEntities: StaticData["articleLikeEntities"]
+}) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   const [sortLanguageId, setSortLanguageId] = useState<string | null>(() => {
-    if (languages.length < 2) {
+    if (articleLikeEntities.languages.length < 2) {
       return null
     }
 
-    const languageIds = mapIds(languages)
+    const languageIds = mapIds(articleLikeEntities.languages)
     const secondDefaultLanguageId =
       siteLanguage.id === "english" ? "tamil" : "english"
 
@@ -33,7 +34,7 @@ const PageBody = ({
       return
     }
 
-    if (!mapIds(languages).includes(siteLanguage.id)) {
+    if (!mapIds(articleLikeEntities.languages).includes(siteLanguage.id)) {
       return
     }
 
@@ -45,22 +46,21 @@ const PageBody = ({
   return (
     <div>
       <DocumentHeader
+        entityType={articleLikeEntities.entities[0].type}
         languageSort={
-          !sortLanguageId ? null : (
+          sortLanguageId === null ? null : (
             <LanguageSort_
               currentSortLanguageId={sortLanguageId}
-              entitiesLanguages={languages}
+              entitiesLanguages={articleLikeEntities.languages}
               setSortLanguageId={setSortLanguageId}
             />
           )
         }
       />
       <DocumentBody
+        articleLikeEntities={articleLikeEntities}
         sortLanguageId={sortLanguageId}
-        recordedEvents={recordedEvents}
       />
     </div>
   )
 }
-
-export default PageBody

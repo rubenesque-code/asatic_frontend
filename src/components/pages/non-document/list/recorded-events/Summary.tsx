@@ -18,6 +18,8 @@ import { StaticData } from "./staticData"
 
 export const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
+// TODO: this is repeated from subject
+
 const RecordedEvent = ({
   recordedEvent,
   sortLanguageId,

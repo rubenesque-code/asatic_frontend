@@ -1,22 +1,23 @@
-import { StaticData } from "./staticData"
-
 import { $PageBody } from "^components/pages/_styles"
-import Header from "^components/header"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import { $nonDocumentMaxWidth } from "^styles/global"
-import PageBody from "./PageBody"
+import { ReactElement } from "react"
 
-const RecordedEventsPage = ({ recordedEvents, header }: StaticData) => {
+export const $PageLayout = ({
+  children: pageBody,
+  header,
+}: {
+  children: ReactElement[]
+  header: ReactElement
+}) => {
   return (
     <>
-      <Header {...header} />
+      {header}
       <$PageBody>
         <$CenterMaxWidth_ maxWidth={$nonDocumentMaxWidth}>
-          <PageBody {...recordedEvents} />
+          <div>{pageBody}</div>
         </$CenterMaxWidth_>
       </$PageBody>
     </>
   )
 }
-
-export default RecordedEventsPage

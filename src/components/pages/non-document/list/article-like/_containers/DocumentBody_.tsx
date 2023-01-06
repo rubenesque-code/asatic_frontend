@@ -10,14 +10,17 @@ import Summary_ from "./Summary_"
 
 const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
 
-const useProcessEntities = ({
-  articleLikeEntities,
+function useProcessEntities<
+  TEntity extends { translations: TTranslation[]; publishDate: string },
+  TTranslation extends { languageId: string }
+>({
+  entities,
   sortLanguageId,
 }: {
-  articleLikeEntities: StaticData["articleLikeEntities"]
+  entities: TEntity[]
   sortLanguageId: string | null
-}) => {
-  const orderedByDate = sortEntitiesByDate(articleLikeEntities.entities)
+}) {
+  const orderedByDate = sortEntitiesByDate(entities)
 
   const { siteLanguage } = useSiteLanguageContext()
 
@@ -37,7 +40,7 @@ const DocumentBody = ({
   sortLanguageId: string | null
 }) => {
   const processedEntities = useProcessEntities({
-    articleLikeEntities,
+    entities: articleLikeEntities.entities,
     sortLanguageId: sortLanguageId,
   })
 
@@ -48,12 +51,13 @@ const DocumentBody = ({
           {processedEntities.map((articleLikeEntity, i) => (
             <div
               css={[
-                i % 2 === 0 && tw`lg:border-r`,
-                i !== processedEntities.length - 1
-                  ? tw`border-b`
-                  : tw`border-b-0`,
-                i !== processedEntities.length - 1 &&
-                i !== processedEntities.length - 2
+                i % 2 === 0 && tw`md:border-r`,
+                processedEntities.length % 2 === 1
+                  ? i !== processedEntities.length - 1
+                    ? tw`border-b`
+                    : tw`border-b-0`
+                  : i !== processedEntities.length - 1 &&
+                    i !== processedEntities.length - 2
                   ? tw`lg:border-b`
                   : tw`lg:border-b-0`,
               ]}
