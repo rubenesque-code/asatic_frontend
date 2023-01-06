@@ -6,7 +6,7 @@ import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import { $nonDocumentMaxWidth } from "^styles/global"
 import { PageBody_ } from "../_containers"
 
-const ArticlesPage = ({ articleLikeEntities, header }: StaticData) => {
+const BlogsPage = ({ articleLikeEntities, header }: StaticData) => {
   return (
     <>
       <Header {...header} />
@@ -19,4 +19,4 @@ const ArticlesPage = ({ articleLikeEntities, header }: StaticData) => {
   )
 }
 
-export default ArticlesPage
+export default BlogsPage

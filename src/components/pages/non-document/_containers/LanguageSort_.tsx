@@ -3,15 +3,15 @@ import { SortAscendingIcon, TranslateIcon } from "^components/Icons"
 import { Language } from "^types/entities"
 
 export type LanguageSort_Props = {
-  currentFilterLanguageId: string
-  setFilterLanguageId: (languageId: string) => void
-  filterLanguages: Language[]
+  currentSortLanguageId: string
+  setSortLanguageId: (languageId: string) => void
+  entitiesLanguages: Language[]
 }
 
 export const LanguageSort_ = ({
-  currentFilterLanguageId,
-  setFilterLanguageId,
-  filterLanguages,
+  currentSortLanguageId,
+  setSortLanguageId,
+  entitiesLanguages,
 }: LanguageSort_Props) => {
   return (
     <div css={[tw`flex items-center gap-sm`]}>
@@ -22,18 +22,18 @@ export const LanguageSort_ = ({
         <TranslateIcon weight="light" />
       </div>
       <div css={[tw`flex gap-xs items-center`]}>
-        {filterLanguages.map((language) => (
+        {entitiesLanguages.map((language) => (
           <div
             css={[
               tw`py-0.5 px-2 border rounded-md text-sm font-serif-secondary tracking-wide text-gray-700 transition-colors ease-in-out`,
-              language.id !== currentFilterLanguageId &&
+              language.id !== currentSortLanguageId &&
                 tw`text-gray-400 cursor-pointer border-gray-100`,
             ]}
             onClick={() => {
-              if (language.id === currentFilterLanguageId) {
+              if (language.id === currentSortLanguageId) {
                 return
               }
-              setFilterLanguageId(language.id)
+              setSortLanguageId(language.id)
             }}
             key={language.id}
           >

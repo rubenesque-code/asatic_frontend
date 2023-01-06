@@ -1,19 +1,23 @@
+import { ReactElement } from "react"
 import tw from "twin.macro"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { LanguageSort_, LanguageSort_Props } from "../../_containers"
 
-const DocumentHeader = (languageFilterProps: LanguageSort_Props) => {
+const DocumentHeader = ({
+  languageSort,
+}: {
+  languageSort: ReactElement | null
+}) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
-    <div css={[tw`pb-sm border-b`]}>
+    <div css={[tw`pb-sm border-b`, !languageSort && tw`pb-lg`]}>
       <h2 css={[tw`text-center text-3xl capitalize`]}>
         {siteTranslations.articles[siteLanguage.id]}
       </h2>
-      <div css={[tw`mt-lg pl-sm md:pl-md`]}>
-        <LanguageSort_ {...languageFilterProps} />
-      </div>
+      {languageSort ? (
+        <div css={[tw`mt-lg pl-sm md:pl-md`]}>{languageSort}</div>
+      ) : null}
     </div>
   )
 }

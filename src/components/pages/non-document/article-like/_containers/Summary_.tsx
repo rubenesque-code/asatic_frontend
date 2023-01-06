@@ -9,26 +9,21 @@ import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { determineChildTranslation } from "^helpers/document"
 import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 import { $link } from "^styles/global"
-import { FilterLanguageId } from "./PageBody"
 
 const $authors = tw`flex gap-xs text-xl text-gray-600 mt-xs`
 
-const Summary = ({
+const Summary_ = ({
   articleLikeEntity,
-  filterLanguageId,
+  sortLanguageId,
 }: {
   articleLikeEntity: ArticleLikeEntityAsSummary
-  filterLanguageId: FilterLanguageId
+  sortLanguageId: string | null
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
-  const languageId = (
-    filterLanguageId !== "all" ? filterLanguageId : siteLanguage.id
-  ) as string
-
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
-    languageId
+    sortLanguageId || siteLanguage.id
   )
 
   const maxBodyCharacters = 650
@@ -78,4 +73,4 @@ const Summary = ({
   )
 }
 
-export default Summary
+export default Summary_

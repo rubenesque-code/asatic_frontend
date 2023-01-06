@@ -1,5 +1,11 @@
 import { useRouter } from "next/router"
-import { createContext, ReactElement, useContext } from "react"
+import {
+  createContext,
+  ReactElement,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
 import { checkObjectHasField } from "^helpers/data"
 import { Language } from "^types/entities"
 
@@ -24,19 +30,27 @@ type Value = {
 const Context = createContext({} as Value)
 
 const SiteLanguageProvider = ({ children }: { children: ReactElement }) => {
+  const [siteLanguage, setSiteLanguage] = useState<SiteLanguage>({
+    id: "english",
+    name: "English",
+  })
+
   const router = useRouter()
   const routerQuery = router.query as RouterQuery
 
-  // defaults to english
-  const currentSiteLanguage: SiteLanguage =
-    routerQuery.siteLanguageId === "tamil"
-      ? { id: "tamil", name: "Tamil" }
-      : { id: "english", name: "English" }
+  useEffect(() => {
+    const currentSiteLanguage: SiteLanguage =
+      routerQuery.siteLanguageId === "tamil"
+        ? { id: "tamil", name: "Tamil" }
+        : { id: "english", name: "English" }
+
+    setSiteLanguage(currentSiteLanguage)
+  }, [routerQuery.siteLanguageId])
 
   return (
     <Context.Provider
       value={{
-        siteLanguage: currentSiteLanguage,
+        siteLanguage,
       }}
     >
       {children}

@@ -1,41 +1,44 @@
 import tw from "twin.macro"
+import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 import {
   sortEntitiesByDate,
   sortEntitiesByLanguage,
 } from "^helpers/manipulateEntity"
 import { StaticData } from "../_types"
-import Summary from "./Summary"
+import Summary_ from "./Summary_"
 
 const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
 
 const useProcessEntities = ({
   articleLikeEntities,
-  filterLanguageId,
+  sortLanguageId,
 }: {
   articleLikeEntities: StaticData["articleLikeEntities"]
-  filterLanguageId: string
+  sortLanguageId: string | null
 }) => {
   const orderedByDate = sortEntitiesByDate(articleLikeEntities.entities)
 
-  const orderedByFilterLanguage = sortEntitiesByLanguage(
+  const { siteLanguage } = useSiteLanguageContext()
+
+  const orderedByLanguage = sortEntitiesByLanguage(
     orderedByDate,
-    filterLanguageId as string
+    sortLanguageId || siteLanguage.id
   )
 
-  return orderedByFilterLanguage
+  return orderedByLanguage
 }
 
 const DocumentBody = ({
   articleLikeEntities,
-  filterLanguageId,
+  sortLanguageId,
 }: {
   articleLikeEntities: StaticData["articleLikeEntities"]
-  filterLanguageId: string
+  sortLanguageId: string | null
 }) => {
   const processedEntities = useProcessEntities({
     articleLikeEntities,
-    filterLanguageId,
+    sortLanguageId: sortLanguageId,
   })
 
   return (
@@ -56,9 +59,9 @@ const DocumentBody = ({
               ]}
               key={articleLikeEntity.id}
             >
-              <Summary
+              <Summary_
                 articleLikeEntity={articleLikeEntity}
-                filterLanguageId={filterLanguageId}
+                sortLanguageId={sortLanguageId}
               />
             </div>
           ))}
