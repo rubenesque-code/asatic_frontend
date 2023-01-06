@@ -37,6 +37,7 @@ export const Languages_ = ({
             }}
             shallow={true}
             passHref
+            replace
             key={language.id}
           >
             <div

@@ -37,6 +37,7 @@ const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
           },
         }}
         shallow={true}
+        replace={true}
         passHref
       >
         <span css={[tw`font-sans-primary font-light cursor-pointer`]}>

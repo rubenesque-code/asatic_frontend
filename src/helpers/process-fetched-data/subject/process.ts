@@ -62,3 +62,35 @@ function orderChildDocumentEntities(
 
   return order(entities)
 }
+
+function processSubjectAsLink(
+  subject: SanitisedSubject,
+  {
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
+  }
+) {
+  const validTranslations = subject.translations.filter((translation) =>
+    validateTranslation(translation, validLanguageIds)
+  ) as ValidTranslation[]
+
+  return {
+    id: subject.id,
+    publishDate: subject.publishDate,
+    translations: validTranslations,
+  }
+}
+
+export function processSubjectsAsLinks(
+  subjects: SanitisedSubject[],
+  {
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
+  }
+) {
+  return subjects.map((subject) =>
+    processSubjectAsLink(subject, { validLanguageIds })
+  )
+}

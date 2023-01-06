@@ -11,4 +11,8 @@ export const siteTranslations = {
     english: "blogs",
     tamil: "Tblogs",
   },
+  subjects: {
+    english: "subjects",
+    tamil: "Tsubjects",
+  },
 }

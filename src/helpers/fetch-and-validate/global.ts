@@ -4,7 +4,7 @@ import { fetchAndValidateSubjects } from "./subjects"
 export async function fetchAndValidateGlobalData() {
   const validLanguages = await fetchAndValidateLanguages("all")
   const subjects = await fetchAndValidateSubjects({
-    subjectIds: "all",
+    ids: "all",
     validLanguageIds: validLanguages.ids,
   })
 

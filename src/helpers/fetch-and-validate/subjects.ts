@@ -11,14 +11,14 @@ import { fetchAndValidateRecordedEvents } from "./recordedEvents"
 
 export async function fetchAndValidateSubjects({
   subjectRelation = "default",
-  subjectIds,
+  ids,
   validLanguageIds: passedValidLanguageIds,
 }: {
   subjectRelation?: "child-of-document" | "default"
-  subjectIds: string[] | "all"
+  ids: string[] | "all"
   validLanguageIds?: string[]
 }) {
-  const fetchedSubjects = await fetchSubjects(subjectIds)
+  const fetchedSubjects = await fetchSubjects(ids)
 
   if (!fetchedSubjects.length) {
     return {
@@ -31,7 +31,7 @@ export async function fetchAndValidateSubjects({
     ? passedValidLanguageIds
     : (await fetchAndValidateLanguages("all")).ids
 
-  const ids = getUniqueChildEntityIds(fetchedSubjects, [
+  const childIds = getUniqueChildEntityIds(fetchedSubjects, [
     "articlesIds",
     "blogsIds",
     "collectionsIds",
@@ -39,19 +39,19 @@ export async function fetchAndValidateSubjects({
   ])
 
   const validArticles = await fetchAndValidateArticles({
-    ids: ids.articlesIds,
+    ids: childIds.articlesIds,
     validLanguageIds,
   })
   const validBlogs = await fetchAndValidateBlogs({
-    ids: ids.blogsIds,
+    ids: childIds.blogsIds,
     validLanguageIds,
   })
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
-    ids: ids.blogsIds,
+    ids: childIds.blogsIds,
     validLanguageIds,
   })
   const validCollections = await fetchAndValidateCollections({
-    collectionIds: ids.collectionsIds,
+    collectionIds: childIds.collectionsIds,
     validLanguageIds,
     collectionRelation: "default",
   })
