@@ -1,4 +1,5 @@
 import { GetStaticProps } from "next"
+import { filterAndMapEntitiesById } from "^helpers/data"
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
@@ -7,6 +8,7 @@ import {
   processArticleLikeEntityAsSummary,
 } from "^helpers/process-fetched-data/article-like"
 import { getUniqueChildEntityIds } from "^helpers/process-fetched-data/general"
+import { getEntitiesUniqueLanguageIds } from "^helpers/queryEntity"
 import { fetchImages } from "^lib/firebase/firestore"
 import { StaticData } from "../_types"
 
@@ -41,9 +43,17 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
     })
   )
 
+  const languageIds = getEntitiesUniqueLanguageIds(processedArticles)
+
   return {
     props: {
-      articleLikeEntities: processedArticles,
+      articleLikeEntities: {
+        entities: processedArticles,
+        languages: filterAndMapEntitiesById(
+          languageIds,
+          globalData.languages.entities
+        ),
+      },
       header: {
         subjects: globalData.subjects.entities,
       },

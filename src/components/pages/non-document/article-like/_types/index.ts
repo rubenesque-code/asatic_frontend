@@ -1,10 +1,13 @@
 import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
-import { SanitisedSubject } from "^types/entities"
+import { Language, SanitisedSubject } from "^types/entities"
 
 type ArticleLikeAsSummary = ReturnType<typeof processArticleLikeEntityAsSummary>
 
 export type StaticData = {
-  articleLikeEntities: ArticleLikeAsSummary[]
+  articleLikeEntities: {
+    entities: ArticleLikeAsSummary[]
+    languages: Language[]
+  }
   header: {
     subjects: SanitisedSubject[]
   }

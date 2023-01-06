@@ -14,6 +14,6 @@ export function sortEntitiesByDate<TEntity extends { publishDate: string }>(
   entities: TEntity[]
 ) {
   return entities.sort((a, b) => {
-    return new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime()
+    return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
   })
 }

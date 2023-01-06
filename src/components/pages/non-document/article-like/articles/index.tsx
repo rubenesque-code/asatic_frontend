@@ -4,7 +4,7 @@ import { $PageBody } from "^components/pages/_styles"
 import Header from "^components/header"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import { $nonDocumentMaxWidth } from "^styles/global"
-import Body from "./Body"
+import PageBody from "./PageBody"
 
 const ArticlesPage = ({ articleLikeEntities, header }: StaticData) => {
   return (
@@ -12,7 +12,7 @@ const ArticlesPage = ({ articleLikeEntities, header }: StaticData) => {
       <Header {...header} />
       <$PageBody>
         <$CenterMaxWidth_ maxWidth={$nonDocumentMaxWidth}>
-          <Body articleLikeEntities={articleLikeEntities} />
+          <PageBody articleLikeEntities={articleLikeEntities} />
         </$CenterMaxWidth_>
       </$PageBody>
     </>

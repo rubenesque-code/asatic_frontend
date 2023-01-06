@@ -5,7 +5,7 @@ import DocumentHeader from "./DocumentHeader"
 
 export type FilterLanguageId = "all" | Omit<string, "all">
 
-const Body = ({
+const PageBody = ({
   articleLikeEntities,
 }: {
   articleLikeEntities: StaticData["articleLikeEntities"]
@@ -15,10 +15,17 @@ const Body = ({
 
   return (
     <div>
-      <DocumentHeader />
-      <DocumentBody />
+      <DocumentHeader
+        filterLanguages={articleLikeEntities.languages}
+        currentFilterLanguageId={filterLanguageId}
+        setFilterLanguageId={setFilterLanguageId}
+      />
+      <DocumentBody
+        articleLikeEntities={articleLikeEntities}
+        filterLanguageId={filterLanguageId}
+      />
     </div>
   )
 }
 
-export default Body
+export default PageBody

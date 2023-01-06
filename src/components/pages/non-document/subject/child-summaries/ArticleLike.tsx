@@ -13,7 +13,7 @@ import { routes } from "^constants/routes"
 import { useRouter } from "next/router"
 import { $link } from "^styles/global"
 
-export const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
+const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
 const ArticleLikeEntity = ({
   articleLikeEntity,
