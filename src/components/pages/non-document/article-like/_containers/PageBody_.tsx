@@ -28,7 +28,7 @@ export const PageBody_ = ({
       ? secondDefaultLanguageId
       : languageIds[0]
   })
-  // console.log("sortLanguageId:", sortLanguageId)
+
   useEffect(() => {
     if (sortLanguageId === null || siteLanguage.id === sortLanguageId) {
       return
@@ -46,6 +46,7 @@ export const PageBody_ = ({
   return (
     <div>
       <DocumentHeader
+        entityType={articleLikeEntities.entities[0].type}
         languageSort={
           sortLanguageId === null ? null : (
             <LanguageSort_

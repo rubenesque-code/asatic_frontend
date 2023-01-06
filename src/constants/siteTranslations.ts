@@ -7,4 +7,8 @@ export const siteTranslations = {
     english: "articles",
     tamil: "Tarticles",
   },
+  blogs: {
+    english: "blogs",
+    tamil: "Tblogs",
+  },
 }

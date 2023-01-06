@@ -78,8 +78,16 @@ const Content = (subjectsProp: SubjectsProp) => {
           />
         </div>
         <div css={[tw`pt-md border-t`]}>
-          <Subjects {...subjectsProp} />
+          <PageLink
+            label={siteTranslations.blogs[siteLanguage.id]}
+            pathname={routes.blogs}
+          />
         </div>
+        {!subjectsProp.subjects.length ? null : (
+          <div css={[tw`pt-md border-t`]}>
+            <Subjects {...subjectsProp} />
+          </div>
+        )}
       </div>
     </div>
   )
@@ -101,10 +109,6 @@ const PageLink = ({ label, pathname }: { label: string; pathname: string }) => {
 
 const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
   const [isExpanded, setIsExpanded] = useState(false)
-
-  if (!subjects.length) {
-    return null
-  }
 
   return (
     <div>
