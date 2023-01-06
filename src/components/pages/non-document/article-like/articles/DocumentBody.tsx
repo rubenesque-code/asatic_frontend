@@ -1,32 +1,29 @@
 import tw from "twin.macro"
 
-import { filterEntitiesWithLanguage } from "^helpers/filter-entities"
-import { sortEntitiesByDate } from "^helpers/manipulateEntity"
+import {
+  sortEntitiesByDate,
+  sortEntitiesByLanguage,
+} from "^helpers/manipulateEntity"
 import { StaticData } from "../_types"
-import { FilterLanguageId } from "./PageBody"
 import Summary from "./Summary"
 
 const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
 
-const processEntities = ({
+const useProcessEntities = ({
   articleLikeEntities,
   filterLanguageId,
 }: {
   articleLikeEntities: StaticData["articleLikeEntities"]
-  filterLanguageId: FilterLanguageId
+  filterLanguageId: string
 }) => {
   const orderedByDate = sortEntitiesByDate(articleLikeEntities.entities)
 
-  if (filterLanguageId === "all") {
-    return orderedByDate
-  }
-
-  const filtered = filterEntitiesWithLanguage(
+  const orderedByFilterLanguage = sortEntitiesByLanguage(
     orderedByDate,
     filterLanguageId as string
   )
 
-  return filtered
+  return orderedByFilterLanguage
 }
 
 const DocumentBody = ({
@@ -34,9 +31,9 @@ const DocumentBody = ({
   filterLanguageId,
 }: {
   articleLikeEntities: StaticData["articleLikeEntities"]
-  filterLanguageId: FilterLanguageId
+  filterLanguageId: string
 }) => {
-  const processedEntities = processEntities({
+  const processedEntities = useProcessEntities({
     articleLikeEntities,
     filterLanguageId,
   })

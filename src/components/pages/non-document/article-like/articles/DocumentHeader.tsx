@@ -1,9 +1,9 @@
 import tw from "twin.macro"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { LanguageFilter_, LanguageFilter_Props } from "../../_containers"
+import { LanguageSort_, LanguageSort_Props } from "../../_containers"
 
-const DocumentHeader = (languageFilterProps: LanguageFilter_Props) => {
+const DocumentHeader = (languageFilterProps: LanguageSort_Props) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
@@ -12,7 +12,7 @@ const DocumentHeader = (languageFilterProps: LanguageFilter_Props) => {
         {siteTranslations.articles[siteLanguage.id]}
       </h2>
       <div css={[tw`mt-lg pl-sm md:pl-md`]}>
-        <LanguageFilter_ {...languageFilterProps} />
+        <LanguageSort_ {...languageFilterProps} />
       </div>
     </div>
   )

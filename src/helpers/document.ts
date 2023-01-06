@@ -1,4 +1,4 @@
-import { findEntityByLanguageId } from "./data"
+import { findTranslationByLanguageId } from "./data"
 import {
   defaultSiteLanguageId,
   secondDefaultSiteLanguageId,
@@ -26,9 +26,9 @@ export function determineChildTranslation<
   TTranslation extends { languageId: string }
 >(translations: TTranslation[], parentLanguageId: string) {
   const translation =
-    findEntityByLanguageId(translations, parentLanguageId) ||
-    findEntityByLanguageId(translations, defaultSiteLanguageId) ||
-    findEntityByLanguageId(translations, secondDefaultSiteLanguageId) ||
+    findTranslationByLanguageId(translations, parentLanguageId) ||
+    findTranslationByLanguageId(translations, defaultSiteLanguageId) ||
+    findTranslationByLanguageId(translations, secondDefaultSiteLanguageId) ||
     translations[0]
 
   return translation

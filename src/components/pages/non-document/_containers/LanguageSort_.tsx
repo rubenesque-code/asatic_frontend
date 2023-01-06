@@ -1,41 +1,27 @@
 import tw from "twin.macro"
-import { TranslateIcon } from "^components/Icons"
+import { SortAscendingIcon, TranslateIcon } from "^components/Icons"
 import { Language } from "^types/entities"
 
-export type LanguageFilter_Props = {
-  currentFilterLanguageId: FilterLanguageId
-  setFilterLanguageId: (languageId: FilterLanguageId) => void
+export type LanguageSort_Props = {
+  currentFilterLanguageId: string
+  setFilterLanguageId: (languageId: string) => void
   filterLanguages: Language[]
 }
 
-export type FilterLanguageId = "all" | Omit<string, "all">
-
-export const LanguageFilter_ = ({
+export const LanguageSort_ = ({
   currentFilterLanguageId,
   setFilterLanguageId,
   filterLanguages,
-}: LanguageFilter_Props) => {
+}: LanguageSort_Props) => {
   return (
     <div css={[tw`flex items-center gap-sm`]}>
-      <div css={[tw`text-gray-400`]}>
+      <div css={[tw`text-gray-400 flex items-center gap-sm`]}>
+        <span css={[tw`text-xl text-gray-600`]}>
+          <SortAscendingIcon weight="light" />
+        </span>
         <TranslateIcon weight="light" />
       </div>
       <div css={[tw`flex gap-xs items-center`]}>
-        <div
-          css={[
-            tw`py-0.5 px-2 border rounded-md text-sm font-serif-secondary tracking-wide text-gray-700 transition-colors ease-in-out`,
-            currentFilterLanguageId !== "all" &&
-              tw`text-gray-400 cursor-pointer border-gray-100`,
-          ]}
-          onClick={() => {
-            if (currentFilterLanguageId === "all") {
-              return
-            }
-            setFilterLanguageId("all")
-          }}
-        >
-          All
-        </div>
         {filterLanguages.map((language) => (
           <div
             css={[

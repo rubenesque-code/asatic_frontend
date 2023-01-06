@@ -1,17 +1,19 @@
 import { useState } from "react"
+import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { StaticData } from "../_types"
 import DocumentBody from "./DocumentBody"
 import DocumentHeader from "./DocumentHeader"
-
-export type FilterLanguageId = "all" | Omit<string, "all">
 
 const PageBody = ({
   articleLikeEntities,
 }: {
   articleLikeEntities: StaticData["articleLikeEntities"]
 }) => {
-  const [filterLanguageId, setFilterLanguageId] =
-    useState<FilterLanguageId>("all")
+  const { siteLanguage } = useSiteLanguageContext()
+
+  const [filterLanguageId, setFilterLanguageId] = useState<string>(
+    siteLanguage.id
+  )
 
   return (
     <div>

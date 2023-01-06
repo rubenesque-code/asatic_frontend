@@ -4,7 +4,7 @@ import { StaticData } from "./staticData"
 
 import { Languages_ } from "^components/pages/_containers"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
-import { findEntityByLanguageId } from "^helpers/data"
+import { findTranslationByLanguageId } from "^helpers/data"
 import { Authors_ } from "../_containers"
 import { RecordedEventType } from "^types/entities"
 import { Video_ } from "../_containers"
@@ -32,7 +32,7 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
   )
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const translation = findEntityByLanguageId(
+  const translation = findTranslationByLanguageId(
     recordedEvent.translations,
     documentLanguage.id
   )!

@@ -8,7 +8,7 @@ import { PlayIcon } from "^components/Icons"
 import { Authors_ } from "^components/pages/_containers"
 import StorageImage from "^components/StorageImage"
 import { routes } from "^constants/routes"
-import { findEntityByLanguageId } from "^helpers/data"
+import { findTranslationByLanguageId } from "^helpers/data"
 import { determineChildTranslation } from "^helpers/document"
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { getYoutubeThumbnailFromId } from "^helpers/youtube"
@@ -82,7 +82,7 @@ const Type = ({
     return null
   }
 
-  const translation = findEntityByLanguageId(
+  const translation = findTranslationByLanguageId(
     type.translations,
     parentLanguageId
   )
