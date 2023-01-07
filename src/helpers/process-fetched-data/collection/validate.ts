@@ -1,7 +1,13 @@
 import { filterArr1ByArr2 } from "^helpers/data"
 import { SanitisedCollection, CollectionTranslation } from "^types/entities"
+import { MakeRequired } from "^types/utilities"
 
-const validateTranslation = (
+export type ValidTranslation = MakeRequired<
+  SanitisedCollection["translations"][number],
+  "title" | "description"
+>
+
+export const validateTranslation = (
   translation: CollectionTranslation,
   validLanguageIds: string[]
 ) => {
@@ -38,11 +44,17 @@ export function filterValidTranslations(
 export function validateCollectionAsChildOfDocumentEntity({
   collection,
   validLanguageIds,
+  validImageIds,
 }: {
   collection: SanitisedCollection
   validLanguageIds: string[]
+  validImageIds: string[]
 }) {
   if (!collection.bannerImage.imageId) {
+    return false
+  }
+
+  if (!validImageIds.includes(collection.bannerImage.imageId)) {
     return false
   }
 
@@ -61,10 +73,12 @@ export function validateCollectionAsChildOfDocumentEntity({
 export function validateCollection({
   collection,
   validDocumentEntityIds,
+  validImageIds,
   validLanguageIds,
 }: {
   collection: SanitisedCollection
   validLanguageIds: string[]
+  validImageIds: string[]
   validDocumentEntityIds: {
     articles: string[]
     blogs: string[]
@@ -72,6 +86,10 @@ export function validateCollection({
   }
 }) {
   if (!collection.bannerImage.imageId) {
+    return false
+  }
+
+  if (!validImageIds.includes(collection.bannerImage.imageId)) {
     return false
   }
 
@@ -109,31 +127,47 @@ export function validateCollection({
   return true
 }
 
-export function filterValidCollections({
-  collections,
-  validDocumentEntityIds,
-  validLanguageIds,
-  collectionRelation,
-}: {
-  collections: SanitisedCollection[]
-  validLanguageIds: string[]
-  validDocumentEntityIds: {
-    articles: string[]
-    blogs: string[]
-    recordedEvents: string[]
+export function filterValidCollections(
+  collections: SanitisedCollection[],
+  {
+    validDocumentEntityIds,
+    validImageIds,
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
+    validImageIds: string[]
+    validDocumentEntityIds: {
+      articles: string[]
+      blogs: string[]
+      recordedEvents: string[]
+    }
   }
-  collectionRelation: "child-of-document" | "default"
-}) {
+) {
   return collections.filter((collection) =>
-    collectionRelation === "default"
-      ? validateCollection({
-          collection,
-          validDocumentEntityIds,
-          validLanguageIds,
-        })
-      : validateCollectionAsChildOfDocumentEntity({
-          collection,
-          validLanguageIds,
-        })
+    validateCollection({
+      collection,
+      validDocumentEntityIds,
+      validLanguageIds,
+      validImageIds,
+    })
+  )
+}
+
+export function filterValidCollectionsAsChildren(
+  collections: SanitisedCollection[],
+  {
+    validImageIds,
+    validLanguageIds,
+  }: {
+    validImageIds: string[]
+    validLanguageIds: string[]
+  }
+) {
+  return collections.filter((collection) =>
+    validateCollectionAsChildOfDocumentEntity({
+      collection,
+      validLanguageIds,
+      validImageIds,
+    })
   )
 }

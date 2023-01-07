@@ -3,7 +3,7 @@ import { fetchSubjects } from "^lib/firebase/firestore"
 import { mapIds } from "^helpers/data"
 import { fetchAndValidateLanguages } from "./languages"
 import { filterValidSubjects } from "^helpers/process-fetched-data/subject/validate"
-import { getUniqueChildEntityIds } from "^helpers/process-fetched-data/general"
+import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { fetchAndValidateArticles } from "./articles"
 import { fetchAndValidateBlogs } from "./blogs"
 import { fetchAndValidateCollections } from "./collections"
@@ -31,7 +31,7 @@ export async function fetchAndValidateSubjects({
     ? passedValidLanguageIds
     : (await fetchAndValidateLanguages("all")).ids
 
-  const childIds = getUniqueChildEntityIds(fetchedSubjects, [
+  const childIds = getUniqueChildEntitiesIds(fetchedSubjects, [
     "articlesIds",
     "blogsIds",
     "collectionsIds",
@@ -51,7 +51,7 @@ export async function fetchAndValidateSubjects({
     validLanguageIds,
   })
   const validCollections = await fetchAndValidateCollections({
-    collectionIds: childIds.collectionsIds,
+    ids: childIds.collectionsIds,
     validLanguageIds,
     collectionRelation: "default",
   })

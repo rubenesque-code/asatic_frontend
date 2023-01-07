@@ -69,7 +69,7 @@ export const getStaticProps: GetStaticProps<
     validLanguageIds: globalData.languages.ids,
   })
   const validCollections = await fetchAndValidateCollections({
-    collectionIds: fetchedRecordedEvent.collectionsIds,
+    ids: fetchedRecordedEvent.collectionsIds,
     collectionRelation: "child-of-document",
     validLanguageIds: globalData.languages.ids,
   })

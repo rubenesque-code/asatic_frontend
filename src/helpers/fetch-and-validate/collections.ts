@@ -1,23 +1,30 @@
-import { fetchCollections } from "^lib/firebase/firestore"
+import { fetchCollections, fetchImages } from "^lib/firebase/firestore"
 
 import { mapIds } from "^helpers/data"
 import { fetchAndValidateLanguages } from "./languages"
-import { getUniqueChildEntityIds } from "^helpers/process-fetched-data/general"
-import { filterValidCollections } from "^helpers/process-fetched-data/collection/validate"
+import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
+import {
+  filterValidCollections,
+  filterValidCollectionsAsChildren,
+} from "^helpers/process-fetched-data/collection/validate"
 import { fetchAndValidateArticles } from "./articles"
 import { fetchAndValidateBlogs } from "./blogs"
 import { fetchAndValidateRecordedEvents } from "./recordedEvents"
+import {
+  getCollectionUniqueChildImageIds,
+  getCollectionsUniqueImageIds,
+} from "^helpers/process-fetched-data/collection/query"
 
 export async function fetchAndValidateCollections({
   collectionRelation = "default",
-  collectionIds,
+  ids,
   validLanguageIds: passedValidLanguageIds,
 }: {
-  collectionRelation: "child-of-document" | "default"
-  collectionIds: string[] | "all"
+  collectionRelation?: "child-of-document" | "default"
+  ids: string[] | "all"
   validLanguageIds?: string[]
 }) {
-  const fetchedCollections = await fetchCollections(collectionIds)
+  const fetchedCollections = await fetchCollections(ids)
 
   if (!fetchedCollections.length) {
     return {
@@ -30,34 +37,63 @@ export async function fetchAndValidateCollections({
     ? passedValidLanguageIds
     : (await fetchAndValidateLanguages("all")).ids
 
-  const ids = getUniqueChildEntityIds(fetchedCollections, [
+  if (collectionRelation === "child-of-document") {
+    const imageIds = getCollectionsUniqueImageIds(fetchedCollections)
+    const fetchedImages = await fetchImages(imageIds)
+    const validImageIds = mapIds(fetchedImages)
+
+    const validCollections = filterValidCollectionsAsChildren(
+      fetchedCollections,
+      {
+        validImageIds,
+        validLanguageIds,
+      }
+    )
+
+    return {
+      entities: validCollections,
+      ids: mapIds(validCollections),
+    }
+  }
+
+  const childIds = getUniqueChildEntitiesIds(fetchedCollections, [
     "articlesIds",
     "blogsIds",
     "recordedEventsIds",
   ])
 
   const validArticles = await fetchAndValidateArticles({
-    ids: ids.articlesIds,
+    ids: childIds.articlesIds,
     validLanguageIds,
   })
   const validBlogs = await fetchAndValidateBlogs({
-    ids: ids.blogsIds,
+    ids: childIds.blogsIds,
     validLanguageIds,
   })
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
-    ids: ids.blogsIds,
+    ids: childIds.blogsIds,
     validLanguageIds,
   })
 
-  const validCollections = filterValidCollections({
-    collections: fetchedCollections,
+  const imageIds = [
+    ...getCollectionsUniqueImageIds(fetchedCollections),
+    ...getCollectionUniqueChildImageIds({
+      articles: validArticles.entities,
+      blogs: validBlogs.entities,
+      recordedEvents: validRecordedEvents.entities,
+    }),
+  ]
+  const fetchedImages = await fetchImages(imageIds)
+  const validImageIds = mapIds(fetchedImages)
+
+  const validCollections = filterValidCollections(fetchedCollections, {
     validDocumentEntityIds: {
       articles: validArticles.ids,
       blogs: validBlogs.ids,
       recordedEvents: validRecordedEvents.ids,
     },
+    validImageIds,
     validLanguageIds,
-    collectionRelation,
   })
 
   return {

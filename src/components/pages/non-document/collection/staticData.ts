@@ -3,15 +3,12 @@ import { GetStaticPaths, GetStaticProps } from "next"
 import { Language, SanitisedSubject, Tag } from "^types/entities"
 
 import { filterAndMapEntitiesById } from "^helpers/data"
-import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import {
   getUniqueChildEntitiesIds,
   mapEntityLanguageIds,
 } from "^helpers/process-fetched-data/general"
-import { getSubjectChildImageIds } from "^helpers/process-fetched-data/subject/query"
-import { fetchImages } from "^lib/firebase/firestore"
-import { processSubjectForOwnPage } from "^helpers/process-fetched-data/subject/process"
+import { fetchCollection, fetchImages } from "^lib/firebase/firestore"
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
@@ -22,19 +19,20 @@ import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-
 import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
 import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
-import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
+import { processCollectionForOwnPage } from "^helpers/process-fetched-data/collection/process"
+import { getCollectionUniqueChildImageIds } from "^helpers/process-fetched-data/collection/query"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const validSubjects = await fetchAndValidateSubjects({ ids: "all" })
+  const validCollections = await fetchAndValidateCollections({ ids: "all" })
 
-  if (!validSubjects.entities.length) {
+  if (!validCollections.entities.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const paths = validSubjects.ids.map((id) => ({
+  const paths = validCollections.ids.map((id) => ({
     params: {
       id,
     },
@@ -47,10 +45,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  subject: ReturnType<typeof processSubjectForOwnPage> & {
+  collection: ReturnType<typeof processCollectionForOwnPage> & {
     languages: Language[]
-    collections: ReturnType<typeof processCollectionAsSummary>[]
     tags: Tag[]
+    subjects: SanitisedSubject[]
   }
   header: {
     subjects: SanitisedSubject[]
@@ -64,40 +62,33 @@ export const getStaticProps: GetStaticProps<
 
   const allValidLanguageIds = globalData.languages.ids
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const subject = globalData.subjects.entities.find(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    (subject) => subject.id === params!.id
-  )!
+  const fetchedCollection = await fetchCollection(params?.id || "")
 
   const validArticles = await fetchAndValidateArticles({
-    ids: subject.articlesIds,
+    ids: fetchedCollection.articlesIds,
     validLanguageIds: allValidLanguageIds,
   })
   const validBlogs = await fetchAndValidateBlogs({
-    ids: subject.blogsIds,
+    ids: fetchedCollection.blogsIds,
     validLanguageIds: allValidLanguageIds,
   })
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
-    ids: subject.recordedEventsIds,
+    ids: fetchedCollection.recordedEventsIds,
     validLanguageIds: allValidLanguageIds,
   })
   const validTags = await fetchAndValidateTags({
-    ids: subject.tagsIds,
+    ids: fetchedCollection.tagsIds,
   })
 
-  const validCollections = await fetchAndValidateCollections({
-    ids: subject.collectionsIds,
-    collectionRelation: "default",
-    validLanguageIds: allValidLanguageIds,
-  })
-
-  const imageIds = getSubjectChildImageIds({
-    articles: validArticles.entities,
-    blogs: validBlogs.entities,
-    recordedEvents: validRecordedEvents.entities,
-    collections: validCollections.entities,
-  })
+  const imageIds = [
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    fetchedCollection.bannerImage.imageId!,
+    ...getCollectionUniqueChildImageIds({
+      articles: validArticles.entities,
+      blogs: validBlogs.entities,
+      recordedEvents: validRecordedEvents.entities,
+    }),
+  ]
   const fetchedImages = await fetchImages(imageIds)
 
   const authorIds = getUniqueChildEntitiesIds(
@@ -147,31 +138,29 @@ export const getStaticProps: GetStaticProps<
         validRecordedEventTypes: validRecordedEventTypes.entities,
       })
   )
-  const processedCollections = validCollections.entities.map((collection) =>
-    processCollectionAsSummary(collection, {
-      validImages: fetchedImages,
-      validLanguageIds: allValidLanguageIds,
-    })
-  )
 
-  const processedSubject = processSubjectForOwnPage(subject, {
+  const processedCollection = processCollectionForOwnPage(fetchedCollection, {
     processedChildDocumentEntities: {
       articles: processedArticles,
       blogs: processedBlogs,
       recordedEvents: processedRecordedEvents,
     },
     validLanguageIds: allValidLanguageIds,
+    validImages: fetchedImages,
   })
 
   const pageData: StaticData = {
-    subject: {
-      ...processedSubject,
+    collection: {
+      ...processedCollection,
       languages: filterAndMapEntitiesById(
-        mapEntityLanguageIds(processedSubject),
+        mapEntityLanguageIds(processedCollection),
         globalData.languages.entities
       ),
-      collections: processedCollections,
       tags: validTags.entities,
+      subjects: filterAndMapEntitiesById(
+        fetchedCollection.subjectsIds,
+        globalData.subjects.entities
+      ),
     },
     header: {
       subjects: globalData.subjects.entities,

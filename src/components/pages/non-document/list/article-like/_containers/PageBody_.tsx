@@ -3,7 +3,7 @@ import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { mapIds } from "^helpers/data"
 import { LanguageSort_ } from "../../_containers"
 import { StaticData } from "../_types"
-import DocumentBody from "../../_containers/DocumentBody_"
+import { DocumentBody_ } from "../../_containers/DocumentBody_"
 import DocumentHeader from "./DocumentHeader_"
 
 export const PageBody_ = ({
@@ -57,8 +57,8 @@ export const PageBody_ = ({
           )
         }
       />
-      <DocumentBody
-        articleLikeEntities={articleLikeEntities}
+      <DocumentBody_
+        entities={articleLikeEntities}
         sortLanguageId={sortLanguageId}
       />
     </div>

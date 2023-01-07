@@ -1,7 +1,14 @@
 import { findEntityById } from "^helpers/data"
+import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import { Image, SanitisedCollection } from "^types/entities"
+import { ArticleLikeEntityAsSummary } from "../article-like"
+import { RecordedEventAsSummary } from "../recorded-event/process"
 import { getCollectionSummaryText } from "./query"
-import { filterValidTranslations } from "./validate"
+import {
+  filterValidTranslations,
+  validateTranslation,
+  ValidTranslation,
+} from "./validate"
 
 function processTranslationForSummary(
   translation: SanitisedCollection["translations"][number]
@@ -54,5 +61,44 @@ export function processCollectionAsSummary(
         }
       : null,
     translations: processedTranslations,
+  }
+}
+
+export function processCollectionForOwnPage(
+  collection: SanitisedCollection,
+  {
+    validLanguageIds,
+    validImages,
+    processedChildDocumentEntities,
+  }: {
+    validLanguageIds: string[]
+    validImages: Image[]
+    processedChildDocumentEntities: {
+      articles: ArticleLikeEntityAsSummary[]
+      blogs: ArticleLikeEntityAsSummary[]
+      recordedEvents: RecordedEventAsSummary[]
+    }
+  }
+) {
+  const bannerImage = {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    storageImage: findEntityById(validImages, collection.bannerImage.imageId!)!,
+    vertPosition: collection.bannerImage.vertPosition || 50,
+  }
+
+  const validTranslations = collection.translations.filter((translation) =>
+    validateTranslation(translation, validLanguageIds)
+  ) as ValidTranslation[]
+
+  const orderedChildDocumentEntities = sortEntitiesByDate(
+    Object.values(processedChildDocumentEntities).flat()
+  )
+
+  return {
+    id: collection.id,
+    publishDate: collection.publishDate,
+    bannerImage,
+    translations: validTranslations,
+    childDocumentEntities: orderedChildDocumentEntities,
   }
 }

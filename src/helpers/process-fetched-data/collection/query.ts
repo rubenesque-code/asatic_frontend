@@ -1,4 +1,11 @@
-import { SanitisedCollection } from "^types/entities"
+import { removeArrDuplicates } from "^helpers/general"
+import {
+  SanitisedArticle,
+  SanitisedBlog,
+  SanitisedCollection,
+  SanitisedRecordedEvent,
+} from "^types/entities"
+import { getArticleLikeDocumentImageIds } from "../article-like"
 
 export function getCollectionAsChildUniqueImageIds(
   collection: SanitisedCollection
@@ -24,4 +31,43 @@ export function getCollectionSummaryText(
   }
 
   return null
+}
+
+export function getCollectionsUniqueImageIds(
+  collections: SanitisedCollection[]
+) {
+  const uniqueImageIds = removeArrDuplicates(
+    collections.flatMap((collection) =>
+      collection.bannerImage.imageId ? [collection.bannerImage.imageId] : []
+    )
+  )
+
+  return uniqueImageIds
+}
+
+export function getCollectionUniqueChildImageIds({
+  articles,
+  blogs,
+  recordedEvents,
+}: {
+  articles: SanitisedArticle[]
+  blogs: SanitisedBlog[]
+  recordedEvents: SanitisedRecordedEvent[]
+}) {
+  const articleAndBlogImageIds = [...articles, ...blogs].flatMap(
+    (articleLikeEntity) =>
+      getArticleLikeDocumentImageIds(articleLikeEntity.translations)
+  )
+  const recordedEventImageIds = recordedEvents.flatMap((recordedEvent) =>
+    recordedEvent.summaryImage.imageId
+      ? [recordedEvent.summaryImage.imageId]
+      : []
+  )
+
+  const unique = removeArrDuplicates([
+    ...articleAndBlogImageIds,
+    ...recordedEventImageIds,
+  ])
+
+  return unique
 }

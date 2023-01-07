@@ -7,7 +7,7 @@ import {
   getArticleLikeEntitiesImageIds,
   processArticleLikeEntityAsSummary,
 } from "^helpers/process-fetched-data/article-like"
-import { getUniqueChildEntityIds } from "^helpers/process-fetched-data/general"
+import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { getEntitiesUniqueLanguageIds } from "^helpers/queryEntity"
 import { fetchImages } from "^lib/firebase/firestore"
 import { StaticData } from "../_types"
@@ -20,7 +20,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
     validLanguageIds: globalData.languages.ids,
   })
 
-  const authorIds = getUniqueChildEntityIds(validBlogs.entities, [
+  const authorIds = getUniqueChildEntitiesIds(validBlogs.entities, [
     "authorsIds",
   ]).authorsIds
   const validAuthors = await fetchAndValidateAuthors({

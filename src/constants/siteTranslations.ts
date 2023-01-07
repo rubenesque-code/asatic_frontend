@@ -8,8 +8,8 @@ export const siteTranslations = {
     tamil: "Tarticles",
   },
   blogs: {
-    english: "blogs",
-    tamil: "Tblogs",
+    english: "blog",
+    tamil: "Tblog",
   },
   recordedEvents: {
     english: "videos",
@@ -18,5 +18,9 @@ export const siteTranslations = {
   subjects: {
     english: "subjects",
     tamil: "Tsubjects",
+  },
+  collection: {
+    english: "collection",
+    tamil: "Tcollection",
   },
 }

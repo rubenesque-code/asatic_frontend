@@ -15,7 +15,7 @@ export function mapEntityLanguageIds<
   return mapLanguageIds(entity.translations)
 }
 
-export function getUniqueChildEntityIds<
+export function getUniqueChildEntitiesIds<
   TParent extends { [k in TKey]: TArr },
   TKey extends keyof TParent,
   TArr extends string[]

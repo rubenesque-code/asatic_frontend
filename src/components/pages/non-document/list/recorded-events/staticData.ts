@@ -5,7 +5,7 @@ import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
 import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
-import { getUniqueChildEntityIds } from "^helpers/process-fetched-data/general"
+import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import {
   getRecordedEventsUniqueImageIds,
@@ -34,7 +34,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   })
 
   const childIds = {
-    ...getUniqueChildEntityIds(validRecordedEvents.entities, ["authorsIds"]),
+    ...getUniqueChildEntitiesIds(validRecordedEvents.entities, ["authorsIds"]),
     recordedEventTypeIds: getRecordedEventTypeIds(validRecordedEvents.entities),
   }
 
