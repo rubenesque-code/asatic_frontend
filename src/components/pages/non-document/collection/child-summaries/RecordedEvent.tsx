@@ -32,39 +32,43 @@ const RecordedEvent = ({
   const pathname = `${routes.recordedEvents}/${recordedEvent.id}`
 
   return (
-    <div css={[tw`max-w-full max-h-full flex flex-col`]}>
-      <SummaryImage
-        image={recordedEvent.summaryImage}
-        youtubeId={recordedEvent.youtubeId}
-      />
-      <Type
-        type={recordedEvent.recordedEventType}
-        parentLanguageId={translation.languageId}
-      />
-      <Link
-        href={{
-          pathname,
-          query: {
-            ...router.query,
-            documentLanguageId: translation.languageId,
-          },
-        }}
-        passHref
-      >
-        <h3 css={[tw`text-xl mb-xxs`, $link]}>{translation.title}</h3>
-      </Link>
-      <Authors_
-        authors={recordedEvent.authors}
-        parentLanguageId={translation.languageId}
-        styles={$authors}
-      />
-      <p
-        css={[
-          tw`mb-xs text-gray-800 font-sans-document font-light text-sm tracking-wider`,
-        ]}
-      >
-        {recordedEvent.publishDate}
-      </p>
+    <div css={[tw`w-full flex gap-sm`]}>
+      <div css={[tw`w-1/2 h-[200px] aspect-ratio[16/9]`]}>
+        <SummaryImage
+          image={recordedEvent.summaryImage}
+          youtubeId={recordedEvent.youtubeId}
+        />
+      </div>
+      <div css={[tw`pt-sm`]}>
+        <Type
+          type={recordedEvent.recordedEventType}
+          parentLanguageId={translation.languageId}
+        />
+        <Link
+          href={{
+            pathname,
+            query: {
+              ...router.query,
+              documentLanguageId: translation.languageId,
+            },
+          }}
+          passHref
+        >
+          <h3 css={[tw`text-xl mb-xxs`, $link]}>{translation.title}</h3>
+        </Link>
+        <Authors_
+          authors={recordedEvent.authors}
+          parentLanguageId={translation.languageId}
+          styles={$authors}
+        />
+        <p
+          css={[
+            tw`mb-xs text-gray-800 font-sans-document font-light text-sm tracking-wider`,
+          ]}
+        >
+          {recordedEvent.publishDate}
+        </p>
+      </div>
     </div>
   )
 }

@@ -14,6 +14,9 @@ module.exports = {
       "sans-document": ["Montserrat", "sans-serif"],
     },
     extend: {
+      screens: {
+        xs: "500px",
+      },
       colors: {
         "overlay-mid": "rgba(237, 242, 247, 0.6)",
       },

@@ -7,14 +7,14 @@ import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguag
 import Header from "^components/header"
 import { $PageBody } from "^components/pages/_styles"
 import DocumentHeader from "./Header"
-import DocumentBody from "./Body"
+import ChildDocuments from "./ChildDocuments"
+import { $CenterMaxWidth_ } from "^page-presentation"
+import tw from "twin.macro"
 
 const PageContent = ({ header, collection }: StaticData) => {
   const { documentLanguage } = useDetermineDocumentLanguage(
     collection.languages
   )
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 
   return (
     <>
@@ -27,11 +27,14 @@ const PageContent = ({ header, collection }: StaticData) => {
             documentLanguage={documentLanguage}
             documentLanguages={collection.languages}
           />
-          <DocumentBody
-            documentLanguage={documentLanguage}
-            childDocumentEntities={collection.childDocumentEntities}
-            subjectTitle={translation.title}
-          />
+          <$CenterMaxWidth_ maxWidth={tw`max-w-[700px]`}>
+            <div css={[tw`border-l border-r`]}>
+              <ChildDocuments
+                documentLanguage={documentLanguage}
+                childDocumentEntities={collection.childDocumentEntities}
+              />
+            </div>
+          </$CenterMaxWidth_>
         </div>
       </$PageBody>
     </>
