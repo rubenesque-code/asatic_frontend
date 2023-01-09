@@ -33,13 +33,15 @@ export const SummaryText = ({
   htmlStr,
   languageId,
   maxCharacters,
+  overflowHidden = true,
 }: {
   htmlStr: string
   languageId: string
   maxCharacters: number
+  overflowHidden?: boolean
 }) => (
   <div
-    css={[tw`overflow-hidden prose pb-sm flex-shrink`]}
+    css={[tw`prose pb-sm flex-shrink`, overflowHidden && tw`overflow-hidden`]}
     className="custom-prose"
     style={{
       width: "auto",

@@ -36,16 +36,16 @@ const ArticleLikeEntity = ({
   const pathname = `${routeRoot}/${articleLikeEntity.id}`
 
   return (
-    <div css={[tw`w-full flex gap-sm`]}>
+    <div css={[tw`w-full sm:flex sm:gap-sm`]}>
       {articleLikeEntity.summaryImage ? (
-        <div css={[tw`w-1/2 h-[200px] aspect-ratio[16/9]`]}>
+        <div css={[tw`sm:h-[200px] aspect-ratio[16/9]`]}>
           <SummaryImage
             image={articleLikeEntity.summaryImage}
             styles={tw`mb-xs`}
           />
         </div>
       ) : null}
-      <div>
+      <div css={[tw``]}>
         <Link
           href={{
             pathname,
@@ -76,6 +76,8 @@ const ArticleLikeEntity = ({
           htmlStr={translation.summaryText}
           languageId={translation.languageId}
           maxCharacters={maxBodyCharacters}
+          // maxCharacters={1000}
+          // overflowHidden={fa}
         />
       </div>
     </div>

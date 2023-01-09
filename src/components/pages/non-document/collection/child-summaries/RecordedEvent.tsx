@@ -32,14 +32,14 @@ const RecordedEvent = ({
   const pathname = `${routes.recordedEvents}/${recordedEvent.id}`
 
   return (
-    <div css={[tw`w-full flex gap-sm`]}>
-      <div css={[tw`w-1/2 h-[200px] aspect-ratio[16/9]`]}>
+    <div css={[tw`w-full sm:flex sm:gap-sm`]}>
+      <div css={[tw`sm:h-[200px] aspect-ratio[16/9]`]}>
         <SummaryImage
           image={recordedEvent.summaryImage}
           youtubeId={recordedEvent.youtubeId}
         />
       </div>
-      <div css={[tw`pt-sm`]}>
+      <div css={[tw`pt-xs sm:pt-sm`]}>
         <Type
           type={recordedEvent.recordedEventType}
           parentLanguageId={translation.languageId}
