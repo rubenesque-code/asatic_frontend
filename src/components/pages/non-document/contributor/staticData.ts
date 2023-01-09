@@ -1,44 +1,42 @@
 import { GetStaticPaths, GetStaticProps } from "next"
-import { mapIds } from "^helpers/data"
+import { filterAndMapEntitiesById } from "^helpers/data"
+import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
+import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
+import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
+import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
+import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
+import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
 import {
-  filterValidArticleLikeEntities,
+  processArticleLikeEntityAsSummary,
+  ArticleLikeEntityAsSummary,
+} from "^helpers/process-fetched-data/article-like"
+import { processAuthor } from "^helpers/process-fetched-data/author/process"
+import { getAuthorChildImageIds } from "^helpers/process-fetched-data/author/query"
+import {
+  getUniqueChildEntitiesIds,
   mapEntityLanguageIds,
-  processValidatedAuthor,
-} from "^helpers/process-fetched-data"
-import { filterValidRecordedEvents } from "^helpers/process-fetched-data/recordedEvent"
-import { fetchAndValidateAuthors } from "^helpers/static-data/authors"
+} from "^helpers/process-fetched-data/general"
 import {
-  fetchAndValidateLanguages,
-  fetchAndValidateSubjects,
-} from "^helpers/static-data/global"
-import {
-  fetchArticles,
-  fetchAuthor,
-  fetchBlogs,
-  fetchRecordedEvents,
-} from "^lib/firebase/firestore"
-import {
-  Author,
-  Language,
-  SanitisedArticle,
-  SanitisedBlog,
-  SanitisedRecordedEvent,
-  SanitisedSubject,
-} from "^types/entities"
+  processRecordedEventAsSummary,
+  RecordedEventAsSummary,
+} from "^helpers/process-fetched-data/recorded-event/process"
+import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
+import { fetchAuthor, fetchImages } from "^lib/firebase/firestore"
+import { Language, SanitisedSubject } from "^types/entities"
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const authors = await fetchAndValidateAuthors()
+  const authors = await fetchAndValidateAuthors({ ids: "all" })
 
-  if (!authors.length) {
+  if (!authors.entities.length) {
     return {
       paths: [],
       fallback: false,
     }
   }
 
-  const paths = authors.map((author) => ({
+  const paths = authors.ids.map((id) => ({
     params: {
-      id: author.id,
+      id,
     },
   }))
 
@@ -49,12 +47,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export type StaticData = {
-  author: Author
-  childEntities: {
+  author: ReturnType<typeof processAuthor> & {
     languages: Language[]
-    articles: SanitisedArticle[]
-    blogs: SanitisedBlog[]
-    recordedEvents: SanitisedRecordedEvent[]
+    articles: ArticleLikeEntityAsSummary[]
+    blogs: ArticleLikeEntityAsSummary[]
+    recordedEvents: RecordedEventAsSummary[]
   }
   header: {
     subjects: SanitisedSubject[]
@@ -65,75 +62,98 @@ export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
-  // - Global data: START ---
+  const globalData = await fetchAndValidateGlobalData()
+  const allValidLanguageIds = globalData.languages.ids
 
-  const allValidSubjects = await fetchAndValidateSubjects()
-  const allValidLanguages = await fetchAndValidateLanguages()
-  const allValidLanguagesIds = mapIds(allValidLanguages)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const fetchedAuthor = await fetchAuthor(params!.id)
 
-  // - Global data: END ---
-
-  // - Page specific data: START ---
-  const fetchedAuthor = await fetchAuthor(params?.id || "")
-
-  const authorChildrenIds = {
-    languages: mapEntityLanguageIds(fetchedAuthor),
-    articles: fetchedAuthor.articlesIds,
-    blogs: fetchedAuthor.blogsIds,
-    recordedEvents: fetchedAuthor.recordedEventsIds,
-  }
-
-  const authorChildrenFetched = {
-    articles: !authorChildrenIds.articles.length
-      ? []
-      : await fetchArticles(authorChildrenIds.articles),
-    blogs: !authorChildrenIds.blogs.length
-      ? []
-      : await fetchBlogs(authorChildrenIds.blogs),
-    recordedEvents: !authorChildrenIds.recordedEvents.length
-      ? []
-      : await fetchRecordedEvents(authorChildrenIds.recordedEvents),
-  }
-
-  const authorChildrenValidated = {
-    articles: filterValidArticleLikeEntities(
-      authorChildrenFetched.articles,
-      allValidLanguagesIds
-    ),
-    blogs: filterValidArticleLikeEntities(
-      authorChildrenFetched.blogs,
-      allValidLanguagesIds
-    ),
-    recordedEvents: filterValidRecordedEvents(
-      authorChildrenFetched.recordedEvents,
-      allValidLanguagesIds
-    ),
-    languages: authorChildrenIds.languages
-      .filter((authorLanguageId) =>
-        allValidLanguagesIds.includes(authorLanguageId)
-      )
-      .map((authorLanguageId) =>
-        allValidLanguages.find((language) => language.id === authorLanguageId)
-      )
-      .flatMap((language) => (language ? [language] : [])),
-  }
-
-  const processedAuthor = processValidatedAuthor({
-    entity: fetchedAuthor,
-    validLanguageIds: allValidLanguagesIds,
-    validRelatedEntitiesIds: {
-      articlesIds: mapIds(authorChildrenValidated.articles),
-      blogsIds: mapIds(authorChildrenValidated.blogs),
-      recordedEventsIds: mapIds(authorChildrenValidated.recordedEvents),
-    },
+  const validArticles = await fetchAndValidateArticles({
+    ids: fetchedAuthor.articlesIds,
+    validLanguageIds: allValidLanguageIds,
   })
-  // - Page specific data: END ---
+  const validBlogs = await fetchAndValidateBlogs({
+    ids: fetchedAuthor.blogsIds,
+    validLanguageIds: allValidLanguageIds,
+  })
+  const validRecordedEvents = await fetchAndValidateRecordedEvents({
+    ids: fetchedAuthor.recordedEventsIds,
+    validLanguageIds: allValidLanguageIds,
+  })
+
+  const authorIds = getUniqueChildEntitiesIds(
+    [
+      ...validArticles.entities,
+      ...validBlogs.entities,
+      ...validRecordedEvents.entities,
+    ],
+    ["authorsIds"]
+  ).authorsIds
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: authorIds,
+    validLanguageIds: allValidLanguageIds,
+  })
+
+  const imageIds = getAuthorChildImageIds({
+    articles: validArticles.entities,
+    blogs: validBlogs.entities,
+    recordedEvents: validRecordedEvents.entities,
+  })
+
+  const fetchedImages = await fetchImages(imageIds)
+
+  const recordedEventTypeIds = getRecordedEventTypeIds(
+    validRecordedEvents.entities
+  )
+  const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
+    ids: recordedEventTypeIds,
+    validLanguageIds: allValidLanguageIds,
+  })
+
+  const processedArticles = validArticles.entities.map((article) =>
+    processArticleLikeEntityAsSummary({
+      entity: article,
+      validAuthors: validAuthors.entities,
+      validImages: fetchedImages,
+      validLanguageIds: allValidLanguageIds,
+    })
+  )
+  const processedBlogs = validBlogs.entities.map((blog) =>
+    processArticleLikeEntityAsSummary({
+      entity: blog,
+      validAuthors: validAuthors.entities,
+      validImages: fetchedImages,
+      validLanguageIds: allValidLanguageIds,
+    })
+  )
+  const processedRecordedEvents = validRecordedEvents.entities.map(
+    (recordedEvent) =>
+      processRecordedEventAsSummary({
+        recordedEvent,
+        validAuthors: validAuthors.entities,
+        validImages: fetchedImages,
+        validLanguageIds: allValidLanguageIds,
+        validRecordedEventTypes: validRecordedEventTypes.entities,
+      })
+  )
+
+  const processedAuthor = processAuthor(fetchedAuthor, {
+    validLanguageIds: allValidLanguageIds,
+  })
 
   const pageData: StaticData = {
-    author: processedAuthor,
-    childEntities: authorChildrenValidated,
+    author: {
+      ...processedAuthor,
+      languages: filterAndMapEntitiesById(
+        mapEntityLanguageIds(processedAuthor),
+        globalData.languages.entities
+      ),
+      articles: processedArticles,
+      blogs: processedBlogs,
+      recordedEvents: processedRecordedEvents,
+    },
     header: {
-      subjects: allValidSubjects,
+      subjects: globalData.subjects.entities,
     },
   }
 

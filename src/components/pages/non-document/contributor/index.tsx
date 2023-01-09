@@ -1,16 +1,18 @@
+import { mapIds } from "^helpers/data"
+
 import { StaticData } from "./staticData"
 
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 
-import { $ContentContainer_ } from "^page-presentation"
-import { Languages_ } from "^components/pages/_containers"
 import Header from "^components/header"
-import ContributorHeader from "./body/Header"
-import ContributorBody from "./body/Body"
+import { $PageBody } from "^components/pages/_styles"
+import DocumentHeader from "./Header"
+import ChildDocuments from "./ChildDocuments"
+import { $CenterMaxWidth_ } from "^page-presentation"
+import tw from "twin.macro"
 
-const PageContent = ({ author, childEntities, header }: StaticData) => {
-  const { documentLanguage, setDocumentLanguage } =
-    useDetermineDocumentLanguage(childEntities.languages)
+const PageContent = ({ header, author }: StaticData) => {
+  const { documentLanguage } = useDetermineDocumentLanguage(author.languages)
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const translation = author.translations.find(
@@ -18,24 +20,30 @@ const PageContent = ({ author, childEntities, header }: StaticData) => {
   )!
 
   return (
-    <div>
-      <Header {...header} />
-      <$ContentContainer_>
-        <ContributorHeader
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          contributor={{ name: translation.name! }}
-          languages={
-            <Languages_
-              documentLanguage={documentLanguage}
-              documentLanguages={childEntities.languages}
-              setDocumentLanguage={setDocumentLanguage}
-            />
-          }
-        />
-        <ContributorBody />
-        {/* <Body body={translation.body} images={childEntities.images} /> */}
-      </$ContentContainer_>
-    </div>
+    <>
+      <Header {...header} documentLanguageIds={mapIds(author.languages)} />
+      <$PageBody>
+        <div>
+          <DocumentHeader
+            title={translation.name}
+            documentLanguage={documentLanguage}
+            documentLanguages={author.languages}
+          />
+          <$CenterMaxWidth_ maxWidth={tw`max-w-[700px]`}>
+            <div css={[tw`border-l border-r`]}>
+              <ChildDocuments
+                documentLanguage={documentLanguage}
+                childDocumentEntities={[
+                  ...author.articles,
+                  ...author.blogs,
+                  ...author.recordedEvents,
+                ]}
+              />
+            </div>
+          </$CenterMaxWidth_>
+        </div>
+      </$PageBody>
+    </>
   )
 }
 

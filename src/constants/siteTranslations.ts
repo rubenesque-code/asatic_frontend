@@ -23,4 +23,8 @@ export const siteTranslations = {
     english: "collection",
     tamil: "Tcollection",
   },
+  authors: {
+    english: "contributors",
+    tamil: "Tcontributors",
+  },
 }
