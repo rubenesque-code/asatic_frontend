@@ -50,6 +50,7 @@ export type StaticData = {
   subject: ReturnType<typeof processSubjectForOwnPage> & {
     languages: Language[]
     collections: ReturnType<typeof processCollectionAsSummary>[]
+    recordedEvents: ReturnType<typeof processRecordedEventAsSummary>[]
     tags: Tag[]
   }
   header: {
@@ -158,7 +159,6 @@ export const getStaticProps: GetStaticProps<
     processedChildDocumentEntities: {
       articles: processedArticles,
       blogs: processedBlogs,
-      recordedEvents: processedRecordedEvents,
     },
     validLanguageIds: allValidLanguageIds,
   })
@@ -171,6 +171,7 @@ export const getStaticProps: GetStaticProps<
         globalData.languages.entities
       ),
       collections: processedCollections,
+      recordedEvents: processedRecordedEvents,
       tags: validTags.entities,
     },
     header: {

@@ -21,6 +21,8 @@ function processTranslationForSummary(
   }
 }
 
+export type CollectionAsSummary = ReturnType<typeof processCollectionAsSummary>
+
 export function processCollectionAsSummary(
   collection: SanitisedCollection,
   {

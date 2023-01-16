@@ -5,8 +5,8 @@ import {
   SanitisedCollection,
   SanitisedRecordedEvent,
 } from "^types/entities"
-import { getArticleLikeDocumentImageIds } from "../article-like"
-import { getCollectionAsChildUniqueImageIds } from "../collection/query"
+import { getAllImageIdsFromArticleLikeEntity } from "../article-like"
+import { getAllCollectionImageIds } from "../collection/query"
 
 export function getSubjectChildImageIds({
   articles,
@@ -21,7 +21,7 @@ export function getSubjectChildImageIds({
 }) {
   const articleAndBlogImageIds = [...articles, ...blogs].flatMap(
     (articleLikeEntity) =>
-      getArticleLikeDocumentImageIds(articleLikeEntity.translations)
+      getAllImageIdsFromArticleLikeEntity(articleLikeEntity)
   )
   const recordedEventImageIds = recordedEvents.flatMap((recordedEvent) =>
     recordedEvent.summaryImage.imageId
@@ -29,7 +29,7 @@ export function getSubjectChildImageIds({
       : []
   )
   const collectionImageIds = collections.flatMap((collection) =>
-    getCollectionAsChildUniqueImageIds(collection)
+    getAllCollectionImageIds(collection)
   )
 
   const unique = removeArrDuplicates([

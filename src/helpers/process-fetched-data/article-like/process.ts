@@ -7,11 +7,13 @@ import {
   TextSection,
   ImageSection,
   VideoSection,
-  ArticleLikeSummaryType,
   Author,
 } from "^types/entities"
 import { DeepRequired, MakeRequired, MyOmit } from "^types/utilities"
-import { getArticleLikeDocumentImageIds, getArticleLikeSummary } from "./query"
+import {
+  getArticleLikeDocumentImageIds,
+  getArticleLikeSummaryText,
+} from "./query"
 import { validateTranslation } from "./validate"
 
 type ProcessedTranslationBody =
@@ -131,14 +133,12 @@ export function processArticleLikeEntityAsSummary<
   entity,
   validLanguageIds,
   validImages,
-  summaryType = "default",
   validAuthors,
 }: {
   entity: TEntity
   validLanguageIds: string[]
   validImages: Image[]
   validAuthors: Author[]
-  summaryType?: ArticleLikeSummaryType
 }) {
   let summaryImage: Image | null = null
 
@@ -172,7 +172,7 @@ export function processArticleLikeEntityAsSummary<
 
   const processedTranslations = validTranslations.map((translation) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const summaryText = getArticleLikeSummary(translation, summaryType)!
+    const summaryText = getArticleLikeSummaryText(translation)!
 
     return {
       title: translation.title,

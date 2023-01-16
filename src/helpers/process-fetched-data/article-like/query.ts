@@ -1,8 +1,6 @@
-import {
-  ArticleLikeSummaryType,
-  SanitisedArticle,
-  SanitisedBlog,
-} from "^types/entities"
+import { stripHtml } from "string-strip-html"
+
+import { SanitisedArticle, SanitisedBlog } from "^types/entities"
 
 type Translation = SanitisedArticle["translations"][number]
 
@@ -19,7 +17,7 @@ export function getArticleLikeDocumentImageIds(
   return unique
 }
 
-export function getArticleLikeEntitiesImageIds(
+export function getArticleLikeEntitiesDocumentImageIds(
   entities: (SanitisedArticle | SanitisedBlog)[]
 ) {
   return entities.flatMap((entity) =>
@@ -27,46 +25,36 @@ export function getArticleLikeEntitiesImageIds(
   )
 }
 
-export const getArticleLikeSummary = (
-  translation: Translation,
-  summaryType: ArticleLikeSummaryType
+export function getArticleLikeSummaryImageId(
+  articleLikeEntity: SanitisedArticle | SanitisedBlog
+) {
+  if (articleLikeEntity.summaryImage.imageId) {
+    return articleLikeEntity.summaryImage.imageId
+  }
+
+  const documentImageId = articleLikeEntity.translations
+    .flatMap((translation) => translation.body)
+    .find((section) => section.type === "image" && section.image.imageId)
+
+  return documentImageId
+}
+
+export function getAllImageIdsFromArticleLikeEntity(
+  articleLikeEntity: SanitisedArticle | SanitisedBlog
+) {
+  return [
+    articleLikeEntity.summaryImage.imageId,
+    ...getArticleLikeDocumentImageIds(articleLikeEntity.translations),
+  ].flatMap((id) => (id ? [id] : []))
+}
+
+export const getArticleLikeSummaryText = (
+  translation: SanitisedArticle["translations"][number]
 ) => {
   const { body, summary } = translation
 
-  if (summaryType === "default") {
-    if (summary.general?.length) {
-      return summary.general
-    }
-    if (summary.collection?.length) {
-      return summary.collection
-    }
-    if (summary.landingCustomSection?.length) {
-      return summary.landingCustomSection
-    }
-  }
-
-  if (summaryType === "collection") {
-    if (summary.collection?.length) {
-      return summary.collection
-    }
-    if (summary.landingCustomSection?.length) {
-      return summary.landingCustomSection
-    }
-    if (summary.general?.length) {
-      return summary.general
-    }
-  }
-
-  if (summaryType === "landing-user-section") {
-    if (summary.landingCustomSection?.length) {
-      return summary.landingCustomSection
-    }
-    if (summary.collection?.length) {
-      return summary.collection
-    }
-    if (summary.general?.length) {
-      return summary.general
-    }
+  if (summary?.length) {
+    return summary
   }
 
   const textSections = body.flatMap((s) => (s.type === "text" ? [s] : []))
@@ -74,9 +62,9 @@ export const getArticleLikeSummary = (
     (textSection) => textSection.text?.length
   )
 
-  if (!firstTextSectionWithText) {
+  if (!firstTextSectionWithText?.text?.length) {
     return null
   }
 
-  return firstTextSectionWithText.text
+  return stripHtml(firstTextSectionWithText.text).result
 }

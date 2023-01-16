@@ -4,7 +4,7 @@ import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import {
-  getArticleLikeEntitiesImageIds,
+  getArticleLikeEntitiesDocumentImageIds,
   processArticleLikeEntityAsSummary,
 } from "^helpers/process-fetched-data/article-like"
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
@@ -30,7 +30,9 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
     validLanguageIds: globalData.languages.ids,
   })
 
-  const imageIds = getArticleLikeEntitiesImageIds(validArticles.entities)
+  const imageIds = getArticleLikeEntitiesDocumentImageIds(
+    validArticles.entities
+  )
   const fetchedImages = await fetchImages(imageIds)
 
   const processedArticles = validArticles.entities.map((article) =>

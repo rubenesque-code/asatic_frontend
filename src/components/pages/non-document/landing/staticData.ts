@@ -1,21 +1,11 @@
-import { GetStaticPaths, GetStaticProps } from "next"
+import { GetStaticProps } from "next"
 
-import { Language, SanitisedSubject, Tag } from "^types/entities"
+import { SanitisedSubject } from "^types/entities"
 
-import { filterAndMapEntitiesById } from "^helpers/data"
-import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import {
-  getUniqueChildEntitiesIds,
-  mapEntityLanguageIds,
-} from "^helpers/process-fetched-data/general"
-import { getSubjectChildImageIds } from "^helpers/process-fetched-data/subject/query"
+import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { fetchImages, fetchLanding } from "^lib/firebase/firestore"
-import { processSubjectForOwnPage } from "^helpers/process-fetched-data/subject/process"
-import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
-import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
-import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
 import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
@@ -23,18 +13,13 @@ import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/
 import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
-import { fetchAndValidateLanding } from "^helpers/fetch-and-validate/landing"
 import { getLandingUserSectionsUniqueChildIds } from "^helpers/process-fetched-data/landing/query"
-import { validateUserSection } from "^helpers/process-fetched-data/landing/validate"
-import { processUserSections } from "^helpers/process-fetched-data/landing/process"
-import { getUniqueDocumentEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
+import { processCustomSection } from "^helpers/process-fetched-data/landing/process"
+import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
+import { fetchAndValidateDocumentEntities } from "^helpers/fetch-and-validate/_helpers"
 
 export type StaticData = {
-  subject: ReturnType<typeof processSubjectForOwnPage> & {
-    languages: Language[]
-    collections: ReturnType<typeof processCollectionAsSummary>[]
-    tags: Tag[]
-  }
+  landingSections: Awaited<ReturnType<typeof handleProcessSections>>
   header: {
     subjects: SanitisedSubject[]
   }
@@ -44,105 +29,188 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
   const allValidLanguageIds = globalData.languages.ids
 
-  const sections = await fetchLanding()
+  const processedSections = await handleProcessSections({
+    validLanguageIds: allValidLanguageIds,
+  })
 
-  const userSections = sections.flatMap((section) =>
-    section.type === "user" ? section : []
-  )
-
-  const userSectionChildIds = getLandingUserSectionsUniqueChildIds(userSections)
-
-  const validUserSectionChildEntities = {
-    articles: await fetchAndValidateArticles({
-      ids: userSectionChildIds.articles,
-      validLanguageIds: allValidLanguageIds,
-    }),
-    blogs: await fetchAndValidateBlogs({
-      ids: userSectionChildIds.blogs,
-      validLanguageIds: allValidLanguageIds,
-    }),
-    recordedEvents: await fetchAndValidateRecordedEvents({
-      ids: userSectionChildIds.recordedEvents,
-      validLanguageIds: allValidLanguageIds,
-    }),
-  }
-
-  const validUserSections = userSections.filter((section) =>
-    validateUserSection(section, {
-      validDocumentEntityIds: {
-        articles: validUserSectionChildEntities.articles.ids,
-        blogs: validUserSectionChildEntities.blogs.ids,
-        recordedEvents: validUserSectionChildEntities.recordedEvents.ids,
+  return {
+    props: {
+      header: {
+        subjects: globalData.subjects.entities,
       },
-    })
+      landingSections: processedSections,
+    },
+  }
+}
+
+async function handleProcessSections({
+  validLanguageIds,
+}: {
+  validLanguageIds: string[]
+}) {
+  const { firstSectionComponents, secondSectionComponents } =
+    await handleProcessCustomSections({ validLanguageIds })
+  const { collections, recordedEvents } =
+    await handleProcessAutoSectionChildEntities({ validLanguageIds })
+
+  return {
+    firstSectionComponents,
+    collections,
+    recordedEvents,
+    secondSectionComponents,
+  }
+}
+
+async function handleProcessCustomSections({
+  validLanguageIds,
+}: {
+  validLanguageIds: string[]
+}) {
+  const customSectionComponents = await fetchLanding()
+
+  const userSectionEntityIds = getLandingUserSectionsUniqueChildIds(
+    customSectionComponents
   )
 
-  const imageIds = getUniqueDocumentEntitiesImageIds({
-    articles: validUserSectionChildEntities.articles.entities,
-    blogs: validUserSectionChildEntities.blogs.entities,
-    recordedEvents: validUserSectionChildEntities.recordedEvents.entities,
+  const validUserSectionEntities = await fetchAndValidateDocumentEntities({
+    articleIds: userSectionEntityIds.articles,
+    blogIds: userSectionEntityIds.blogs,
+    validLanguageIds,
+  })
+
+  const validArticleLikeEntities = [
+    ...validUserSectionEntities.articles.entities,
+    ...validUserSectionEntities.blogs.entities,
+  ]
+
+  const imageIds = getUniqueChildEntitiesImageIds({
+    articleLikeEntities: validArticleLikeEntities,
+  })
+  const fetchedImages = await fetchImages(imageIds)
+
+  const authorIds = getUniqueChildEntitiesIds(validArticleLikeEntities, [
+    "authorsIds",
+  ]).authorsIds
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: authorIds,
+    validLanguageIds,
+  })
+
+  const processedArticleLikeEntities = validArticleLikeEntities.map(
+    (articleLikeEntity) =>
+      processArticleLikeEntityAsSummary({
+        entity: articleLikeEntity,
+        validAuthors: validAuthors.entities,
+        validImages: fetchedImages,
+        validLanguageIds,
+      })
+  )
+
+  const validEntityIds = [
+    ...validUserSectionEntities.articles.ids,
+    ...validUserSectionEntities.blogs.ids,
+  ]
+
+  const componentsWithValidatedEntities = customSectionComponents.filter(
+    (component) => validEntityIds.includes(component.entity.id)
+  )
+  const firstSectionWithValidatedEntities =
+    componentsWithValidatedEntities.filter(
+      (component) => component.section === 0
+    )
+  const secondSectionWithValidatedEntities =
+    componentsWithValidatedEntities.filter(
+      (component) => component.section === 1
+    )
+
+  const firstSectionComponentsProcessed = processCustomSection(
+    firstSectionWithValidatedEntities,
+    {
+      validChildEntities: { articleLikeEntities: processedArticleLikeEntities },
+    }
+  )
+  const secondSectionComponentsProcessed = processCustomSection(
+    secondSectionWithValidatedEntities,
+    {
+      validChildEntities: { articleLikeEntities: processedArticleLikeEntities },
+    }
+  )
+
+  return {
+    firstSectionComponents: firstSectionComponentsProcessed.length
+      ? firstSectionComponentsProcessed
+      : null,
+    secondSectionComponents: secondSectionComponentsProcessed.length
+      ? secondSectionComponentsProcessed
+      : null,
+  }
+}
+
+async function handleProcessAutoSectionChildEntities({
+  validLanguageIds,
+}: {
+  validLanguageIds: string[]
+}) {
+  // 1. fetch and validate child entities
+  // 2. process sections; populate components
+
+  const validRecordedEvents = await fetchAndValidateRecordedEvents({
+    ids: "all",
+    validLanguageIds,
+  })
+  const validCollections = await fetchAndValidateCollections({
+    ids: "all",
+    validLanguageIds,
+  })
+
+  const imageIds = getUniqueChildEntitiesImageIds({
+    recordedEvents: validRecordedEvents?.entities,
+    collections: validCollections?.entities,
   })
   const fetchedImages = await fetchImages(imageIds)
 
   const authorIds = getUniqueChildEntitiesIds(
-    [
-      ...validUserSectionChildEntities.articles.entities,
-      ...validUserSectionChildEntities.blogs.entities,
-      ...validUserSectionChildEntities.recordedEvents.entities,
-    ],
+    [...(validRecordedEvents?.entities || [])],
     ["authorsIds"]
   ).authorsIds
   const validAuthors = await fetchAndValidateAuthors({
     ids: authorIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
 
   const recordedEventTypeIds = getRecordedEventTypeIds(
-    validUserSectionChildEntities.recordedEvents.entities
+    validRecordedEvents?.entities || []
   )
   const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
     ids: recordedEventTypeIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
 
-  const processedArticles = validUserSectionChildEntities.articles.entities.map(
-    (article) =>
-      processArticleLikeEntityAsSummary({
-        entity: article,
-        validAuthors: validAuthors.entities,
-        validImages: fetchedImages,
-        validLanguageIds: allValidLanguageIds,
-      })
-  )
-  const processedBlogs = validUserSectionChildEntities.blogs.entities.map(
-    (blog) =>
-      processArticleLikeEntityAsSummary({
-        entity: blog,
-        validAuthors: validAuthors.entities,
-        validImages: fetchedImages,
-        validLanguageIds: allValidLanguageIds,
-      })
-  )
-  const processedRecordedEvents =
-    validUserSectionChildEntities.recordedEvents.entities.map((recordedEvent) =>
+  const processDocumentEntitySharedArgs = {
+    validAuthors: validAuthors.entities,
+    validImages: fetchedImages,
+    validLanguageIds,
+  }
+
+  const processedRecordedEvents = validRecordedEvents?.entities.map(
+    (recordedEvent) =>
       processRecordedEventAsSummary({
         recordedEvent,
-        validAuthors: validAuthors.entities,
-        validImages: fetchedImages,
-        validLanguageIds: allValidLanguageIds,
+        ...processDocumentEntitySharedArgs,
         validRecordedEventTypes: validRecordedEventTypes.entities,
       })
-    )
-
-  const processedUserSections = processUserSections(validUserSections, {
-    validChildEntities: {
-      articles: processedArticles,
-      blogs: processedBlogs,
-      recordedEvents: processedRecordedEvents,
-    },
-  })
+  )
+  const processedCollections = validCollections?.entities.map((collection) =>
+    processCollectionAsSummary(collection, {
+      validImages: fetchedImages,
+      validLanguageIds,
+    })
+  )
 
   return {
-    props: pageData,
+    recordedEvents: processedRecordedEvents.length
+      ? processedRecordedEvents
+      : null,
+    collections: processedCollections.length ? processedCollections : null,
   }
 }

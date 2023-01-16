@@ -1,7 +1,7 @@
 import { Expand, TupleToUnion } from "./utilities"
 
 import { ImageFields } from "./entity-image"
-import { RichText, SummaryField, TranslationField } from "./entity-translation"
+import { RichText, TranslationField } from "./entity-translation"
 
 import {
   EntityGlobalFields,
@@ -15,10 +15,7 @@ import {
   EntityNameToChildKeyTuple,
 } from "./entity"
 import { Translations } from "./entity-translation"
-import {
-  SummaryImageField,
-  LandingCustomSectionImageField,
-} from "./entity-image"
+import { SummaryImageField } from "./entity-image"
 import { DisplayEntityStatus } from "./entity-status"
 
 type SectionTypes = "text" | "image" | "video"
@@ -39,7 +36,8 @@ export type VideoSection = Section<"video"> &
 
 type ArticleLikeTranslationFields = TranslationField<"title"> & {
   body: (Expand<TextSection> | Expand<ImageSection> | Expand<VideoSection>)[]
-} & SummaryField<"collection" | "general" | "landingCustomSection">
+  summary?: string
+}
 
 type ArticleLikeEntityName = EntityNameSubSet<"article" | "blog">
 
@@ -49,8 +47,7 @@ export type ArticleLikeEntity<TEntityName extends ArticleLikeEntityName> =
     PublishFields &
     SaveFields &
     Translations<ArticleLikeTranslationFields> &
-    SummaryImageField<"isToggleable"> &
-    LandingCustomSectionImageField
+    SummaryImageField<"isToggleable">
 
 export type ArticleLikeTranslation =
   Translations<ArticleLikeTranslationFields>["translations"][number]

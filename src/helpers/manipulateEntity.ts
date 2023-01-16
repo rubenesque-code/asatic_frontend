@@ -43,3 +43,11 @@ export function sortEntitiesByLanguage<
     return 0
   })
 }
+
+export function sortEntitiesByIndex<TEntity extends { index: number }>(
+  entities: TEntity[]
+) {
+  return entities.sort((a, b) => {
+    return b.index - a.index
+  })
+}

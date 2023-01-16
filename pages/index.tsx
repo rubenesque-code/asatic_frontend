@@ -1,11 +1,12 @@
 import type { NextPage } from "next"
 
-const Home: NextPage = () => {
-  return (
-    <div>
-      <button>Fetch</button>
-    </div>
-  )
+import { StaticData } from "^components/pages/non-document/landing/staticData"
+import PageContent from "^components/pages/non-document/landing"
+
+export { getStaticProps } from "^components/pages/non-document/landing/staticData"
+
+const Home: NextPage<StaticData> = (staticData) => {
+  return <PageContent {...staticData} />
 }
 
 export default Home

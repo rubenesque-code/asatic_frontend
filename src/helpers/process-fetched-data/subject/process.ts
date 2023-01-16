@@ -24,7 +24,6 @@ export function processSubjectForOwnPage(
     processedChildDocumentEntities: {
       articles: ArticleLikeEntityAsSummary[]
       blogs: ArticleLikeEntityAsSummary[]
-      recordedEvents: RecordedEventAsSummary[]
     }
   }
 ) {

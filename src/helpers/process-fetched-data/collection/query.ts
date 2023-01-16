@@ -7,9 +7,7 @@ import {
 } from "^types/entities"
 import { getArticleLikeDocumentImageIds } from "../article-like"
 
-export function getCollectionAsChildUniqueImageIds(
-  collection: SanitisedCollection
-) {
+export function getAllCollectionImageIds(collection: SanitisedCollection) {
   const imageIds = [
     collection.bannerImage.imageId,
     collection.summaryImage.imageId,
@@ -23,8 +21,8 @@ export function getCollectionAsChildUniqueImageIds(
 export function getCollectionSummaryText(
   translation: SanitisedCollection["translations"][number]
 ) {
-  if (translation.summary.general?.length) {
-    return translation.summary.general
+  if (translation.summary?.length) {
+    return translation.summary
   }
   if (translation.description?.length) {
     return translation.description

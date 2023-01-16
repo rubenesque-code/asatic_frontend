@@ -9,7 +9,7 @@ import {
   FetchedArticle,
   FetchedSubject,
   Image,
-  LandingSection,
+  LandingCustomSectionComponent,
   Language,
   RecordedEventType,
   SanitisedArticle,
@@ -163,7 +163,7 @@ export const fetchLanguages = async (ids: string[] | "all") => {
 }
 
 export const fetchLanding = async () =>
-  (await fetchFirestoreCollection("landing")) as LandingSection[]
+  (await fetchFirestoreCollection("landing")) as LandingCustomSectionComponent[]
 
 export const fetchRecordedEvent = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(

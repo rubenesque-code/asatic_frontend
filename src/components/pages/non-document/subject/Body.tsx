@@ -23,6 +23,7 @@ const DocumentBody = ({
   subjectTitle: string
 }) => {
   const windowSize = useWindowSize()
+  console.log("childDocumentEntities:", childDocumentEntities)
   return (
     <div css={[tw`pb-xl`]}>
       <div css={[tw`border-b`]}>
