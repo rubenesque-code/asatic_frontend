@@ -13,6 +13,8 @@ import { routes } from "^constants/routes"
 import { useRouter } from "next/router"
 import { $link } from "^styles/global"
 
+// TODO: Articli summary image not working in Subject. Collection summary image is showing.
+
 const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
 const ArticleLikeEntity = ({

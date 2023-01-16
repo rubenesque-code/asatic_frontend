@@ -99,6 +99,7 @@ export const getStaticProps: GetStaticProps<
     recordedEvents: validRecordedEvents.entities,
     collections: validCollections.entities,
   })
+  console.log("imageIds:", imageIds)
   const fetchedImages = await fetchImages(imageIds)
 
   const authorIds = getUniqueChildEntitiesIds(
