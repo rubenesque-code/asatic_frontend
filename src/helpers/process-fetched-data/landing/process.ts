@@ -13,17 +13,21 @@ export function processCustomSection(
     }
   }
 ) {
-  const componentsPopulated = components.map((component) =>
-    component.entity.type === "article"
-      ? findEntityById(
-          validChildEntities.articleLikeEntities,
-          component.entity.id
-        )!
-      : findEntityById(
-          validChildEntities.articleLikeEntities,
-          component.entity.id
-        )!
-  )
+  const componentsProcessed = components
+    .sort((a, b) => a.index - b.index)
+    .map((component) => {
+      const { entity: componentEntity, ...restComponent } = component
 
-  return componentsPopulated
+      const entity = findEntityById(
+        validChildEntities.articleLikeEntities,
+        componentEntity.id
+      )!
+
+      return {
+        ...restComponent,
+        entity,
+      }
+    })
+
+  return componentsProcessed
 }

@@ -11,25 +11,27 @@ import { EntityLink_ } from "^entity-summary/_containers"
 
 const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
+// TODO: max characthers
+
 export const ArticleLikeSummaryDefault = ({
   articleLikeEntity,
   parentCurrentLanguageId,
-  isFirst,
+  useImage,
+  maxBodyCharacters = 200,
 }: {
   articleLikeEntity: ArticleLikeEntityAsSummary
   parentCurrentLanguageId: string
-  isFirst?: boolean
+  useImage: boolean
+  maxBodyCharacters?: number
 }) => {
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId
   )
 
-  const maxBodyCharacters = isFirst ? 800 : 200
-
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
-      {isFirst ? (
+      {useImage ? (
         <$SummaryImage
           image={articleLikeEntity.summaryImage}
           styles={tw`mb-xs`}

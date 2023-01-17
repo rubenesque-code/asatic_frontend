@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import tw from "twin.macro"
 
 import { TranslateIcon } from "^components/Icons"
+import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 export type SiteLanguageProps = {
@@ -41,7 +42,7 @@ const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
         passHref
       >
         <span css={[tw`font-sans-primary font-light cursor-pointer`]}>
-          {siteLanguage.id === "english" ? "Tamil" : "English"}
+          {siteLanguage.id === "english" ? siteTranslations.tamil : "English"}
         </span>
       </Link>
     </div>

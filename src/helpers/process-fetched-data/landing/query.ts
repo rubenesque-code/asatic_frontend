@@ -6,10 +6,10 @@ export function getLandingUserSectionsUniqueChildIds(
 ) {
   const articleIds = components
     .filter((component) => component.entity.type === "article")
-    .map((entity) => entity.id)
+    .map((component) => component.entity.id)
   const blogIds = components
     .filter((component) => component.entity.type === "blog")
-    .map((entity) => entity.id)
+    .map((component) => component.entity.id)
 
   return {
     articles: removeArrDuplicates(articleIds),

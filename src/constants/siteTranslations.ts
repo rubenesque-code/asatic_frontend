@@ -1,30 +1,35 @@
 export const siteTranslations = {
+  siteName: {
+    english: "Asatic",
+    tamil: "அசதி",
+  },
   home: {
     english: "home",
-    tamil: "Thome",
+    tamil: "வீடு",
   },
   articles: {
     english: "articles",
-    tamil: "Tarticles",
+    tamil: "கட்டுரைகள்",
   },
   blogs: {
     english: "blog",
-    tamil: "Tblog",
+    tamil: "வலைப்பதிவு",
   },
   recordedEvents: {
     english: "videos",
-    tamil: "TVideos",
+    tamil: "வீடியோக்கள்",
   },
   subjects: {
     english: "subjects",
-    tamil: "Tsubjects",
+    tamil: "பொருள்",
   },
   collection: {
     english: "collection",
-    tamil: "Tcollection",
+    tamil: "சேகரிப்பு",
   },
   authors: {
     english: "contributors",
-    tamil: "Tcontributors",
+    tamil: "ஆசிரியர்கள்",
   },
+  tamil: "தமிழ்",
 }

@@ -13,20 +13,24 @@ export async function fetchAndValidateDocumentEntities({
   recordedEventIds?: string[]
   validLanguageIds?: string[]
 }) {
+  const articles = await fetchAndValidateArticles({
+    ids: articleIds,
+    validLanguageIds,
+  })
+  const blogs = await fetchAndValidateBlogs({
+    ids: blogIds,
+    validLanguageIds,
+  })
+  const recordedEvents = recordedEventIds
+    ? await fetchAndValidateRecordedEvents({
+        ids: recordedEventIds,
+        validLanguageIds,
+      })
+    : null
+
   return {
-    articles: await fetchAndValidateArticles({
-      ids: articleIds,
-      validLanguageIds,
-    }),
-    blogs: await fetchAndValidateBlogs({
-      ids: blogIds,
-      validLanguageIds,
-    }),
-    recordedEvents: recordedEventIds
-      ? await fetchAndValidateRecordedEvents({
-          ids: recordedEventIds,
-          validLanguageIds,
-        })
-      : null,
+    articles,
+    blogs,
+    recordedEvents,
   }
 }

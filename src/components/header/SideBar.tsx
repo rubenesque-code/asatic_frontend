@@ -116,6 +116,8 @@ const PageLink = ({ label, pathname }: { label: string; pathname: string }) => {
 const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
+  const { siteLanguage } = useSiteLanguageContext()
+
   return (
     <div>
       <div
@@ -123,7 +125,9 @@ const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
         className="group"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span css={[$text, tw`group-hover:text-gray-900`]}>Subjects</span>
+        <span css={[$text, tw`group-hover:text-gray-900`]}>
+          {siteTranslations["subjects"][siteLanguage.id]}
+        </span>
         <span css={[tw`group-hover:bg-gray-50 rounded-full p-xxxs`]}>
           {isExpanded ? <CaretUp /> : <CaretDown />}
         </span>

@@ -27,6 +27,7 @@ const DocumentBody = ({
   recordedEvents: RecordedEventAsSummary[]
   subjectTitle: string
 }) => {
+  // TODO: caun use media qs instead of below?
   const windowSize = useWindowSize()
 
   return (
@@ -49,7 +50,8 @@ const DocumentBody = ({
               <ArticleLikeSummaryDefault
                 articleLikeEntity={entity as ArticleLikeEntityAsSummary}
                 parentCurrentLanguageId={documentLanguage.id}
-                isFirst={i === 0}
+                useImage={i === 0}
+                maxBodyCharacters={i === 0 ? 800 : undefined}
               />
             </$SummaryContainer>
           ))}
@@ -107,6 +109,7 @@ const DocumentBody = ({
                 <ArticleLikeSummaryDefault
                   articleLikeEntity={entity as ArticleLikeEntityAsSummary}
                   parentCurrentLanguageId={documentLanguage.id}
+                  useImage={false}
                 />
               </$SummaryContainer>
             ))}

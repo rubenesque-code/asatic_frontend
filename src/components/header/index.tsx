@@ -1,5 +1,6 @@
 import Link from "next/link"
 import tw from "twin.macro"
+import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { $link } from "^styles/global"
 
@@ -22,7 +23,9 @@ const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
         href={{ pathname: "/", query: { siteLanguageId: siteLanguage.id } }}
         passHref
       >
-        <div css={[tw`text-2xl font-bold`, $link]}>Asatic</div>
+        <div css={[tw`text-2xl font-bold`, $link]}>
+          {siteTranslations.siteName[siteLanguage.id]}
+        </div>
       </Link>
       <SiteLanguage documentLanguageIds={documentLanguageIds} />
     </div>
