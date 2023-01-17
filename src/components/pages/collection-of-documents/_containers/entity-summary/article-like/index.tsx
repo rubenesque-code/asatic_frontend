@@ -3,7 +3,7 @@ import tw from "twin.macro"
 import { determineChildTranslation } from "^helpers/document"
 import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 
-import { Authors_ } from "^components/pages/_containers"
+import { Authors_, DateString_ } from "^components/pages/_containers"
 import { $link } from "^styles/global"
 
 import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
@@ -54,7 +54,10 @@ export const ArticleLikeSummaryDefault = ({
           tw`mb-xs text-gray-800 font-sans-document font-light text-sm tracking-wider`,
         ]}
       >
-        {articleLikeEntity.publishDate}
+        <DateString_
+          engDateStr={articleLikeEntity.publishDate}
+          languageId={translation.languageId}
+        />
       </p>
       <$SummaryText
         htmlStr={translation.summaryText}

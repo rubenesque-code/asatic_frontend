@@ -3,7 +3,7 @@
 import { determineChildTranslation } from "^helpers/document"
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 
-import { Authors_ } from "^components/pages/_containers"
+import { Authors_, DateString_ } from "^components/pages/_containers"
 import { SummaryImage_, Type_ } from "../_containers"
 
 import { $SwiperSlideContainer } from "^entity-summary/_presentation/$SwiperSlide"
@@ -50,7 +50,12 @@ const RecordedEventSwiperSummary = ({
         parentLanguageId={translation.languageId}
         styles={$authors}
       />
-      <$Date>{recordedEvent.publishDate}</$Date>
+      <$Date>
+        <DateString_
+          engDateStr={recordedEvent.publishDate}
+          languageId={translation.languageId}
+        />
+      </$Date>
     </$SwiperSlideContainer>
   )
 }
