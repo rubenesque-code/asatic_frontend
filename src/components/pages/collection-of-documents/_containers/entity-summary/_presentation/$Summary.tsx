@@ -3,9 +3,7 @@ import HtmlStrToJSX from "^components/HtmlStrToJSX"
 import StorageImage from "^components/StorageImage"
 import { Image } from "^types/entities"
 
-export const $ChildSummaryContainer = tw.div`p-sm`
-
-export const SummaryImage = ({
+export const $SummaryImage = ({
   image,
   styles,
 }: {
@@ -29,7 +27,7 @@ export const SummaryImage = ({
   )
 }
 
-export const SummaryText = ({
+export const $SummaryText = ({
   htmlStr,
   languageId,
   maxCharacters,

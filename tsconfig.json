@@ -30,7 +30,10 @@
       "^styles/*": ["src/styles/*"],
       "^types/*": ["src/types/*"],
       "^page-presentation": ["src/components/pages/_presentation/index.ts"],
-      "^page-container": ["src/components/pages/_containers/index.ts"]
+      "^page-container": ["src/components/pages/_containers/index.ts"],
+      "^entity-summary/*": [
+        "src/components/pages/collection-of-documents/_containers/entity-summary/*"
+      ]
     }
   },
   "include": [

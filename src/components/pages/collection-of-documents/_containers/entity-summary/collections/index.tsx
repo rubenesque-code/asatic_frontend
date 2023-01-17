@@ -1,17 +1,15 @@
-import tw from "twin.macro"
-
-import { StaticData } from "./staticData"
+import { sortEntitiesByDate } from "^helpers/manipulateEntity"
+import { CollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
 
 import { Swiper_ } from "^page-container"
-import { sortEntitiesByDate } from "^helpers/manipulateEntity"
-import Collection from "./child-summaries/Collection"
-import { $SectionContent, $SectionHeader } from "./_styles"
+import Summary from "./Summary"
+import { $SwiperSectionLayout } from "../_presentation/$SwiperSectionLayout"
 
 const Collections = ({
   collections,
   parentCurrentLanguageId,
 }: {
-  collections: StaticData["subject"]["collections"]
+  collections: CollectionAsSummary[]
   parentCurrentLanguageId: string
 }) => {
   if (!collections.length) {
@@ -21,13 +19,11 @@ const Collections = ({
   const orderedCollections = sortEntitiesByDate(collections)
 
   return (
-    <div css={[tw`border-b`]}>
-      <$SectionHeader>Collections</$SectionHeader>
-      <$SectionContent>
+    <$SwiperSectionLayout
+      swiper={
         <Swiper_
-          colorTheme="white"
           slides={orderedCollections.map((collection, i) => (
-            <Collection
+            <Summary
               collection={collection}
               parentCurrentLanguageId={parentCurrentLanguageId}
               index={i}
@@ -35,8 +31,9 @@ const Collections = ({
             />
           ))}
         />
-      </$SectionContent>
-    </div>
+      }
+      title="Collections"
+    />
   )
 }
 

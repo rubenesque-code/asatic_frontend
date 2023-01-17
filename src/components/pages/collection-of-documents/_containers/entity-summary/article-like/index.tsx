@@ -4,20 +4,14 @@ import { determineChildTranslation } from "^helpers/document"
 import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 
 import { Authors_ } from "^components/pages/_containers"
-import {
-  SummaryImage,
-  SummaryText,
-} from "^components/pages/_collections/DocumentSummary"
-import Link from "next/link"
-import { routes } from "^constants/routes"
-import { useRouter } from "next/router"
 import { $link } from "^styles/global"
 
-// TODO: Articli summary image not working in Subject. Collection summary image is showing.
+import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
+import { EntityLink_ } from "^entity-summary/_containers"
 
 const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
-const ArticleLikeEntity = ({
+export const ArticleLikeSummaryDefault = ({
   articleLikeEntity,
   parentCurrentLanguageId,
   isFirst,
@@ -33,34 +27,23 @@ const ArticleLikeEntity = ({
 
   const maxBodyCharacters = isFirst ? 800 : 200
 
-  const router = useRouter()
-
-  const routeRoot =
-    articleLikeEntity.type === "article" ? routes.articles : routes.blogs
-  const pathname = `${routeRoot}/${articleLikeEntity.id}`
-
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
       {isFirst ? (
-        <SummaryImage
+        <$SummaryImage
           image={articleLikeEntity.summaryImage}
           styles={tw`mb-xs`}
         />
       ) : null}
-      <Link
-        href={{
-          pathname,
-          query: {
-            ...router.query,
-            documentLanguageId: translation.languageId,
-          },
-        }}
-        passHref
+      <EntityLink_
+        entityId={articleLikeEntity.id}
+        documentLanguageId={translation.languageId}
+        routeKey={articleLikeEntity.type === "article" ? "articles" : "blogs"}
       >
         <h3 css={[tw`text-xl mb-xxs cursor-pointer`, $link]}>
           {translation.title}
         </h3>
-      </Link>
+      </EntityLink_>
       <Authors_
         authors={articleLikeEntity.authors}
         parentLanguageId={translation.languageId}
@@ -73,7 +56,7 @@ const ArticleLikeEntity = ({
       >
         {articleLikeEntity.publishDate}
       </p>
-      <SummaryText
+      <$SummaryText
         htmlStr={translation.summaryText}
         languageId={translation.languageId}
         maxCharacters={maxBodyCharacters}
@@ -81,5 +64,3 @@ const ArticleLikeEntity = ({
     </div>
   )
 }
-
-export default ArticleLikeEntity

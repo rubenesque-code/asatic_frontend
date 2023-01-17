@@ -4,7 +4,7 @@ import { SanitisedSubject } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
 import { validateTranslation } from "./validate"
 import { ArticleLikeEntityAsSummary } from "../article-like"
-import { RecordedEventAsSummary } from "../recorded-event/process"
+// import { RecordedEventAsSummary } from "../recorded-event/process"
 import { sortEntitiesByDate, unshiftFirstEntityWithImage } from "../_helpers"
 import { DocumentEntitiesAsSummaries } from "../_types"
 
@@ -50,9 +50,7 @@ function splitChildEntitiesIntoSections(entities: DocumentEntitiesAsSummaries) {
   }
 }
 
-function orderChildDocumentEntities(
-  entities: (ArticleLikeEntityAsSummary | RecordedEventAsSummary)[]
-) {
+function orderChildDocumentEntities(entities: ArticleLikeEntityAsSummary[]) {
   const order = pipe(
     sortEntitiesByDate,
     unshiftFirstEntityWithImage,

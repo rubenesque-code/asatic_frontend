@@ -6,16 +6,9 @@ import { Swiper, SwiperSlide } from "swiper/react"
 import { CaretLeft, CaretRight } from "phosphor-react"
 import tw from "twin.macro"
 
-import { sectionColorThemes, SectionColorTheme } from "^constants/colours"
 import { useWindowSize } from "react-use"
 
-export const Swiper_ = ({
-  colorTheme,
-  slides,
-}: {
-  colorTheme: SectionColorTheme
-  slides: ReactElement[]
-}) => {
+export const Swiper_ = ({ slides }: { slides: ReactElement[] }) => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null)
 
   const navButtonsFuncs = {
@@ -39,26 +32,21 @@ export const Swiper_ = ({
         // `SwiperSlide`, as it's imported from swiper/react, needs to be a direct child of `Swiper`; can't be within another component.
         <SwiperSlide key={i}>{slide}</SwiperSlide>
       ))}
-      {navigationIsShowing ? (
-        <Navigation_ colorTheme={colorTheme} {...navButtonsFuncs} />
-      ) : null}
+      {navigationIsShowing ? <Navigation_ {...navButtonsFuncs} /> : null}
     </Swiper>
   )
 }
 
 const Navigation_ = ({
-  colorTheme,
   swipeLeft,
   swipeRight,
 }: {
-  colorTheme: SectionColorTheme
   swipeLeft: () => void
   swipeRight: () => void
 }) => {
   return (
     <div
       css={[
-        sectionColorThemes[colorTheme].bg,
         tw`z-20 absolute top-0 right-0 min-w-[110px] h-full bg-opacity-70 flex flex-col justify-center`,
       ]}
     >

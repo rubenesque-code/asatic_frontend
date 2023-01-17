@@ -1,12 +1,12 @@
 import type { NextPage } from "next"
 
-import { StaticData } from "^components/pages/non-document/subject/staticData"
-import PageContent from "^components/pages/non-document/subject"
+import { StaticData } from "^components/pages/collection-of-documents/subject/staticData"
+import PageContent from "^components/pages/collection-of-documents/subject"
 
 export {
   getStaticPaths,
   getStaticProps,
-} from "^components/pages/non-document/subject/staticData"
+} from "^components/pages/collection-of-documents/subject/staticData"
 
 const SubjectPage: NextPage<StaticData> = (staticData) => {
   return <PageContent {...staticData} />

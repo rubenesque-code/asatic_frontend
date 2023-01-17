@@ -4,32 +4,37 @@ import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-e
 import { Language } from "^types/entities"
 import { StaticData } from "./staticData"
 
-import ArticleLikeEntity from "./child-summaries/ArticleLike"
-import RecordedEvent from "./child-summaries/RecordedEvent"
-import Collections from "./Collections"
-import { $ChildSummaryContainer } from "^components/pages/_collections/DocumentSummary"
+import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
+// import RecordedEvent from "./child-summaries/RecordedEvent"
+import Collections from "../_containers/entity-summary/collections"
+import RecordedEvents from "../_containers/entity-summary/recorded-events/swiper"
 import { $SectionContent, $SectionHeader } from "./_styles"
 import { useWindowSize } from "react-use"
+import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
+
+import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 
 const DocumentBody = ({
   documentLanguage,
   childDocumentEntities,
   collections,
+  recordedEvents,
   subjectTitle,
 }: {
   documentLanguage: Language
   childDocumentEntities: StaticData["subject"]["childDocumentEntities"]
   collections: StaticData["subject"]["collections"]
+  recordedEvents: RecordedEventAsSummary[]
   subjectTitle: string
 }) => {
   const windowSize = useWindowSize()
-  console.log("childDocumentEntities:", childDocumentEntities)
+
   return (
     <div css={[tw`pb-xl`]}>
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`grid grid-cols-12 lg:grid-rows-2`]}>
           {childDocumentEntities.first.map((entity, i) => (
-            <$ChildSummaryContainer
+            <$SummaryContainer
               css={[
                 tw`col-span-12`,
                 i === 0 && tw`lg:row-span-2 lg:col-span-6 lg:border-r`,
@@ -41,19 +46,12 @@ const DocumentBody = ({
               ]}
               key={entity.id}
             >
-              {entity.type === "article" || entity.type === "blog" ? (
-                <ArticleLikeEntity
-                  articleLikeEntity={entity}
-                  parentCurrentLanguageId={documentLanguage.id}
-                  isFirst={i === 0}
-                />
-              ) : (
-                <RecordedEvent
-                  parentCurrentLanguageId={documentLanguage.id}
-                  recordedEvent={entity as RecordedEventAsSummary}
-                />
-              )}
-            </$ChildSummaryContainer>
+              <ArticleLikeSummaryDefault
+                articleLikeEntity={entity as ArticleLikeEntityAsSummary}
+                parentCurrentLanguageId={documentLanguage.id}
+                isFirst={i === 0}
+              />
+            </$SummaryContainer>
           ))}
         </$SectionContent>
       </div>
@@ -61,12 +59,16 @@ const DocumentBody = ({
         collections={collections}
         parentCurrentLanguageId={documentLanguage.id}
       />
+      <RecordedEvents
+        recordedEvents={recordedEvents}
+        parentCurrentLanguageId={documentLanguage.id}
+      />
       {childDocumentEntities.second.length ? (
         <div css={[tw`border-b`]}>
           <$SectionHeader>More from {subjectTitle}</$SectionHeader>
           <$SectionContent css={[tw`grid grid-cols-12`]}>
             {childDocumentEntities.second.map((entity, i) => (
-              <$ChildSummaryContainer
+              <$SummaryContainer
                 css={[
                   tw`col-span-12 md:col-span-6 lg:col-span-4`,
                   i !== childDocumentEntities.second.length - 1
@@ -102,18 +104,11 @@ const DocumentBody = ({
                 ]}
                 key={entity.id}
               >
-                {entity.type === "article" || entity.type === "blog" ? (
-                  <ArticleLikeEntity
-                    articleLikeEntity={entity}
-                    parentCurrentLanguageId={documentLanguage.id}
-                  />
-                ) : (
-                  <RecordedEvent
-                    parentCurrentLanguageId={documentLanguage.id}
-                    recordedEvent={entity as RecordedEventAsSummary}
-                  />
-                )}
-              </$ChildSummaryContainer>
+                <ArticleLikeSummaryDefault
+                  articleLikeEntity={entity as ArticleLikeEntityAsSummary}
+                  parentCurrentLanguageId={documentLanguage.id}
+                />
+              </$SummaryContainer>
             ))}
           </$SectionContent>
         </div>
