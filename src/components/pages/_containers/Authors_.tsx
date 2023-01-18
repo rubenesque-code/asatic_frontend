@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from "next/link"
-import React from "react"
 import tw, { TwStyle } from "twin.macro"
 import { routes } from "^constants/routes"
+import { useGlobalDataContext } from "^context/GlobalData"
+import { $link } from "^styles/global"
 
-import { Author } from "^types/entities"
+import { Author as AuthorType } from "^types/entities"
 
-function filterAuthorsForLanguage(authors: Author[], languageId: string) {
+function filterAuthorsForLanguage(authors: AuthorType[], languageId: string) {
   return authors.filter((author) =>
     author.translations.find(
       (translation) =>
@@ -20,7 +22,7 @@ export const Authors_ = ({
   styles,
 }: {
   parentLanguageId: string
-  authors: Author[]
+  authors: AuthorType[]
   styles: TwStyle
 }) => {
   if (!authors.length) {
@@ -48,21 +50,32 @@ export const Authors_ = ({
     <div css={[styles]}>
       {authorsProcessed.map((author, i) => (
         <div css={[tw`flex gap-xxxs`]} key={author.id}>
-          <Link
-            href={`${routes.contributors}/${author.translation.id}`}
-            passHref
-          >
-            <h4
-              css={[
-                tw`cursor-pointer hover:text-blue-900 transition-colors ease-in-out`,
-              ]}
-            >
-              {author.translation.name}
-            </h4>
-          </Link>
+          <Author authorId={author.id} authorName={author.translation.name!} />
           {i !== authorsProcessed.length - 1 ? "," : ""}
         </div>
       ))}
     </div>
   )
 }
+
+const Author = ({
+  authorId,
+  authorName,
+}: {
+  authorId: string
+  authorName: string
+}) => {
+  const { isMultipleAuthors } = useGlobalDataContext()
+  console.log("isMultipleAuthors:", isMultipleAuthors)
+
+  return isMultipleAuthors ? (
+    <Link href={`${routes.contributors}/${authorId}`} passHref>
+      <$Author css={[$link]}>{authorName}</$Author>
+    </Link>
+  ) : (
+    <$Author>{authorName}</$Author>
+  )
+}
+
+const $Author = tw.h4``
+// tw.h4`cursor-pointer hover:text-blue-900 transition-colors ease-in-out`

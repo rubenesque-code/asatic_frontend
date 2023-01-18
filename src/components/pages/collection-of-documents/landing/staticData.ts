@@ -23,6 +23,7 @@ export type StaticData = {
   header: {
     subjects: SanitisedSubject[]
   }
+  isMultipleAuthors: boolean
 }
 
 export const getStaticProps: GetStaticProps<StaticData> = async () => {
@@ -39,6 +40,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
         subjects: globalData.subjects.entities,
       },
       landingSections: processedSections,
+      isMultipleAuthors: globalData.isMultipleAuthors,
     },
   }
 }
