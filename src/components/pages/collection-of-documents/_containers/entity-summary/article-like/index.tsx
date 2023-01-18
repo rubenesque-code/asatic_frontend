@@ -4,12 +4,16 @@ import { determineChildTranslation } from "^helpers/document"
 import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 
 import { Authors_, DateString_ } from "^components/pages/_containers"
-import { $link } from "^styles/global"
 
 import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
 import { EntityLink_ } from "^entity-summary/_containers"
 
-const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
+import {
+  $Title,
+  $authors,
+  $Date,
+  $image,
+} from "^entity-summary/_styles/$summary"
 
 // TODO: max characthers
 
@@ -59,35 +63,26 @@ export const ArticleLikeSummaryDefault = ({
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
       {useImage ? (
-        <$SummaryImage
-          image={articleLikeEntity.summaryImage}
-          styles={tw`mb-xs`}
-        />
+        <$SummaryImage image={articleLikeEntity.summaryImage} styles={$image} />
       ) : null}
       <EntityLink_
         entityId={articleLikeEntity.id}
         documentLanguageId={translation.languageId}
         routeKey={articleLikeEntity.type === "article" ? "articles" : "blogs"}
       >
-        <h3 css={[tw`text-xl mb-xxs cursor-pointer`, $link]}>
-          {translation.title}
-        </h3>
+        <$Title>{translation.title}</$Title>
       </EntityLink_>
       <Authors_
         authors={articleLikeEntity.authors}
         parentLanguageId={translation.languageId}
         styles={$authors}
       />
-      <p
-        css={[
-          tw`mb-xs text-gray-800 font-sans-document font-light text-sm tracking-wider`,
-        ]}
-      >
+      <$Date>
         <DateString_
           engDateStr={articleLikeEntity.publishDate}
           languageId={translation.languageId}
         />
-      </p>
+      </$Date>
       <$SummaryText
         htmlStr={translation.summaryText}
         languageId={translation.languageId}

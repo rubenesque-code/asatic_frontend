@@ -6,7 +6,7 @@ import { StaticData } from "./staticData"
 
 import ArticleLikeEntity from "./child-summaries/ArticleLike"
 import RecordedEvent from "./child-summaries/RecordedEvent"
-import { $ChildSummaryContainer } from "^components/pages/_collections/DocumentSummary"
+import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 
 // TODO: responsive child docs
 
@@ -19,8 +19,8 @@ const ChildDocuments = ({
 }) => {
   return (
     <div css={[tw`pb-xl`]}>
-      {childDocumentEntities.map((entity) => (
-        <$ChildSummaryContainer css={[tw`border-b`]} key={entity.id}>
+      {childDocumentEntities.reverse().map((entity) => (
+        <$SummaryContainer css={[tw`border-b`]} key={entity.id}>
           {entity.type === "article" || entity.type === "blog" ? (
             <ArticleLikeEntity
               articleLikeEntity={entity}
@@ -32,7 +32,7 @@ const ChildDocuments = ({
               recordedEvent={entity as RecordedEventAsSummary}
             />
           )}
-        </$ChildSummaryContainer>
+        </$SummaryContainer>
       ))}
     </div>
   )

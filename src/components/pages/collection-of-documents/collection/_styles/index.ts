@@ -1,5 +1,5 @@
 import tw from "twin.macro"
 
-export const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
+export const $SummaryContainer = tw.div`w-full sm:flex sm:gap-sm`
 
-export const $SectionHeader = tw.div`text-2xl text-gray-700 border-b pl-xl pb-sm pt-md`
+export const $ImageContainer = tw.div`sm:h-[160px] aspect-ratio[16/9]`

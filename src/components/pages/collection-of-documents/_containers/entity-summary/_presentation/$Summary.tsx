@@ -39,7 +39,7 @@ export const $SummaryText = ({
   overflowHidden?: boolean
 }) => (
   <div
-    css={[tw`prose pb-sm flex-shrink`, overflowHidden && tw`overflow-hidden`]}
+    css={[overflowHidden && tw`overflow-hidden`, tw`prose flex-shrink`]}
     className="custom-prose"
     style={{
       width: "auto",

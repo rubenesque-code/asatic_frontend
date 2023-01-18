@@ -36,7 +36,7 @@ const HtmlStrToJSX = ({
   return !flattenedTextContent ? (
     <div ref={textRef}>{parse(htmlStr)}</div>
   ) : (
-    <p>{truncateText(flattenedTextContent, flattenContent.numChars)}</p>
+    <>{truncateText(flattenedTextContent, flattenContent.numChars)}</>
   )
 }
 

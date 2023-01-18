@@ -3,17 +3,11 @@ import tw from "twin.macro"
 import { determineChildTranslation } from "^helpers/document"
 import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 
-import { Authors_ } from "^components/pages/_containers"
-import {
-  SummaryImage,
-  SummaryText,
-} from "^components/pages/_collections/DocumentSummary"
-import Link from "next/link"
-import { routes } from "^constants/routes"
-import { useRouter } from "next/router"
-import { $link } from "^styles/global"
-
-const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
+import { Authors_, DateString_ } from "^components/pages/_containers"
+import { EntityLink_ } from "^entity-summary/_containers"
+import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
+import { $Title, $authors, $Date } from "^entity-summary/_styles/$summary"
+import { $ImageContainer } from "../_styles"
 
 const ArticleLikeEntity = ({
   articleLikeEntity,
@@ -27,57 +21,42 @@ const ArticleLikeEntity = ({
     parentCurrentLanguageId
   )
 
-  const maxBodyCharacters = articleLikeEntity.summaryImage ? 120 : 300
-
-  const router = useRouter()
-
-  const routeRoot =
-    articleLikeEntity.type === "article" ? routes.articles : routes.blogs
-  const pathname = `${routeRoot}/${articleLikeEntity.id}`
+  const maxBodyCharacters = articleLikeEntity.summaryImage ? 300 : 300
 
   return (
-    <div css={[tw`w-full sm:flex sm:gap-sm`]}>
+    <div css={[tw`w-full min-h-[180px]`]}>
       {articleLikeEntity.summaryImage ? (
-        <div css={[tw`sm:h-[200px] aspect-ratio[16/9]`]}>
-          <SummaryImage
+        <$ImageContainer css={[tw`sm:float-left sm:pr-sm box-content`]}>
+          <$SummaryImage
             image={articleLikeEntity.summaryImage}
-            styles={tw`mb-xs`}
+            // styles={tw`mb-xs`}
           />
-        </div>
+        </$ImageContainer>
       ) : null}
-      <div css={[tw``]}>
-        <Link
-          href={{
-            pathname,
-            query: {
-              ...router.query,
-              documentLanguageId: translation.languageId,
-            },
-          }}
-          passHref
+      <div>
+        <EntityLink_
+          documentLanguageId={translation.languageId}
+          entityId={articleLikeEntity.id}
+          routeKey={articleLikeEntity.type === "article" ? "articles" : "blogs"}
         >
-          <h3 css={[tw`text-xl mb-xxs cursor-pointer`, $link]}>
-            {translation.title}
-          </h3>
-        </Link>
+          <$Title>{translation.title}</$Title>
+        </EntityLink_>
         <Authors_
           authors={articleLikeEntity.authors}
           parentLanguageId={translation.languageId}
           styles={$authors}
         />
-        <p
-          css={[
-            tw`mb-xs text-gray-800 font-sans-document font-light text-sm tracking-wider`,
-          ]}
-        >
-          {articleLikeEntity.publishDate}
-        </p>
-        <SummaryText
+        <$Date>
+          <DateString_
+            engDateStr={articleLikeEntity.publishDate}
+            languageId={translation.languageId}
+          />
+        </$Date>
+        <$SummaryText
           htmlStr={translation.summaryText}
           languageId={translation.languageId}
           maxCharacters={maxBodyCharacters}
-          // maxCharacters={1000}
-          // overflowHidden={fa}
+          overflowHidden={false}
         />
       </div>
     </div>
