@@ -9,10 +9,10 @@ const RecordedEventSwiperSection = ({
   recordedEvents,
   parentCurrentLanguageId,
 }: {
-  recordedEvents: RecordedEventAsSummary[]
+  recordedEvents: RecordedEventAsSummary[] | null
   parentCurrentLanguageId: string
 }) => {
-  if (!recordedEvents.length) {
+  if (!recordedEvents?.length) {
     return null
   }
 

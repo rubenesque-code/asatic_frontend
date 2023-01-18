@@ -39,7 +39,7 @@ const Collection = ({
       <$SummaryText
         htmlStr={translation.summaryText!}
         languageId={translation.languageId}
-        maxCharacters={200}
+        maxCharacters={150}
       />
     </$SwiperSlideContainer>
   )

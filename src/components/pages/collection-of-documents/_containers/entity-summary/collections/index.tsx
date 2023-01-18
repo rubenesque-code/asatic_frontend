@@ -9,10 +9,10 @@ const Collections = ({
   collections,
   parentCurrentLanguageId,
 }: {
-  collections: CollectionAsSummary[]
+  collections: CollectionAsSummary[] | null
   parentCurrentLanguageId: string
 }) => {
-  if (!collections.length) {
+  if (!collections?.length) {
     return null
   }
 

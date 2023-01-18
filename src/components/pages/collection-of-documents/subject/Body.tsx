@@ -51,7 +51,7 @@ const DocumentBody = ({
                 articleLikeEntity={entity as ArticleLikeEntityAsSummary}
                 parentCurrentLanguageId={documentLanguage.id}
                 useImage={i === 0}
-                maxBodyCharacters={i === 0 ? 800 : undefined}
+                isSmall={windowSize.width >= 1024 && i !== 0}
               />
             </$SummaryContainer>
           ))}
@@ -110,6 +110,7 @@ const DocumentBody = ({
                   articleLikeEntity={entity as ArticleLikeEntityAsSummary}
                   parentCurrentLanguageId={documentLanguage.id}
                   useImage={false}
+                  isSmall={false}
                 />
               </$SummaryContainer>
             ))}

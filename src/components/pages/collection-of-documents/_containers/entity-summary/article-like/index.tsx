@@ -17,17 +17,44 @@ export const ArticleLikeSummaryDefault = ({
   articleLikeEntity,
   parentCurrentLanguageId,
   useImage,
-  maxBodyCharacters = 200,
+  isSmall,
 }: {
   articleLikeEntity: ArticleLikeEntityAsSummary
   parentCurrentLanguageId: string
   useImage: boolean
-  maxBodyCharacters?: number
+  isSmall: boolean
 }) => {
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId
   )
+
+  const isImage = useImage && articleLikeEntity.summaryImage
+  const imageCharsEquivalent = !isImage ? 0 : 400 // image will only show when colSpan = 2.
+
+  const titleCharsEquivalentForColSpan2 =
+    !translation.title?.length || translation.title.length < 30
+      ? 120
+      : (translation.title.length / 30) * 60
+  const titleCharsEquivalent = !isSmall
+    ? titleCharsEquivalentForColSpan2
+    : titleCharsEquivalentForColSpan2 / 2
+
+  const authorsCharsEquivalent = !articleLikeEntity.authors.length
+    ? 0
+    : !isSmall
+    ? 140
+    : 70
+
+  const baseChars = !isSmall ? 700 : 350
+
+  const maxCharsCalculated =
+    baseChars -
+    imageCharsEquivalent -
+    titleCharsEquivalent -
+    authorsCharsEquivalent
+
+  const maxCharacters = maxCharsCalculated > 100 ? maxCharsCalculated : 100
 
   return (
     <div css={[tw`max-w-full max-h-full flex flex-col`]}>
@@ -64,7 +91,7 @@ export const ArticleLikeSummaryDefault = ({
       <$SummaryText
         htmlStr={translation.summaryText}
         languageId={translation.languageId}
-        maxCharacters={maxBodyCharacters}
+        maxCharacters={maxCharacters}
       />
     </div>
   )
