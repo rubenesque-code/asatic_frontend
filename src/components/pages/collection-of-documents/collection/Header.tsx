@@ -8,6 +8,8 @@ import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import { siteTranslations } from "^constants/siteTranslations"
 import { Language } from "^types/entities"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
+import { ReactElement } from "react"
+import { MyOmit } from "^types/utilities"
 
 const DocumentHeader = ({
   bannerImage,
@@ -26,6 +28,12 @@ const DocumentHeader = ({
     (translation) => translation.languageId === documentLanguage.id
   )!
 
+  const metaProps: MyOmit<MetaProps, "languages"> = {
+    description: translation.description,
+    siteLanguageId: siteLanguage.id,
+    title: translation.title,
+  }
+
   return (
     <$CenterMaxWidth_ maxWidth={tw`max-w-[1400px]`}>
       <div>
@@ -40,36 +48,108 @@ const DocumentHeader = ({
               vertPosition={bannerImage.vertPosition}
             />
           </div>
-          <div
-            css={[
-              tw`absolute inset-lg hidden sm:block sm:inset-auto sm:left-xl sm:translate-x-0 sm:top-1/2 sm:-translate-y-1/2 z-10 max-w-[500px] p-lg bg-white bg-opacity-80`,
-            ]}
-          >
-            {documentLanguages.length > 1 ? (
-              <div css={[tw`mb-md`]}>
-                <Languages_
-                  documentLanguage={documentLanguage}
-                  documentLanguages={documentLanguages}
-                  color="dark"
-                />
-              </div>
-            ) : null}
-            <h3
-              css={[
-                tw`uppercase font-sans-document text-sm tracking-wider mb-sm text-gray-600`,
-              ]}
-            >
-              {siteTranslations.collection[siteLanguage.id]}
-            </h3>
-            <h2 css={[tw`text-5xl text-gray-800 tracking-wide`]}>
-              {translation.title}
-            </h2>
-            <div css={[tw`mt-md`]}>{translation.description}</div>
-          </div>
+          <MetaContentLarge
+            {...metaProps}
+            languages={
+              <Languages
+                documentLanguage={documentLanguage}
+                documentLanguages={documentLanguages}
+                color="dark"
+              />
+            }
+          />
         </div>
+        <MetaContentSmall
+          {...metaProps}
+          languages={
+            <Languages
+              documentLanguage={documentLanguage}
+              documentLanguages={documentLanguages}
+            />
+          }
+        />
       </div>
     </$CenterMaxWidth_>
   )
 }
 
 export default DocumentHeader
+
+type MetaProps = {
+  siteLanguageId: "english" | "tamil"
+  languages: ReactElement
+  title: string
+  description: string
+}
+
+const MetaContentLarge = ({
+  languages,
+  title,
+  description,
+  siteLanguageId,
+}: MetaProps) => {
+  return (
+    <div
+      css={[
+        tw`absolute inset-lg hidden sm:block sm:inset-auto sm:left-xl sm:translate-x-0 sm:top-1/2 sm:-translate-y-1/2 z-10 max-w-[500px] p-lg bg-white bg-opacity-80`,
+      ]}
+    >
+      {languages}
+      <$SubHeading css={[tw`mb-sm`]}>
+        {siteTranslations["collection"][siteLanguageId]}
+      </$SubHeading>
+      <$Title css={[tw`text-5xl`]}>{title}</$Title>
+      <div css={[tw`mt-md`]}>
+        <$Description text={description} />
+      </div>
+    </div>
+  )
+}
+
+const MetaContentSmall = ({
+  languages,
+  title,
+  description,
+  siteLanguageId,
+}: MetaProps) => {
+  return (
+    <div css={[tw`sm:hidden border-t border-b px-sm pt-sm pb-md`]}>
+      {languages}
+      <$SubHeading css={[tw`mb-xs`]}>
+        {siteTranslations["collection"][siteLanguageId]}
+      </$SubHeading>
+      <$Title css={[tw`text-4xl`]}>{title}</$Title>
+      <div css={[tw`mt-sm`]}>
+        <$Description text={description} />
+      </div>
+    </div>
+  )
+}
+
+const $SubHeading = tw.h3`uppercase font-sans-document text-sm tracking-wider text-gray-600`
+
+const $Title = tw.h2`text-gray-800 tracking-wide`
+
+const $Description = ({ text }: { text: string }) => (
+  <div
+    css={[tw`prose`]}
+    className="custom-prose"
+    style={{
+      width: "auto",
+      maxWidth: "100%",
+    }}
+  >
+    {text}
+  </div>
+)
+
+const Languages = (props: Languages_Props) => {
+  if (!props.documentLanguages.length) {
+    return null
+  }
+  return (
+    <div css={[tw`mb-md`]}>
+      <Languages_ {...props} />
+    </div>
+  )
+}

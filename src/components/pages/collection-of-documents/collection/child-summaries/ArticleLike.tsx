@@ -29,7 +29,7 @@ const ArticleLikeEntity = ({
         <$ImageContainer css={[tw`sm:float-left sm:pr-sm box-content`]}>
           <$SummaryImage
             image={articleLikeEntity.summaryImage}
-            // styles={tw`mb-xs`}
+            styles={tw`mb-xs sm:mb-0`}
           />
         </$ImageContainer>
       ) : null}

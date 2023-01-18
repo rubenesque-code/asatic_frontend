@@ -6,7 +6,7 @@ body {
 }
 
 html::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
 }
 html::-webkit-scrollbar-track {
   background: rgb(249, 250, 251);
@@ -17,7 +17,7 @@ html::-webkit-scrollbar-thumb {
   background: rgb(209 213 219);
   border-radius: 4px;
   width: 8px;
-  height: 20px;
+  /* height: 20px; */
 }
 html::-webkit-scrollbar-thumb:hover {
   background: rgb(156 163 175);
