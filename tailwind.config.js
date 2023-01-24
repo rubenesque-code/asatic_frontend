@@ -12,6 +12,9 @@ module.exports = {
       "serif-secondary": ["Bitter", "serif"],
       "sans-primary": ["Lato", "sans-serif"],
       "sans-document": ["Montserrat", "sans-serif"],
+      "serif-primary-tamil": ["Arima Madurai", "serif"],
+      "sans-primary-tamil": ["Anek Tamil", "sans-serif"],
+      "sans-document-tamil": ["Catamaran", "sans-serif"],
     },
     extend: {
       screens: {

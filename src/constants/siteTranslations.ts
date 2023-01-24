@@ -27,6 +27,10 @@ export const siteTranslations = {
     english: "collection",
     tamil: "சேகரிப்பு",
   },
+  collections: {
+    english: "collections",
+    tamil: "சேகரிப்புகள்",
+  },
   authors: {
     english: "contributors",
     tamil: "ஆசிரியர்கள்",

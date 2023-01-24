@@ -13,6 +13,7 @@ import {
   $Title,
 } from "^entity-summary/_styles/$swiper-summary"
 import { EntityLink_ } from "^entity-summary/_containers"
+import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 const RecordedEventSwiperSummary = ({
   recordedEvent,
@@ -23,6 +24,8 @@ const RecordedEventSwiperSummary = ({
   parentCurrentLanguageId: string
   index: number
 }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   const translation = determineChildTranslation(
     recordedEvent.translations,
     parentCurrentLanguageId
@@ -50,7 +53,7 @@ const RecordedEventSwiperSummary = ({
         parentLanguageId={translation.languageId}
         styles={$authors}
       />
-      <$Date>
+      <$Date languageId={siteLanguage.id}>
         <DateString_
           engDateStr={recordedEvent.publishDate}
           languageId={translation.languageId}

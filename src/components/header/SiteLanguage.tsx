@@ -41,7 +41,14 @@ const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
         replace={true}
         passHref
       >
-        <span css={[tw`font-sans-primary font-light cursor-pointer`]}>
+        <span
+          css={[
+            siteLanguage.id === "english"
+              ? tw`font-sans-primary-tamil`
+              : tw`font-sans-primary`,
+            tw`font-light cursor-pointer`,
+          ]}
+        >
           {siteLanguage.id === "english" ? siteTranslations.tamil : "English"}
         </span>
       </Link>

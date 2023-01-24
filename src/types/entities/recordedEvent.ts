@@ -8,10 +8,7 @@ import {
   RelatedEntityFields,
   SaveFields,
 } from "./entity"
-import {
-  LandingCustomSectionImageField,
-  SummaryImageField,
-} from "./entity-image"
+import { SummaryImageField } from "./entity-image"
 import { DisplayEntityStatus } from "./entity-status"
 import { RichText, TranslationField, Translations } from "./entity-translation"
 import { TupleToUnion } from "./utilities"
@@ -44,8 +41,7 @@ export type DbRecordedEvent = EntityGlobalFields<"recordedEvent"> &
   PublishFields &
   SaveFields &
   Translations<RecordedEventTranslationFields> &
-  SummaryImageField<"isNotToggleable"> &
-  LandingCustomSectionImageField
+  SummaryImageField<"isNotToggleable">
 
 export type FetchedRecordedEvent = MyOmit<DbRecordedEvent, "publishStatus">
 

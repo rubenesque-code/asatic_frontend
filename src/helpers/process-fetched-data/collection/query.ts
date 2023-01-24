@@ -18,14 +18,12 @@ export function getAllCollectionImageIds(collection: SanitisedCollection) {
   return unique
 }
 
-export function getCollectionSummaryText(
-  translation: SanitisedCollection["translations"][number]
-) {
-  if (translation.summary?.length) {
-    return translation.summary
+export function getCollectionSummaryText(collection: SanitisedCollection) {
+  if (collection.summary?.length) {
+    return collection.summary
   }
-  if (translation.description?.length) {
-    return translation.description
+  if (collection.description?.length) {
+    return collection.description
   }
 
   return null

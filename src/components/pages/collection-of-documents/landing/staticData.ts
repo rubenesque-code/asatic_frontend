@@ -205,7 +205,6 @@ async function handleProcessAutoSectionChildEntities({
   const processedCollections = validCollections?.entities.map((collection) =>
     processCollectionAsSummary(collection, {
       validImages: fetchedImages,
-      validLanguageIds,
     })
   )
 

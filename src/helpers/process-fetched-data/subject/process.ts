@@ -1,36 +1,22 @@
 import { pipe } from "ramda"
 
 import { SanitisedSubject } from "^types/entities"
-import { MakeRequired } from "^types/utilities"
-import { validateTranslation } from "./validate"
 import { ArticleLikeEntityAsSummary } from "../article-like"
-// import { RecordedEventAsSummary } from "../recorded-event/process"
 import { sortEntitiesByDate, unshiftFirstEntityWithImage } from "../_helpers"
 import { DocumentEntitiesAsSummaries } from "../_types"
-
-type ValidTranslation = MakeRequired<
-  SanitisedSubject["translations"][number],
-  "title"
->
 
 /** Invoked after validation so has required fields. */
 export function processSubjectForOwnPage(
   subject: SanitisedSubject,
   {
-    validLanguageIds,
     processedChildDocumentEntities,
   }: {
-    validLanguageIds: string[]
     processedChildDocumentEntities: {
       articles: ArticleLikeEntityAsSummary[]
       blogs: ArticleLikeEntityAsSummary[]
     }
   }
 ) {
-  const validTranslations = subject.translations.filter((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  ) as ValidTranslation[]
-
   const orderedChildDocumentEntities = orderChildDocumentEntities(
     Object.values(processedChildDocumentEntities).flat()
   )
@@ -38,8 +24,9 @@ export function processSubjectForOwnPage(
   return {
     id: subject.id,
     publishDate: subject.publishDate,
-    translations: validTranslations,
+    title: subject.title,
     childDocumentEntities: orderedChildDocumentEntities,
+    languageId: subject.languageId,
   }
 }
 
@@ -60,34 +47,15 @@ function orderChildDocumentEntities(entities: ArticleLikeEntityAsSummary[]) {
   return order(entities)
 }
 
-function processSubjectAsLink(
-  subject: SanitisedSubject,
-  {
-    validLanguageIds,
-  }: {
-    validLanguageIds: string[]
-  }
-) {
-  const validTranslations = subject.translations.filter((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  ) as ValidTranslation[]
-
+function processSubjectAsLink(subject: SanitisedSubject) {
   return {
     id: subject.id,
     publishDate: subject.publishDate,
-    translations: validTranslations,
+    title: subject.title,
+    languageId: subject.languageId,
   }
 }
 
-export function processSubjectsAsLinks(
-  subjects: SanitisedSubject[],
-  {
-    validLanguageIds,
-  }: {
-    validLanguageIds: string[]
-  }
-) {
-  return subjects.map((subject) =>
-    processSubjectAsLink(subject, { validLanguageIds })
-  )
+export function processSubjectsAsLinks(subjects: SanitisedSubject[]) {
+  return subjects.map((subject) => processSubjectAsLink(subject))
 }

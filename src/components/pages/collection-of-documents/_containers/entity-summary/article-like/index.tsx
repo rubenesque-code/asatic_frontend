@@ -14,8 +14,7 @@ import {
   $Date,
   $image,
 } from "^entity-summary/_styles/$summary"
-
-// TODO: max characthers
+import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 export const ArticleLikeSummaryDefault = ({
   articleLikeEntity,
@@ -28,6 +27,8 @@ export const ArticleLikeSummaryDefault = ({
   useImage: boolean
   isSmall: boolean
 }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId
@@ -77,7 +78,7 @@ export const ArticleLikeSummaryDefault = ({
         parentLanguageId={translation.languageId}
         styles={$authors}
       />
-      <$Date>
+      <$Date languageId={siteLanguage.id}>
         <DateString_
           engDateStr={articleLikeEntity.publishDate}
           languageId={translation.languageId}

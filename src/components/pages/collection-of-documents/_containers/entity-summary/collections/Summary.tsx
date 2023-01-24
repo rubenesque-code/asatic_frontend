@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import tw from "twin.macro"
 
-import { determineChildTranslation } from "^helpers/document"
 import { CollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
 
 import { EntityLink_ } from "^entity-summary/_containers"
@@ -14,33 +13,28 @@ import { $Title } from "^entity-summary/_styles/$swiper-summary"
 
 const Collection = ({
   collection,
-  parentCurrentLanguageId,
   index,
 }: {
   collection: CollectionAsSummary
-  parentCurrentLanguageId: string
   index: number
 }) => {
-  const translation = determineChildTranslation(
-    collection.translations,
-    parentCurrentLanguageId
-  )
-
   return (
     <$SwiperSlideContainer index={index}>
       <$SummaryImage image={collection.summaryImage!} styles={tw`mb-xs`} />
       <EntityLink_
         entityId={collection.id}
-        documentLanguageId={translation.languageId}
+        documentLanguageId={collection.languageId}
         routeKey="recordedEvents"
       >
-        <$Title>{translation.title}</$Title>
+        <$Title>{collection.title}</$Title>
       </EntityLink_>
-      <$SummaryText
-        htmlStr={translation.summaryText!}
-        languageId={translation.languageId}
-        maxCharacters={150}
-      />
+      {collection.text ? (
+        <$SummaryText
+          htmlStr={collection.text}
+          languageId={collection.languageId}
+          maxCharacters={150}
+        />
+      ) : null}
     </$SwiperSlideContainer>
   )
 }

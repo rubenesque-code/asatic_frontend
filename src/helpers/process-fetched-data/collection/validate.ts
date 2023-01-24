@@ -1,55 +1,19 @@
 import { filterArr1ByArr2 } from "^helpers/data"
-import { SanitisedCollection, CollectionTranslation } from "^types/entities"
-import { MakeRequired } from "^types/utilities"
+import { SanitisedCollection } from "^types/entities"
 
-export type ValidTranslation = MakeRequired<
-  SanitisedCollection["translations"][number],
-  "title" | "description"
->
-
-export const validateTranslation = (
-  translation: CollectionTranslation,
-  validLanguageIds: string[]
-) => {
-  const languageIsValid = validLanguageIds.includes(translation.languageId)
-  const isTitle = translation.title?.length
-  const isDescription = translation.description?.length
-
-  return Boolean(languageIsValid && isTitle && isDescription)
-}
-
-function findValidTranslation(
-  translations: CollectionTranslation[],
-  validLanguageIds: string[]
-) {
-  const translation = translations.find((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  )
-  if (translation) {
-    return translation as Required<CollectionTranslation>
+const validateCollection = (
+  collection: SanitisedCollection,
+  {
+    validImageIds,
+    validLanguageIds,
+  }: {
+    validImageIds: string[]
+    validLanguageIds: string[]
   }
-  return translation
-}
-
-export function filterValidTranslations(
-  translations: CollectionTranslation[],
-  validLanguageIds: string[]
-) {
-  return translations.filter((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  ) as Required<CollectionTranslation>[]
-}
-
-/** If collection is child of document entity, will have a related document entitiy (so don't need to check for it) */
-export function validateCollectionAsChildOfDocumentEntity({
-  collection,
-  validLanguageIds,
-  validImageIds,
-}: {
-  collection: SanitisedCollection
-  validLanguageIds: string[]
-  validImageIds: string[]
-}) {
+) => {
+  if (!validLanguageIds.includes(collection.languageId)) {
+    return false
+  }
   if (!collection.bannerImage.imageId) {
     return false
   }
@@ -58,47 +22,51 @@ export function validateCollectionAsChildOfDocumentEntity({
     return false
   }
 
-  const validTranslation = findValidTranslation(
-    collection.translations,
-    validLanguageIds
-  )
+  const hasTitle = collection.title
 
-  if (!validTranslation) {
+  if (!hasTitle) {
     return false
   }
 
   return true
 }
 
-export function validateCollection({
-  collection,
-  validDocumentEntityIds,
-  validImageIds,
-  validLanguageIds,
-}: {
-  collection: SanitisedCollection
-  validLanguageIds: string[]
-  validImageIds: string[]
-  validDocumentEntityIds: {
-    articles: string[]
-    blogs: string[]
-    recordedEvents: string[]
+/** If collection is child of document entity, will have a related document entitiy (so don't need to check for it) */
+export function validateCollectionAsChildOfDocumentEntity(
+  collection: SanitisedCollection,
+  {
+    validImageIds,
+    validLanguageIds,
+  }: {
+    validImageIds: string[]
+    validLanguageIds: string[]
   }
-}) {
-  if (!collection.bannerImage.imageId) {
-    return false
+) {
+  return validateCollection(collection, { validImageIds, validLanguageIds })
+}
+
+export function validateCollectionAsParent(
+  collection: SanitisedCollection,
+  {
+    validDocumentEntityIds,
+    validImageIds,
+    validLanguageIds,
+  }: {
+    validImageIds: string[]
+    validLanguageIds: string[]
+    validDocumentEntityIds: {
+      articles: string[]
+      blogs: string[]
+      recordedEvents: string[]
+    }
   }
+) {
+  const isSelfValid = validateCollection(collection, {
+    validImageIds,
+    validLanguageIds,
+  })
 
-  if (!validImageIds.includes(collection.bannerImage.imageId)) {
-    return false
-  }
-
-  const validTranslation = findValidTranslation(
-    collection.translations,
-    validLanguageIds
-  )
-
-  if (!validTranslation) {
+  if (!isSelfValid) {
     return false
   }
 
@@ -134,8 +102,8 @@ export function filterValidCollections(
     validImageIds,
     validLanguageIds,
   }: {
-    validLanguageIds: string[]
     validImageIds: string[]
+    validLanguageIds: string[]
     validDocumentEntityIds: {
       articles: string[]
       blogs: string[]
@@ -144,11 +112,10 @@ export function filterValidCollections(
   }
 ) {
   return collections.filter((collection) =>
-    validateCollection({
-      collection,
+    validateCollectionAsParent(collection, {
       validDocumentEntityIds,
-      validLanguageIds,
       validImageIds,
+      validLanguageIds,
     })
   )
 }
@@ -164,10 +131,9 @@ export function filterValidCollectionsAsChildren(
   }
 ) {
   return collections.filter((collection) =>
-    validateCollectionAsChildOfDocumentEntity({
-      collection,
-      validLanguageIds,
+    validateCollectionAsChildOfDocumentEntity(collection, {
       validImageIds,
+      validLanguageIds,
     })
   )
 }

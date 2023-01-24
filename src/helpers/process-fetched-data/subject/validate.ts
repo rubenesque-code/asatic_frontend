@@ -1,47 +1,57 @@
 import { filterArr1ByArr2 } from "^helpers/data"
-import { SanitisedSubject, SubjectTranslation } from "^types/entities"
+import { SanitisedSubject } from "^types/entities"
 
 /** requires: valid language id and title. */
-export const validateTranslation = (
-  translation: SubjectTranslation,
-  validLanguageIds: string[]
-) => {
-  const languageIsValid = validLanguageIds.includes(translation.languageId)
-  const isTitle = translation.title?.length
-
-  return Boolean(languageIsValid && isTitle)
-}
-
-export function validateSubjectAsChild(
+const validateSubject = (
   subject: SanitisedSubject,
-  validLanguageIds: string[]
-) {
-  const validTranslation = subject.translations.find((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  )
+  {
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
+  }
+) => {
+  if (!validLanguageIds.includes(subject.languageId)) {
+    return false
+  }
 
-  if (!validTranslation) {
+  const hasTitle = subject.title?.length
+
+  if (!hasTitle) {
     return false
   }
 
   return true
 }
 
-export function validateSubject(
+export function validateSubjectAsChild(
   subject: SanitisedSubject,
-  validLanguageIds: string[],
-  validDocumentEntityIds: {
-    articles: string[]
-    blogs: string[]
-    collections: string[]
-    recordedEvents: string[]
+  {
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
   }
 ) {
-  const validTranslation = subject.translations.find((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  )
+  return validateSubject(subject, { validLanguageIds })
+}
 
-  if (!validTranslation) {
+export function validateSubjectAsParent(
+  subject: SanitisedSubject,
+  {
+    validDocumentEntityIds,
+    validLanguageIds,
+  }: {
+    validLanguageIds: string[]
+    validDocumentEntityIds: {
+      articles: string[]
+      blogs: string[]
+      collections: string[]
+      recordedEvents: string[]
+    }
+  }
+) {
+  const isSelfValid = validateSubject(subject, { validLanguageIds })
+
+  if (!isSelfValid) {
     return false
   }
 
@@ -79,11 +89,11 @@ export function filterValidSubjects(
   subjects: SanitisedSubject[],
   {
     subjectRelation,
-    validChildEntityIds,
+    validDocumentEntityIds,
     validLanguageIds,
   }: {
     validLanguageIds: string[]
-    validChildEntityIds: {
+    validDocumentEntityIds: {
       articles: string[]
       blogs: string[]
       collections: string[]
@@ -94,7 +104,10 @@ export function filterValidSubjects(
 ) {
   return subjects.filter((subject) =>
     subjectRelation === "default"
-      ? validateSubject(subject, validLanguageIds, validChildEntityIds)
-      : validateSubjectAsChild(subject, validLanguageIds)
+      ? validateSubjectAsParent(subject, {
+          validLanguageIds,
+          validDocumentEntityIds,
+        })
+      : validateSubjectAsChild(subject, { validLanguageIds })
   )
 }

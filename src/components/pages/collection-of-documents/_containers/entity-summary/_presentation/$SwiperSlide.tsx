@@ -7,7 +7,7 @@ export const $SwiperSlideContainer = ({
   children,
   index,
 }: {
-  children: ReactElement | ReactElement[]
+  children: ReactElement | ReactElement[] | (ReactElement | null)[]
   index: number
 }) => (
   <$SummaryContainer css={[index !== 0 && tw`border-l`]}>

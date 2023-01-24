@@ -58,7 +58,7 @@ export async function fetchAndValidateSubjects({
 
   const validSubjects = filterValidSubjects(fetchedSubjects, {
     subjectRelation,
-    validChildEntityIds: {
+    validDocumentEntityIds: {
       articles: validArticles.ids,
       blogs: validBlogs.ids,
       collections: validCollections.ids,

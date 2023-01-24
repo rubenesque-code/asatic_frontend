@@ -4,14 +4,16 @@ import { CollectionAsSummary } from "^helpers/process-fetched-data/collection/pr
 import { Swiper_ } from "^page-container"
 import Summary from "./Summary"
 import { $SwiperSectionLayout } from "../_presentation/$SwiperSectionLayout"
+import { siteTranslations } from "^constants/siteTranslations"
+import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 const Collections = ({
   collections,
-  parentCurrentLanguageId,
 }: {
   collections: CollectionAsSummary[] | null
-  parentCurrentLanguageId: string
 }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   if (!collections?.length) {
     return null
   }
@@ -23,16 +25,11 @@ const Collections = ({
       swiper={
         <Swiper_
           slides={orderedCollections.map((collection, i) => (
-            <Summary
-              collection={collection}
-              parentCurrentLanguageId={parentCurrentLanguageId}
-              index={i}
-              key={collection.id}
-            />
+            <Summary collection={collection} index={i} key={collection.id} />
           ))}
         />
       }
-      title="Collections"
+      title={siteTranslations.collections[siteLanguage.id]}
     />
   )
 }

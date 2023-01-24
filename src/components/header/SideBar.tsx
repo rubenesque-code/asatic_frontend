@@ -4,11 +4,12 @@ import { CaretDown, CaretUp, List, X } from "phosphor-react"
 import { useState } from "react"
 import tw from "twin.macro"
 
+import { useSiteLanguageContext } from "^context/SiteLanguage"
+
+import { SanitisedSubject } from "^types/entities"
+
 import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { findTranslation } from "^helpers/data"
-import { SanitisedSubject } from "^types/entities"
 import { $link } from "^styles/global"
 
 export type SideBarProps = SubjectsProp
@@ -62,7 +63,14 @@ const Content = (subjectsProp: SubjectsProp) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
-    <div css={[tw`mt-lg`]}>
+    <div
+      css={[
+        siteLanguage.id === "tamil"
+          ? tw`font-sans-primary-tamil`
+          : tw`font-sans-primary`,
+        tw`mt-lg`,
+      ]}
+    >
       <CloseButton />
       <div css={[tw`flex flex-col gap-md min-w-[200px] mt-md`]}>
         <div css={[tw`pt-md border-t`]}>
@@ -101,7 +109,7 @@ const Content = (subjectsProp: SubjectsProp) => {
 
 export default SideBar
 
-const $text = tw`font-sans-primary font-light tracking-wide capitalize text-lg text-gray-700 `
+const $text = tw`font-light tracking-wide capitalize text-lg text-gray-700 `
 
 const PageLink = ({ label, pathname }: { label: string; pathname: string }) => {
   const { siteLanguage } = useSiteLanguageContext()
@@ -117,6 +125,10 @@ const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { siteLanguage } = useSiteLanguageContext()
+
+  const subjectsForSiteLanguage = subjects.filter(
+    (subject) => subject.languageId === siteLanguage.id
+  )
 
   return (
     <div>
@@ -139,7 +151,7 @@ const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
           tw`overflow-hidden transition-all ease-in-out duration-150`,
         ]}
       >
-        {subjects.map((subject) => (
+        {subjectsForSiteLanguage.map((subject) => (
           <Subject subject={subject} key={subject.id} />
         ))}
       </div>
@@ -148,23 +160,9 @@ const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
 }
 
 const Subject = ({ subject }: { subject: SanitisedSubject }) => {
-  const { siteLanguage } = useSiteLanguageContext()
-
-  const translationForSiteLanguage = findTranslation(
-    subject.translations,
-    siteLanguage.id
-  )
-
-  if (
-    !translationForSiteLanguage ||
-    !translationForSiteLanguage.title?.length
-  ) {
-    return null
-  }
-
   return (
     <Link href={`/subjects/${subject.id}`} passHref>
-      <div css={[$text, $link]}>{translationForSiteLanguage.title}</div>
+      <div css={[$text, $link]}>{subject.title}</div>
     </Link>
   )
 }

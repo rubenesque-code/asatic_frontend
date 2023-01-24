@@ -4,6 +4,8 @@ import { Swiper_ } from "^page-container"
 import Summary from "./Summary"
 import { $SwiperSectionLayout } from "../../_presentation/$SwiperSectionLayout"
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
+import { useSiteLanguageContext } from "^context/SiteLanguage"
+import { siteTranslations } from "^constants/siteTranslations"
 
 const RecordedEventSwiperSection = ({
   recordedEvents,
@@ -12,6 +14,8 @@ const RecordedEventSwiperSection = ({
   recordedEvents: RecordedEventAsSummary[] | null
   parentCurrentLanguageId: string
 }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   if (!recordedEvents?.length) {
     return null
   }
@@ -32,7 +36,7 @@ const RecordedEventSwiperSection = ({
           ))}
         />
       }
-      title="Videos"
+      title={siteTranslations.recordedEvents[siteLanguage.id]}
     />
   )
 }

@@ -4,22 +4,6 @@ import { Image, SanitisedCollection } from "^types/entities"
 import { ArticleLikeEntityAsSummary } from "../article-like"
 import { RecordedEventAsSummary } from "../recorded-event/process"
 import { getCollectionSummaryText } from "./query"
-import {
-  filterValidTranslations,
-  validateTranslation,
-  ValidTranslation,
-} from "./validate"
-
-function processTranslationForSummary(
-  translation: SanitisedCollection["translations"][number]
-) {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    title: translation.title!,
-    languageId: translation.languageId,
-    summaryText: getCollectionSummaryText(translation),
-  }
-}
 
 export type CollectionAsSummary = ReturnType<typeof processCollectionAsSummary>
 
@@ -27,10 +11,8 @@ export function processCollectionAsSummary(
   collection: SanitisedCollection,
   {
     validImages,
-    validLanguageIds,
   }: {
     validImages: Image[]
-    validLanguageIds: string[]
   }
 ) {
   let summaryImage: Image | null = null
@@ -44,14 +26,6 @@ export function processCollectionAsSummary(
       findEntityById(validImages, collection.bannerImage.imageId) || null
   }
 
-  const validTranslations = filterValidTranslations(
-    collection.translations,
-    validLanguageIds
-  )
-  const processedTranslations = validTranslations.map((translation) =>
-    processTranslationForSummary(translation)
-  )
-
   return {
     id: collection.id,
     type: collection.type,
@@ -62,18 +36,19 @@ export function processCollectionAsSummary(
           storageImage: summaryImage,
         }
       : null,
-    translations: processedTranslations,
+    title: collection.title,
+    text: getCollectionSummaryText(collection),
+    languageId: collection.languageId,
   }
 }
 
+/**occurs after validation; requirements already met. */
 export function processCollectionForOwnPage(
   collection: SanitisedCollection,
   {
-    validLanguageIds,
     validImages,
     processedChildDocumentEntities,
   }: {
-    validLanguageIds: string[]
     validImages: Image[]
     processedChildDocumentEntities: {
       articles: ArticleLikeEntityAsSummary[]
@@ -88,10 +63,6 @@ export function processCollectionForOwnPage(
     vertPosition: collection.bannerImage.vertPosition || 50,
   }
 
-  const validTranslations = collection.translations.filter((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  ) as ValidTranslation[]
-
   const orderedChildDocumentEntities = sortEntitiesByDate(
     Object.values(processedChildDocumentEntities).flat()
   )
@@ -100,7 +71,8 @@ export function processCollectionForOwnPage(
     id: collection.id,
     publishDate: collection.publishDate,
     bannerImage,
-    translations: validTranslations,
+    title: collection.title,
+    description: collection.description,
     childDocumentEntities: orderedChildDocumentEntities,
   }
 }

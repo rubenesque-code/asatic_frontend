@@ -1,8 +1,7 @@
 import { StaticData } from "./staticData"
 
-import Header from "^components/header"
 import PageBody from "./PageBody"
-import { GlobalDataProvider } from "^context/GlobalData"
+import { PageLayout_ } from "^components/pages/_containers"
 
 const PageContent = ({
   header,
@@ -10,12 +9,9 @@ const PageContent = ({
   isMultipleAuthors,
 }: StaticData) => {
   return (
-    <GlobalDataProvider isMultipleAuthors={isMultipleAuthors}>
-      <>
-        <Header {...header} />
-        <PageBody landingSections={landingSections} />
-      </>
-    </GlobalDataProvider>
+    <PageLayout_ staticData={{ isMultipleAuthors, subjects: header.subjects }}>
+      <PageBody landingSections={landingSections} />
+    </PageLayout_>
   )
 }
 

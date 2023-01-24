@@ -16,7 +16,6 @@ import {
 } from "./entity"
 import { Translations } from "./entity-translation"
 import { SummaryImageField } from "./entity-image"
-import { DisplayEntityStatus } from "./entity-status"
 
 type SectionTypes = "text" | "image" | "video"
 
@@ -41,9 +40,9 @@ type ArticleLikeTranslationFields = TranslationField<"title"> & {
 
 type ArticleLikeEntityName = EntityNameSubSet<"article" | "blog">
 
-export type ArticleLikeEntity<TEntityName extends ArticleLikeEntityName> =
+export type DbArticleLikeEntity<TEntityName extends ArticleLikeEntityName> =
   EntityGlobalFields<TEntityName> &
-    ArticleLikeChildEntityFields &
+    RelatedEntityFields<ArticleLikeRelatedEntityUnion> &
     PublishFields &
     SaveFields &
     Translations<ArticleLikeTranslationFields> &
@@ -61,13 +60,6 @@ export type ArticleLikeRelatedEntityTuple = EntityNameTupleSubset<
 
 export type ArticleLikeRelatedEntityUnion =
   TupleToUnion<ArticleLikeRelatedEntityTuple>
-
-type InvalidReason = "no valid translation"
-
-export type ArticleLikeStatus = DisplayEntityStatus<
-  ArticleLikeRelatedEntityUnion,
-  InvalidReason
->
 
 export type ArticleLikeChildEntitiesKeysTuple =
   EntityNameToChildKeyTuple<ArticleLikeRelatedEntityTuple>

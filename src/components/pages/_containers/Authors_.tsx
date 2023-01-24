@@ -66,7 +66,6 @@ const Author = ({
   authorName: string
 }) => {
   const { isMultipleAuthors } = useGlobalDataContext()
-  console.log("isMultipleAuthors:", isMultipleAuthors)
 
   return isMultipleAuthors ? (
     <Link href={`${routes.contributors}/${authorId}`} passHref>

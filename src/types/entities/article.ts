@@ -1,7 +1,7 @@
-import { ArticleLikeEntity } from "./article-like-entity"
+import { DbArticleLikeEntity } from "./article-like-entity"
 import { MyOmit } from "./utilities"
 
-export type DbArticle = ArticleLikeEntity<"article">
+export type DbArticle = DbArticleLikeEntity<"article">
 
 export type FetchedArticle = MyOmit<DbArticle, "publishStatus">
 
