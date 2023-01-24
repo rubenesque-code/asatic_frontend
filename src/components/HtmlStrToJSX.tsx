@@ -1,5 +1,6 @@
 import parse from "html-react-parser"
-import { useEffect, useRef, useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
+import tw from "twin.macro"
 import { truncateText } from "^helpers/document"
 
 const HtmlStrToJSX = ({
@@ -17,7 +18,9 @@ const HtmlStrToJSX = ({
 
   const textRef = useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => {
+  // const a = flattenContent ? null : textRef.current
+
+  useLayoutEffect(() => {
     if (!flattenContent) {
       return
     }
@@ -34,7 +37,9 @@ const HtmlStrToJSX = ({
   }
 
   return !flattenedTextContent ? (
-    <div ref={textRef}>{parse(htmlStr)}</div>
+    <div css={[tw`hidden`]} ref={textRef}>
+      {parse(htmlStr)}
+    </div>
   ) : (
     <>{truncateText(flattenedTextContent, flattenContent.numChars)}</>
   )

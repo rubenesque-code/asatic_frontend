@@ -10,9 +10,11 @@ import { siteTranslations } from "^constants/siteTranslations"
 const RecordedEventSwiperSection = ({
   recordedEvents,
   parentCurrentLanguageId,
+  showSeeAllElement = false,
 }: {
   recordedEvents: RecordedEventAsSummary[] | null
   parentCurrentLanguageId: string
+  showSeeAllElement?: boolean
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
@@ -43,7 +45,12 @@ const RecordedEventSwiperSection = ({
         />
       }
       title={siteTranslations.recordedEvents[siteLanguage.id]}
-      seeAllText={`More ${siteTranslations.recordedEvents[siteLanguage.id]}`}
+      seeAllText={
+        showSeeAllElement
+          ? `More ${siteTranslations.recordedEvents[siteLanguage.id]}`
+          : undefined
+      }
+      routeKey="recordedEvents"
     />
   )
 }

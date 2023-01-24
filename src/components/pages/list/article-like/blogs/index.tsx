@@ -12,7 +12,7 @@ import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguag
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
 const ArticlesPageContent = ({
-  articleLikeEntities: articles,
+  articleLikeEntities: blogs,
   header,
   isMultipleAuthors,
 }: StaticData) => {
@@ -21,30 +21,26 @@ const ArticlesPageContent = ({
       staticData={{
         isMultipleAuthors,
         subjects: header.subjects,
-        documentLanguageIds: mapIds(articles.languages),
+        documentLanguageIds: mapIds(blogs.languages),
       }}
     >
-      <PageBody articles={articles} />
+      <PageBody blogs={blogs} />
     </PageLayout_>
   )
 }
 
 export default ArticlesPageContent
 
-const PageBody = ({
-  articles,
-}: {
-  articles: StaticData["articleLikeEntities"]
-}) => {
+const PageBody = ({ blogs }: { blogs: StaticData["articleLikeEntities"] }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    articles.languages
+    blogs.languages
   )
 
-  const articlesProcessed = sortEntitiesByDate(
-    articles.entities.filter((article) =>
-      findTranslationByLanguageId(article.translations, filterLanguage.id)
+  const blogsProcessed = sortEntitiesByDate(
+    blogs.entities.filter((blog) =>
+      findTranslationByLanguageId(blog.translations, filterLanguage.id)
     )
   )
 
@@ -53,37 +49,37 @@ const PageBody = ({
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`px-sm pt-xl pb-md border-r-0 border-l-0`]}>
           <h1 css={[tw`text-3xl capitalize text-gray-700 text-center`]}>
-            {siteTranslations.articles[siteLanguage.id]}
+            {siteTranslations.blogs[siteLanguage.id]}
           </h1>
           <div css={[tw`pt-sm`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={articles.languages}
+              documentLanguages={blogs.languages}
             />
           </div>
         </$SectionContent>
       </div>
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`grid grid-cols-1 sm:grid-cols-2`]}>
-          {articlesProcessed.map((article, i) => {
+          {blogsProcessed.map((blog, i) => {
             return (
               <$SummaryContainer
                 css={[
                   i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
-                  i < articlesProcessed.length ? tw`border-b` : tw`border-b-0`,
-                  articlesProcessed.length % 2 === 0
-                    ? i < articlesProcessed.length - 2
+                  i < blogsProcessed.length ? tw`border-b` : tw`border-b-0`,
+                  blogsProcessed.length % 2 === 0
+                    ? i < blogsProcessed.length - 2
                       ? tw`sm:border-b`
                       : tw`sm:border-b-0`
-                    : articlesProcessed.length % 2 === 1 &&
-                      i < articlesProcessed.length - 1
+                    : blogsProcessed.length % 2 === 1 &&
+                      i < blogsProcessed.length - 1
                     ? tw`sm:border-b`
                     : tw`sm:border-b-0`,
                 ]}
-                key={article.id}
+                key={blog.id}
               >
                 <ArticleLikeSummaryDefault
-                  articleLikeEntity={article}
+                  articleLikeEntity={blog}
                   isSmall={false}
                   parentCurrentLanguageId={filterLanguage.id}
                   useImage={true}

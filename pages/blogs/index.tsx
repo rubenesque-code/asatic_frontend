@@ -1,11 +1,28 @@
 import type { NextPage } from "next"
+import { useRouter } from "next/router"
+import { useLayoutEffect } from "react"
 
-import { StaticData } from "^components/pages/non-document/list/article-like/_types"
-import PageContent from "^components/pages/non-document/list/article-like/blogs"
+import { routes } from "^constants/routes"
 
-export { getStaticProps } from "^components/pages/non-document/list/article-like/blogs/staticData"
+import { StaticData } from "^components/pages/list/article-like/_types"
+import PageContent from "^components/pages/list/article-like/blogs"
+export { getStaticProps } from "^components/pages/list/article-like/blogs/staticData"
 
 const BlogsPage: NextPage<StaticData> = (staticData) => {
+  const isBlog = staticData.articleLikeEntities.entities.length
+
+  const router = useRouter()
+
+  useLayoutEffect(() => {
+    if (isBlog) {
+      return
+    }
+
+    router.push({ pathname: routes.articles, query: router.query })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBlog])
+
   return <PageContent {...staticData} />
 }
 

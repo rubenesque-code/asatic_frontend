@@ -1,18 +1,18 @@
 import tw from "twin.macro"
 
-import { StaticData } from "../_types"
+import { StaticData } from "./staticData"
 
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
-import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
+import { Summary_ } from "^entity-summary/recorded-events/_containers"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
 import { findTranslationByLanguageId, mapIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
-const ArticlesPageContent = ({
-  articleLikeEntities: articles,
+const RecordedEventsPageContent = ({
+  recordedEvents,
   header,
   isMultipleAuthors,
 }: StaticData) => {
@@ -21,30 +21,30 @@ const ArticlesPageContent = ({
       staticData={{
         isMultipleAuthors,
         subjects: header.subjects,
-        documentLanguageIds: mapIds(articles.languages),
+        documentLanguageIds: mapIds(recordedEvents.languages),
       }}
     >
-      <PageBody articles={articles} />
+      <PageBody recordedEvents={recordedEvents} />
     </PageLayout_>
   )
 }
 
-export default ArticlesPageContent
+export default RecordedEventsPageContent
 
 const PageBody = ({
-  articles,
+  recordedEvents,
 }: {
-  articles: StaticData["articleLikeEntities"]
+  recordedEvents: StaticData["recordedEvents"]
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    articles.languages
+    recordedEvents.languages
   )
 
-  const articlesProcessed = sortEntitiesByDate(
-    articles.entities.filter((article) =>
-      findTranslationByLanguageId(article.translations, filterLanguage.id)
+  const recordedEventsProcessed = sortEntitiesByDate(
+    recordedEvents.entities.filter((recordedEvent) =>
+      findTranslationByLanguageId(recordedEvent.translations, filterLanguage.id)
     )
   )
 
@@ -53,40 +53,40 @@ const PageBody = ({
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`px-sm pt-xl pb-md border-r-0 border-l-0`]}>
           <h1 css={[tw`text-3xl capitalize text-gray-700 text-center`]}>
-            {siteTranslations.articles[siteLanguage.id]}
+            {siteTranslations.recordedEvents[siteLanguage.id]}
           </h1>
           <div css={[tw`pt-sm`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={articles.languages}
+              documentLanguages={recordedEvents.languages}
             />
           </div>
         </$SectionContent>
       </div>
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`grid grid-cols-1 sm:grid-cols-2`]}>
-          {articlesProcessed.map((article, i) => {
+          {recordedEventsProcessed.map((recordedEvent, i) => {
             return (
               <$SummaryContainer
                 css={[
                   i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
-                  i < articlesProcessed.length ? tw`border-b` : tw`border-b-0`,
-                  articlesProcessed.length % 2 === 0
-                    ? i < articlesProcessed.length - 2
+                  i < recordedEventsProcessed.length
+                    ? tw`border-b`
+                    : tw`border-b-0`,
+                  recordedEventsProcessed.length % 2 === 0
+                    ? i < recordedEventsProcessed.length - 2
                       ? tw`sm:border-b`
                       : tw`sm:border-b-0`
-                    : articlesProcessed.length % 2 === 1 &&
-                      i < articlesProcessed.length - 1
+                    : recordedEventsProcessed.length % 2 === 1 &&
+                      i < recordedEventsProcessed.length - 1
                     ? tw`sm:border-b`
                     : tw`sm:border-b-0`,
                 ]}
-                key={article.id}
+                key={recordedEvent.id}
               >
-                <ArticleLikeSummaryDefault
-                  articleLikeEntity={article}
-                  isSmall={false}
+                <Summary_
                   parentCurrentLanguageId={filterLanguage.id}
-                  useImage={true}
+                  recordedEvent={recordedEvent}
                 />
               </$SummaryContainer>
             )

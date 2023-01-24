@@ -1,19 +1,7 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import { determineChildTranslation } from "^helpers/document"
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 
-import { Authors_, DateString_ } from "^components/pages/_containers"
-import { SummaryImage_, Type_ } from "../_containers"
-
 import { $SwiperSlideContainer } from "^entity-summary/_presentation/$SwiperSlide"
-import {
-  $authors,
-  $Date,
-  $Title,
-} from "^entity-summary/_styles/$swiper-summary"
-import { EntityLink_ } from "^entity-summary/_containers"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
+import { Summary_ } from "../_containers"
 
 const RecordedEventSwiperSummary = ({
   recordedEvent,
@@ -26,41 +14,12 @@ const RecordedEventSwiperSummary = ({
   index: number
   rightBorder: boolean
 }) => {
-  const { siteLanguage } = useSiteLanguageContext()
-
-  const translation = determineChildTranslation(
-    recordedEvent.translations,
-    parentCurrentLanguageId
-  )
-
   return (
     <$SwiperSlideContainer index={index} rightBorder={rightBorder}>
-      <SummaryImage_
-        image={recordedEvent.summaryImage}
-        youtubeId={recordedEvent.youtubeId}
+      <Summary_
+        parentCurrentLanguageId={parentCurrentLanguageId}
+        recordedEvent={recordedEvent}
       />
-      <Type_
-        type={recordedEvent.recordedEventType}
-        parentLanguageId={translation.languageId}
-      />
-      <EntityLink_
-        entityId={recordedEvent.id}
-        documentLanguageId={translation.languageId}
-        routeKey="recordedEvents"
-      >
-        <$Title>{translation.title}</$Title>
-      </EntityLink_>
-      <Authors_
-        authors={recordedEvent.authors}
-        parentLanguageId={translation.languageId}
-        styles={$authors}
-      />
-      <$Date languageId={siteLanguage.id}>
-        <DateString_
-          engDateStr={recordedEvent.publishDate}
-          languageId={translation.languageId}
-        />
-      </$Date>
     </$SwiperSlideContainer>
   )
 }

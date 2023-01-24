@@ -9,8 +9,10 @@ import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 const Collections = ({
   collections,
+  showSeeAllElement,
 }: {
   collections: CollectionAsSummary[] | null
+  showSeeAllElement?: boolean
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
@@ -40,7 +42,12 @@ const Collections = ({
         />
       }
       title={siteTranslations.collections[siteLanguage.id]}
-      seeAllText={`More ${siteTranslations.collections[siteLanguage.id]}`}
+      seeAllText={
+        showSeeAllElement
+          ? `More ${siteTranslations.collections[siteLanguage.id]}`
+          : undefined
+      }
+      routeKey="collections"
     />
   )
 }

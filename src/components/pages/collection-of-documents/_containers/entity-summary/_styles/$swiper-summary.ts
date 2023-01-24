@@ -8,11 +8,9 @@ export const $Title = styled(tw.h3`text-xl mb-xxs`)(() => [$link])
 
 export const $authors = tw`flex gap-xs text-lg text-gray-600 mb-xxs`
 
-export const $Date = styled.p(
-  ({ languageId }: { languageId: "english" | "tamil" }) => [
-    languageId === "tamil"
-      ? tw`font-sans-document-tamil`
-      : tw`font-sans-document`,
-    tw`mb-xs text-gray-800 font-light text-sm tracking-wider`,
-  ]
-)
+export const $Date = styled.p(({ languageId }: { languageId: string }) => [
+  languageId === "tamil"
+    ? tw`font-sans-document-tamil`
+    : tw`font-sans-document`,
+  tw`mb-xs text-gray-800 font-light text-sm tracking-wider`,
+])

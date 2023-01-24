@@ -92,6 +92,7 @@ export const ArticleLikeSummaryDefault = ({
         htmlStr={translation.summaryText}
         languageId={translation.languageId}
         maxCharacters={maxCharacters}
+        overflowHidden
       />
     </div>
   )

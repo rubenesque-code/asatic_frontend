@@ -40,7 +40,7 @@ const SideBar = (subjectsProp: SideBarProps) => {
           </Menu.Items>
           <div
             css={[
-              tw`fixed top-0 left-0 visible w-screen h-screen bg-overlay-mid`,
+              tw`z-10 fixed top-0 left-0 visible w-screen h-screen bg-overlay-mid`,
               tw`transition-opacity ease-in duration-300`,
               open ? tw`opacity-100` : tw` opacity-0 hidden`,
             ]}

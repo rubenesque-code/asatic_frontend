@@ -51,6 +51,7 @@ const PageBody = ({
       <RecordedEventsSection
         recordedEvents={recordedEventsForSiteLanguage}
         parentCurrentLanguageId={siteLanguage.id}
+        showSeeAllElement
       />
       <CustomSection
         components={secondSectionComponentsForSiteLanguage}
