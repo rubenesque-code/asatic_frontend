@@ -1,9 +1,9 @@
 import type { NextPage } from "next"
 
-import { StaticData } from "^components/pages/non-document/list/article-like/_types"
-import PageContent from "^components/pages/non-document/list/article-like/articles"
+import { StaticData } from "^components/pages/list/article-like/_types"
+import PageContent from "^components/pages/list/article-like/articles"
 
-export { getStaticProps } from "^components/pages/non-document/list/article-like/articles/staticData"
+export { getStaticProps } from "^components/pages/list/article-like/articles/staticData"
 
 const ArticlesPage: NextPage<StaticData> = (staticData) => {
   return <PageContent {...staticData} />

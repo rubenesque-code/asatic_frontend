@@ -14,19 +14,25 @@ const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
 
   return (
     <div
-      css={[tw`flex justify-between items-center pt-md px-md pb-md border-b`]}
+      css={[
+        tw`relative flex justify-between items-center pt-md px-md pb-md border-b`,
+      ]}
     >
       <div>
         <SideBar subjects={subjects} />
       </div>
-      <Link
-        href={{ pathname: "/", query: { siteLanguageId: siteLanguage.id } }}
-        passHref
+      <div
+        css={[tw`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`]}
       >
-        <div css={[tw`text-2xl font-bold`, $link]}>
-          {siteTranslations.siteName[siteLanguage.id]}
-        </div>
-      </Link>
+        <Link
+          href={{ pathname: "/", query: { siteLanguageId: siteLanguage.id } }}
+          passHref
+        >
+          <div css={[tw`text-2xl font-bold`, $link]}>
+            {siteTranslations.siteName[siteLanguage.id]}
+          </div>
+        </Link>
+      </div>
       <SiteLanguage documentLanguageIds={documentLanguageIds} />
     </div>
   )
