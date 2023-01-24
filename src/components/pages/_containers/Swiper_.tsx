@@ -8,7 +8,11 @@ import tw from "twin.macro"
 
 import { useWindowSize } from "react-use"
 
-export const Swiper_ = ({ slides }: { slides: ReactElement[] }) => {
+export const Swiper_ = ({
+  slides,
+}: {
+  slides: ({ numSlidesPerView }: { numSlidesPerView: number }) => ReactElement[]
+}) => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null)
 
   const navButtonsFuncs = {
@@ -28,7 +32,7 @@ export const Swiper_ = ({ slides }: { slides: ReactElement[] }) => {
       slidesPerView={numSlidesPerView}
       onSwiper={(swiper) => setSwiper(swiper)}
     >
-      {slides.map((slide, i) => (
+      {slides({ numSlidesPerView }).map((slide, i) => (
         // `SwiperSlide`, as it's imported from swiper/react, needs to be a direct child of `Swiper`; can't be within another component.
         <SwiperSlide key={i}>{slide}</SwiperSlide>
       ))}

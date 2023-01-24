@@ -1,5 +1,18 @@
-import tw from "twin.macro"
+import tw, { styled } from "twin.macro"
+import { SiteLanguageId } from "^constants/languages"
 
 export const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
 
-export const $SectionHeader = tw.div`text-2xl capitalize text-gray-700 border-b pl-xl pb-sm pt-md`
+export const $SectionHeaderContainer = tw.div`flex justify-between border-b px-xl pb-sm pt-md`
+export const $SectionHeaderTitle = tw.div`text-2xl capitalize text-gray-700`
+export const $SectionHeaderSeeAllContainer = tw.div`flex items-center gap-xs text-gray-600`
+export const $SectionHeaderSeeAllText = styled.div(
+  ({ languageId }: { languageId: SiteLanguageId }) => [
+    tw`font-light`,
+    languageId === "tamil"
+      ? tw`font-sans-primary-tamil`
+      : tw`font-sans-primary`,
+  ]
+)
+
+export const $SectionHeaderSeeAllArrowIcon = tw.span`translate-y-0.5 text-lg`

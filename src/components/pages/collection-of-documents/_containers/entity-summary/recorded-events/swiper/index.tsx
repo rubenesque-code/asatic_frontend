@@ -26,17 +26,24 @@ const RecordedEventSwiperSection = ({
     <$SwiperSectionLayout
       swiper={
         <Swiper_
-          slides={orderedRecordedEvents.map((recordedEvent, i) => (
-            <Summary
-              recordedEvent={recordedEvent}
-              parentCurrentLanguageId={parentCurrentLanguageId}
-              index={i}
-              key={recordedEvent.id}
-            />
-          ))}
+          slides={({ numSlidesPerView }) =>
+            orderedRecordedEvents.map((recordedEvent, i) => (
+              <Summary
+                recordedEvent={recordedEvent}
+                parentCurrentLanguageId={parentCurrentLanguageId}
+                index={i}
+                rightBorder={
+                  orderedRecordedEvents.length < numSlidesPerView &&
+                  i === orderedRecordedEvents.length - 1
+                }
+                key={recordedEvent.id}
+              />
+            ))
+          }
         />
       }
       title={siteTranslations.recordedEvents[siteLanguage.id]}
+      seeAllText={`More ${siteTranslations.recordedEvents[siteLanguage.id]}`}
     />
   )
 }

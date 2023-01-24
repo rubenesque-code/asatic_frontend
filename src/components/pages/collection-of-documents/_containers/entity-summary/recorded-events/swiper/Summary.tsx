@@ -19,10 +19,12 @@ const RecordedEventSwiperSummary = ({
   recordedEvent,
   parentCurrentLanguageId,
   index,
+  rightBorder,
 }: {
   recordedEvent: RecordedEventAsSummary
   parentCurrentLanguageId: string
   index: number
+  rightBorder: boolean
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
@@ -32,7 +34,7 @@ const RecordedEventSwiperSummary = ({
   )
 
   return (
-    <$SwiperSlideContainer index={index}>
+    <$SwiperSlideContainer index={index} rightBorder={rightBorder}>
       <SummaryImage_
         image={recordedEvent.summaryImage}
         youtubeId={recordedEvent.youtubeId}

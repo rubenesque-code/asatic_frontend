@@ -14,12 +14,14 @@ import { $Title } from "^entity-summary/_styles/$swiper-summary"
 const Collection = ({
   collection,
   index,
+  rightBorder,
 }: {
   collection: CollectionAsSummary
   index: number
+  rightBorder: boolean
 }) => {
   return (
-    <$SwiperSlideContainer index={index}>
+    <$SwiperSlideContainer index={index} rightBorder={rightBorder}>
       <$SummaryImage image={collection.summaryImage!} styles={tw`mb-xs`} />
       <EntityLink_
         entityId={collection.id}

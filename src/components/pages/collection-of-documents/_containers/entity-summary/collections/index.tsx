@@ -24,12 +24,23 @@ const Collections = ({
     <$SwiperSectionLayout
       swiper={
         <Swiper_
-          slides={orderedCollections.map((collection, i) => (
-            <Summary collection={collection} index={i} key={collection.id} />
-          ))}
+          slides={({ numSlidesPerView }) =>
+            orderedCollections.map((collection, i) => (
+              <Summary
+                collection={collection}
+                index={i}
+                rightBorder={
+                  orderedCollections.length < numSlidesPerView &&
+                  i === orderedCollections.length - 1
+                }
+                key={collection.id}
+              />
+            ))
+          }
         />
       }
       title={siteTranslations.collections[siteLanguage.id]}
+      seeAllText={`More ${siteTranslations.collections[siteLanguage.id]}`}
     />
   )
 }
