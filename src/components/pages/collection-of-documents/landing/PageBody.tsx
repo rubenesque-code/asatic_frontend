@@ -47,7 +47,10 @@ const PageBody = ({
         components={firstSectionComponentsForSiteLanguage}
         section={0}
       />
-      <CollectionsSection collections={collectionsForSiteLanguage} />
+      <CollectionsSection
+        collections={collectionsForSiteLanguage}
+        parentCurrentLanguageId={siteLanguage.id}
+      />
       <RecordedEventsSection
         recordedEvents={recordedEventsForSiteLanguage}
         parentCurrentLanguageId={siteLanguage.id}

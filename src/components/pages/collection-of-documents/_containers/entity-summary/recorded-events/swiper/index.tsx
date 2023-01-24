@@ -4,8 +4,8 @@ import { Swiper_ } from "^page-container"
 import Summary from "./Summary"
 import { $SwiperSectionLayout } from "../../_presentation/$SwiperSectionLayout"
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
+import { SiteLanguageId } from "^constants/languages"
 
 const RecordedEventSwiperSection = ({
   recordedEvents,
@@ -16,13 +16,14 @@ const RecordedEventSwiperSection = ({
   parentCurrentLanguageId: string
   showSeeAllElement?: boolean
 }) => {
-  const { siteLanguage } = useSiteLanguageContext()
-
   if (!recordedEvents?.length) {
     return null
   }
 
   const orderedRecordedEvents = sortEntitiesByDate(recordedEvents)
+
+  const languageId: SiteLanguageId =
+    parentCurrentLanguageId === "tamil" ? "tamil" : "english"
 
   return (
     <$SwiperSectionLayout
@@ -44,13 +45,14 @@ const RecordedEventSwiperSection = ({
           }
         />
       }
-      title={siteTranslations.recordedEvents[siteLanguage.id]}
+      title={siteTranslations.recordedEvents[languageId]}
       seeAllText={
         showSeeAllElement
-          ? `More ${siteTranslations.recordedEvents[siteLanguage.id]}`
+          ? `${siteTranslations.more[languageId]} ${siteTranslations.recordedEvents[languageId]}`
           : undefined
       }
       routeKey="recordedEvents"
+      parentCurrentLanguageId={parentCurrentLanguageId}
     />
   )
 }

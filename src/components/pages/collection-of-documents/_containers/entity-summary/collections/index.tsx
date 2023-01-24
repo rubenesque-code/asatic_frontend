@@ -5,22 +5,25 @@ import { Swiper_ } from "^page-container"
 import Summary from "./Summary"
 import { $SwiperSectionLayout } from "../_presentation/$SwiperSectionLayout"
 import { siteTranslations } from "^constants/siteTranslations"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
+import { SiteLanguageId } from "^constants/languages"
 
 const Collections = ({
   collections,
   showSeeAllElement,
+  parentCurrentLanguageId,
 }: {
   collections: CollectionAsSummary[] | null
   showSeeAllElement?: boolean
+  parentCurrentLanguageId: string
 }) => {
-  const { siteLanguage } = useSiteLanguageContext()
-
   if (!collections?.length) {
     return null
   }
 
   const orderedCollections = sortEntitiesByDate(collections)
+
+  const languageId: SiteLanguageId =
+    parentCurrentLanguageId === "tamil" ? "tamil" : "english"
 
   return (
     <$SwiperSectionLayout
@@ -41,13 +44,14 @@ const Collections = ({
           }
         />
       }
-      title={siteTranslations.collections[siteLanguage.id]}
+      title={siteTranslations.collections[languageId]}
       seeAllText={
         showSeeAllElement
-          ? `More ${siteTranslations.collections[siteLanguage.id]}`
+          ? `${siteTranslations.more[languageId]} ${siteTranslations.collections[languageId]}`
           : undefined
       }
       routeKey="collections"
+      parentCurrentLanguageId={parentCurrentLanguageId}
     />
   )
 }

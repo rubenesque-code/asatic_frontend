@@ -1,17 +1,22 @@
 import tw from "twin.macro"
 
-import { Languages_, Languages_Props } from "^components/pages/_containers"
-
 const DocumentHeader = ({
   title,
-  ...languages_props
-}: { title: string } & Languages_Props) => {
+  languageId,
+}: {
+  title: string
+  languageId: string
+}) => {
   return (
-    <div css={[tw`pb-sm border-b`]}>
+    <div
+      css={[
+        tw`pb-lg border-b`,
+        languageId === "tamil"
+          ? tw`font-serif-primary-tamil`
+          : tw`font-serif-primary`,
+      ]}
+    >
       <h2 css={[tw`text-center text-3xl`]}>{title}</h2>
-      <div css={[tw`mt-lg pl-sm md:pl-md`]}>
-        <Languages_ {...languages_props} />
-      </div>
     </div>
   )
 }

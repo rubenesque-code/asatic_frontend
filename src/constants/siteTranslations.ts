@@ -35,5 +35,9 @@ export const siteTranslations = {
     english: "contributors",
     tamil: "ஆசிரியர்கள்",
   },
+  more: {
+    english: "more",
+    tamil: "மேலும்",
+  },
   tamil: "தமிழ்",
 }

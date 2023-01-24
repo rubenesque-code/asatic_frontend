@@ -1,7 +1,6 @@
 import tw from "twin.macro"
 
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
-import { Language } from "^types/entities"
 import { StaticData } from "./staticData"
 
 import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
@@ -15,17 +14,17 @@ import { ArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/articl
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 
 const DocumentBody = ({
-  documentLanguage,
   childDocumentEntities,
   collections,
   recordedEvents,
   subjectTitle,
+  subjectLanguageId,
 }: {
-  documentLanguage: Language
   childDocumentEntities: StaticData["subject"]["childDocumentEntities"]
   collections: StaticData["subject"]["collections"]
   recordedEvents: RecordedEventAsSummary[]
   subjectTitle: string
+  subjectLanguageId: string
 }) => {
   // TODO: caun use media qs instead of below?
   const windowSize = useWindowSize()
@@ -49,9 +48,10 @@ const DocumentBody = ({
             >
               <ArticleLikeSummaryDefault
                 articleLikeEntity={entity as ArticleLikeEntityAsSummary}
-                parentCurrentLanguageId={documentLanguage.id}
+                parentCurrentLanguageId={subjectLanguageId}
                 useImage={i === 0}
                 isSmall={windowSize.width >= 1024 && i !== 0}
+                isDouble={i === 0 && windowSize.width >= 1024}
               />
             </$SummaryContainer>
           ))}
@@ -59,11 +59,11 @@ const DocumentBody = ({
       </div>
       <Collections
         collections={collections}
-        parentCurrentLanguageId={documentLanguage.id}
+        parentCurrentLanguageId={subjectLanguageId}
       />
       <RecordedEvents
         recordedEvents={recordedEvents}
-        parentCurrentLanguageId={documentLanguage.id}
+        parentCurrentLanguageId={subjectLanguageId}
       />
       {childDocumentEntities.second.length ? (
         <div css={[tw`border-b`]}>
@@ -108,7 +108,7 @@ const DocumentBody = ({
               >
                 <ArticleLikeSummaryDefault
                   articleLikeEntity={entity as ArticleLikeEntityAsSummary}
-                  parentCurrentLanguageId={documentLanguage.id}
+                  parentCurrentLanguageId={subjectLanguageId}
                   useImage={false}
                   isSmall={false}
                 />

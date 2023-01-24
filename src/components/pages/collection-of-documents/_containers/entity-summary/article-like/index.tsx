@@ -20,12 +20,15 @@ export const ArticleLikeSummaryDefault = ({
   parentCurrentLanguageId,
   useImage,
   isSmall,
+  isDouble,
 }: {
   articleLikeEntity: ArticleLikeEntityAsSummary
   parentCurrentLanguageId: string
   useImage: boolean
   isSmall: boolean
+  isDouble?: boolean
 }) => {
+  console.log("isSmall:", isSmall)
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId
@@ -48,7 +51,7 @@ export const ArticleLikeSummaryDefault = ({
     ? 140
     : 70
 
-  const baseChars = !isSmall ? 700 : 350
+  const baseChars = isDouble ? 1400 : !isSmall ? 700 : 300
 
   const maxCharsCalculated =
     baseChars -

@@ -1,6 +1,10 @@
 import { ReactElement } from "react"
 import tw from "twin.macro"
 import { ArrowRight } from "phosphor-react"
+import { useRouter } from "next/router"
+import Link from "next/link"
+
+import { routes } from "^constants/routes"
 
 import {
   $SectionContent,
@@ -11,26 +15,26 @@ import {
   $SectionHeaderSeeAllArrowIcon,
 } from "../_styles/$swiper-section"
 import { $link } from "^styles/global"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { useRouter } from "next/router"
-import Link from "next/link"
-import { routes } from "^constants/routes"
+import { SiteLanguageId } from "^constants/languages"
 
 export const $SwiperSectionLayout = ({
   swiper,
   title,
   seeAllText,
   routeKey,
+  parentCurrentLanguageId,
 }: {
   title: string
   swiper: ReactElement
   seeAllText?: string
   routeKey: Extract<keyof typeof routes, "collections" | "recordedEvents">
+  parentCurrentLanguageId: string
 }) => {
-  const { siteLanguage } = useSiteLanguageContext()
-
   const router = useRouter()
   const pathname = routes[routeKey]
+
+  const languageId: SiteLanguageId =
+    parentCurrentLanguageId === "tamil" ? "tamil" : "english"
 
   return (
     <div css={[tw`border-b`]}>
@@ -39,7 +43,7 @@ export const $SwiperSectionLayout = ({
         {seeAllText ? (
           <Link href={{ pathname, query: router.query }}>
             <$SectionHeaderSeeAllContainer css={[$link]}>
-              <$SectionHeaderSeeAllText languageId={siteLanguage.id}>
+              <$SectionHeaderSeeAllText languageId={languageId}>
                 {seeAllText}
               </$SectionHeaderSeeAllText>
               <$SectionHeaderSeeAllArrowIcon>

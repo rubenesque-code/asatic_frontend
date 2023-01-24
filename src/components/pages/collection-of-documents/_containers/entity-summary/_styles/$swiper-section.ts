@@ -8,7 +8,7 @@ export const $SectionHeaderTitle = tw.div`text-2xl capitalize text-gray-700`
 export const $SectionHeaderSeeAllContainer = tw.div`flex items-center gap-xs text-gray-600`
 export const $SectionHeaderSeeAllText = styled.div(
   ({ languageId }: { languageId: SiteLanguageId }) => [
-    tw`font-light`,
+    tw`font-light capitalize`,
     languageId === "tamil"
       ? tw`font-sans-primary-tamil`
       : tw`font-sans-primary`,

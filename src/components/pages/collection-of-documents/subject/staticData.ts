@@ -1,14 +1,10 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import { Language, SanitisedSubject, Tag } from "^types/entities"
+import { SanitisedSubject, Tag } from "^types/entities"
 
-import { filterAndMapEntitiesById } from "^helpers/data"
 import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import {
-  getUniqueChildEntitiesIds,
-  mapEntityLanguageIds,
-} from "^helpers/process-fetched-data/general"
+import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { getSubjectChildImageIds } from "^helpers/process-fetched-data/subject/query"
 import { fetchImages } from "^lib/firebase/firestore"
 import { processSubjectForOwnPage } from "^helpers/process-fetched-data/subject/process"
@@ -48,7 +44,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export type StaticData = {
   subject: ReturnType<typeof processSubjectForOwnPage> & {
-    languages: Language[]
     collections: ReturnType<typeof processCollectionAsSummary>[]
     recordedEvents: ReturnType<typeof processRecordedEventAsSummary>[]
     tags: Tag[]
@@ -56,7 +51,10 @@ export type StaticData = {
   header: {
     subjects: SanitisedSubject[]
   }
+  isMultipleAuthors: boolean
 }
+
+// TODO: child documents, e.g. article, should only be valid and only need translation for parent id.
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
@@ -99,7 +97,6 @@ export const getStaticProps: GetStaticProps<
     recordedEvents: validRecordedEvents.entities,
     collections: validCollections.entities,
   })
-  console.log("imageIds:", imageIds)
   const fetchedImages = await fetchImages(imageIds)
 
   const authorIds = getUniqueChildEntitiesIds(
@@ -152,7 +149,6 @@ export const getStaticProps: GetStaticProps<
   const processedCollections = validCollections.entities.map((collection) =>
     processCollectionAsSummary(collection, {
       validImages: fetchedImages,
-      validLanguageIds: allValidLanguageIds,
     })
   )
 
@@ -161,16 +157,11 @@ export const getStaticProps: GetStaticProps<
       articles: processedArticles,
       blogs: processedBlogs,
     },
-    validLanguageIds: allValidLanguageIds,
   })
 
   const pageData: StaticData = {
     subject: {
       ...processedSubject,
-      languages: filterAndMapEntitiesById(
-        mapEntityLanguageIds(processedSubject),
-        globalData.languages.entities
-      ),
       collections: processedCollections,
       recordedEvents: processedRecordedEvents,
       tags: validTags.entities,
@@ -178,6 +169,7 @@ export const getStaticProps: GetStaticProps<
     header: {
       subjects: globalData.subjects.entities,
     },
+    isMultipleAuthors: globalData.isMultipleAuthors,
   }
 
   return {
