@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useRouter } from "next/router"
-import { siteLanguageIds } from "^constants/languages"
+import { defaultSiteLanguageId, siteLanguageIds } from "^constants/languages"
 import { findEntityById, mapIds } from "^helpers/data"
 
 import { Language } from "^types/entities"
@@ -26,6 +26,8 @@ export const useDetermineDocumentLanguage = (documentLanguages: Language[]) => {
       : routerQuery.siteLanguageId &&
         documentLanguageIds.includes(routerQuery.siteLanguageId)
       ? findEntityById(documentLanguages, routerQuery.siteLanguageId)!
+      : documentLanguageIds.includes(defaultSiteLanguageId)
+      ? findEntityById(documentLanguages, defaultSiteLanguageId)!
       : documentLanguages[0]
 
   return { documentLanguage }

@@ -1,4 +1,6 @@
 import produce from "immer"
+import { defaultSiteLanguageId } from "^constants/languages"
+import { Language } from "^types/entities"
 import { findTranslationByLanguageId } from "./data"
 
 export function reorderSections<TSection extends { index: number }>(
@@ -49,5 +51,19 @@ export function sortEntitiesByIndex<TEntity extends { index: number }>(
 ) {
   return entities.sort((a, b) => {
     return b.index - a.index
+  })
+}
+
+export function sortLanguages(languages: Language[]) {
+  return languages.sort((a, b) => {
+    const aIsDefaultLanguage = a.id === defaultSiteLanguageId
+    const bIsDefaultLanguage = b.id === defaultSiteLanguageId
+
+    if (aIsDefaultLanguage) {
+      return -1
+    } else if (bIsDefaultLanguage) {
+      return 1
+    }
+    return 0
   })
 }
