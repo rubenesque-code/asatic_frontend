@@ -5,8 +5,7 @@ import { StaticData } from "./staticData"
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
 import { mapIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
-import { EntityLink_ } from "^entity-summary/_containers"
-import { $link } from "^styles/global"
+import Summary from "./Summary"
 
 const AuthorsPageContent = ({
   author,
@@ -57,13 +56,21 @@ const PageBody = ({ author }: { author: StaticData["author"] }) => {
           </div>
         </$SectionContent>
       </div>
-      <div css={[tw`border-b`]}>
+      <div>
         <$SectionContent>
-          <div>{}</div>
+          <div css={[tw`p-xl flex flex-col gap-lg`]}>
+            {translation.documents.map((entity) => (
+              <Summary
+                entity={entity}
+                languageId={filterLanguage.id}
+                key={entity.id}
+              />
+            ))}
+          </div>
         </$SectionContent>
       </div>
     </div>
   )
 }
 
-const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
+const $SectionContent = tw.div`mx-xxs sm:mx-sm md:mx-md`

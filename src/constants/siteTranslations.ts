@@ -7,13 +7,25 @@ export const siteTranslations = {
     english: "home",
     tamil: "வீடு",
   },
+  article: {
+    english: "article",
+    tamil: "கட்டுரை",
+  },
   articles: {
     english: "articles",
     tamil: "கட்டுரைகள்",
   },
+  blog: {
+    english: "blog",
+    tamil: "வலைப்பதிவு",
+  },
   blogs: {
     english: "blog",
     tamil: "வலைப்பதிவு",
+  },
+  recordedEvent: {
+    english: "video",
+    tamil: "காணொளி",
   },
   recordedEvents: {
     english: "videos",

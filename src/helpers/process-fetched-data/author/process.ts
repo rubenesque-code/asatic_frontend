@@ -60,10 +60,10 @@ export function processAuthorAsParent(
 
             return {
               id: article.id,
-              title: translation.id,
+              title: translation.title,
               text: getArticleLikeSummaryText(translation),
               publishDate: article.publishDate,
-              type: "article",
+              type: "article" as const,
             }
           }),
         blogs: authorBlogs
@@ -80,10 +80,10 @@ export function processAuthorAsParent(
 
             return {
               id: blog.id,
-              title: translation.id,
+              title: translation.title,
               text: getArticleLikeSummaryText(translation),
               publishDate: blog.publishDate,
-              type: "blog",
+              type: "blog" as const,
             }
           }),
         recordedEvents: authorRecordedEvents
@@ -100,9 +100,9 @@ export function processAuthorAsParent(
 
             return {
               id: recordedEvent.id,
-              title: translation.id,
+              title: translation.title,
               publishDate: recordedEvent.publishDate,
-              type: "recordedEvent",
+              type: "recordedEvent" as const,
             }
           }),
       }
