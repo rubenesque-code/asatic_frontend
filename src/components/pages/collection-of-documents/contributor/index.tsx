@@ -3,34 +3,26 @@ import tw from "twin.macro"
 import { StaticData } from "./staticData"
 
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
-import { mapIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import Summary from "./Summary"
 
-const AuthorsPageContent = ({
-  author,
-  header,
-  isMultipleAuthors,
-}: StaticData) => {
+const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_
-      staticData={{
-        isMultipleAuthors,
-        subjects: header.subjects,
-        documentLanguageIds: mapIds(author.languages),
-      }}
-    >
-      <PageBody author={author} />
+    <PageLayout_ globalData={globalData}>
+      <PageBody pageData={pageData} />
     </PageLayout_>
   )
 }
 
 export default AuthorsPageContent
 
-const PageBody = ({ author }: { author: StaticData["author"] }) => {
-  const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    author.languages
-  )
+const PageBody = ({
+  pageData: { author, languages },
+}: {
+  pageData: StaticData["pageData"]
+}) => {
+  const { documentLanguage: filterLanguage } =
+    useDetermineDocumentLanguage(languages)
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const translation = author.translations.find(
@@ -51,7 +43,7 @@ const PageBody = ({ author }: { author: StaticData["author"] }) => {
           <div css={[tw`pt-lg`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={author.languages}
+              documentLanguages={languages}
             />
           </div>
         </$SectionContent>

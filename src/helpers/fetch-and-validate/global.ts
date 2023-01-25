@@ -32,6 +32,7 @@ export async function fetchAndValidateGlobalData() {
       allSubjects: validSubjects,
       allCollections: validCollections,
       allLanguages: validLanguages,
+      allAuthors: validAuthors,
     },
   }
 }

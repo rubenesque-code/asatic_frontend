@@ -2,29 +2,20 @@ import tw from "twin.macro"
 
 import { StaticData } from "./staticData"
 
+import { useSiteLanguageContext } from "^context/SiteLanguage"
+import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
+import { siteTranslations } from "^constants/siteTranslations"
+import { findTranslationByLanguageId } from "^helpers/data"
+import { sortEntitiesByDate } from "^helpers/manipulateEntity"
+
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import { Summary_ } from "^entity-summary/recorded-events/_containers"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { siteTranslations } from "^constants/siteTranslations"
-import { findTranslationByLanguageId, mapIds } from "^helpers/data"
-import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
-import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
-const RecordedEventsPageContent = ({
-  recordedEvents,
-  header,
-  isMultipleAuthors,
-}: StaticData) => {
+const RecordedEventsPageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_
-      staticData={{
-        isMultipleAuthors,
-        subjects: header.subjects,
-        documentLanguageIds: mapIds(recordedEvents.languages),
-      }}
-    >
-      <PageBody recordedEvents={recordedEvents} />
+    <PageLayout_ globalData={globalData}>
+      <PageBody pageData={pageData} />
     </PageLayout_>
   )
 }
@@ -32,18 +23,17 @@ const RecordedEventsPageContent = ({
 export default RecordedEventsPageContent
 
 const PageBody = ({
-  recordedEvents,
+  pageData: { languages, recordedEvents },
 }: {
-  recordedEvents: StaticData["recordedEvents"]
+  pageData: StaticData["pageData"]
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
-  const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    recordedEvents.languages
-  )
+  const { documentLanguage: filterLanguage } =
+    useDetermineDocumentLanguage(languages)
 
   const recordedEventsProcessed = sortEntitiesByDate(
-    recordedEvents.entities.filter((recordedEvent) =>
+    recordedEvents.filter((recordedEvent) =>
       findTranslationByLanguageId(recordedEvent.translations, filterLanguage.id)
     )
   )
@@ -58,7 +48,7 @@ const PageBody = ({
           <div css={[tw`pt-sm`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={recordedEvents.languages}
+              documentLanguages={languages}
             />
           </div>
         </$SectionContent>

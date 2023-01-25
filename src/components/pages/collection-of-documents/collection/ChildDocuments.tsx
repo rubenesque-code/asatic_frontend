@@ -10,7 +10,7 @@ import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 const ChildDocuments = ({
   collection,
 }: {
-  collection: StaticData["collection"]
+  collection: StaticData["pageData"]["collection"]
 }) => {
   console.log("collection:", collection)
   return (

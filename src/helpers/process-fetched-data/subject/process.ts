@@ -17,7 +17,7 @@ export function processSubjectForOwnPage(
     }
   }
 ) {
-  const orderedChildDocumentEntities = orderChildDocumentEntities(
+  const orderedChildDocumentEntities = processCustomSections(
     Object.values(processedChildDocumentEntities).flat()
   )
 
@@ -25,7 +25,7 @@ export function processSubjectForOwnPage(
     id: subject.id,
     publishDate: subject.publishDate,
     title: subject.title,
-    childDocumentEntities: orderedChildDocumentEntities,
+    customSections: orderedChildDocumentEntities,
     languageId: subject.languageId,
   }
 }
@@ -37,7 +37,7 @@ function splitChildEntitiesIntoSections(entities: DocumentEntitiesAsSummaries) {
   }
 }
 
-function orderChildDocumentEntities(entities: ArticleLikeEntityAsSummary[]) {
+function processCustomSections(entities: ArticleLikeEntityAsSummary[]) {
   const order = pipe(
     sortEntitiesByDate,
     unshiftFirstEntityWithImage,

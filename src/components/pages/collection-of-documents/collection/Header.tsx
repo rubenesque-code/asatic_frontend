@@ -11,7 +11,7 @@ import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 const DocumentHeader = ({
   collection,
 }: {
-  collection: StaticData["collection"]
+  collection: StaticData["pageData"]["collection"]
 }) => {
   const metaProps: MetaProps = {
     description: collection.description,

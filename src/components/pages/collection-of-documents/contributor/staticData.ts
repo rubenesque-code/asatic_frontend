@@ -1,8 +1,8 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import { Language, SanitisedSubject } from "^types/entities"
+import { Language } from "^types/entities"
+import { StaticDataWrapper } from "^types/staticData"
 
-import { fetchAuthor } from "^lib/firebase/firestore"
 import { mapLanguageIds } from "^helpers/data"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
@@ -31,15 +31,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
-export type StaticData = {
-  author: ReturnType<typeof processAuthorAsParent> & {
-    languages: Language[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
+type PageData = {
+  author: ReturnType<typeof processAuthorAsParent>
+  languages: Language[]
 }
+
+export type StaticData = StaticDataWrapper<PageData>
+
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
@@ -47,43 +45,43 @@ export const getStaticProps: GetStaticProps<
   const globalData = await fetchAndValidateGlobalData()
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const fetchedAuthor = await fetchAuthor(params!.id)
+  const validatedAuthor = globalData.validatedData.allAuthors.entities.find(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    (author) => author.id === params!.id
+  )!
 
   const validChildDocumentEntities = await fetchAndValidateDocumentEntities({
-    articleIds: fetchedAuthor.articlesIds,
-    blogIds: fetchedAuthor.blogsIds,
-    recordedEventIds: fetchedAuthor.recordedEventsIds,
-    validLanguageIds: globalData.languages.ids,
+    articleIds: validatedAuthor.articlesIds,
+    blogIds: validatedAuthor.blogsIds,
+    recordedEventIds: validatedAuthor.recordedEventsIds,
+    validLanguageIds: globalData.validatedData.allLanguages.ids,
   })
 
-  const processedAuthor = processAuthorAsParent(fetchedAuthor, {
+  const processedAuthor = processAuthorAsParent(validatedAuthor, {
     allAuthorsValidChildDocumentEntities: {
       articles: validChildDocumentEntities.articles.entities,
       blogs: validChildDocumentEntities.blogs.entities,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       recordedEvents: validChildDocumentEntities.recordedEvents!.entities,
     },
-    validLanguageIds: globalData.languages.ids,
+    validLanguageIds: globalData.validatedData.allLanguages.ids,
   })
 
   const authorLanguageIds = mapLanguageIds(processedAuthor.translations)
   const authorLanguages = authorLanguageIds.map(
     (languageId) =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      globalData.languages.entities.find(
+      globalData.validatedData.allLanguages.entities.find(
         (validLanguage) => validLanguage.id === languageId
       )!
   )
 
   const pageData: StaticData = {
-    author: {
-      ...processedAuthor,
+    globalData: globalData.globalContextData,
+    pageData: {
+      author: processedAuthor,
       languages: authorLanguages,
     },
-    header: {
-      subjects: globalData.subjects.entities,
-    },
-    isMultipleAuthors: globalData.isMultipleAuthors,
   }
 
   return {

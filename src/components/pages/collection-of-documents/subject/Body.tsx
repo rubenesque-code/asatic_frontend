@@ -20,7 +20,7 @@ const DocumentBody = ({
   subjectTitle,
   subjectLanguageId,
 }: {
-  childDocumentEntities: StaticData["subject"]["childDocumentEntities"]
+  childDocumentEntities: StaticData["subject"]["customSections"]
   collections: StaticData["subject"]["collections"]
   recordedEvents: RecordedEventAsSummary[]
   subjectTitle: string

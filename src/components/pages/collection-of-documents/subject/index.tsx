@@ -7,24 +7,27 @@ import DocumentBody from "./Body"
 import { $nonDocumentMaxWidth } from "^styles/global"
 import { PageLayout_ } from "^components/pages/_containers"
 
-const PageContent = ({ header, subject, isMultipleAuthors }: StaticData) => {
+const PageContent = ({
+  globalData,
+  pageData: { title, languageId, collections, customSections, recordedEvents },
+}: StaticData) => {
   return (
-    <PageLayout_ staticData={{ isMultipleAuthors, subjects: header.subjects }}>
+    <PageLayout_ globalData={globalData}>
       <$PageBody>
         <$CenterMaxWidth_ maxWidth={$nonDocumentMaxWidth}>
           <div>
             <DocumentHeader
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              title={subject.title!}
-              languageId={subject.languageId}
+              title={title!}
+              languageId={languageId}
             />
             <DocumentBody
-              childDocumentEntities={subject.childDocumentEntities}
-              collections={subject.collections}
-              recordedEvents={subject.recordedEvents}
+              childDocumentEntities={customSections}
+              collections={collections}
+              recordedEvents={recordedEvents}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              subjectTitle={subject.title!}
-              subjectLanguageId={subject.languageId}
+              subjectTitle={title!}
+              subjectLanguageId={languageId}
             />
           </div>
         </$CenterMaxWidth_>

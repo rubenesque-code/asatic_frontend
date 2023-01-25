@@ -13,36 +13,34 @@ import {
   processRecordedEventAsSummary,
   RecordedEventAsSummary,
 } from "^helpers/process-fetched-data/recorded-event/process"
-import { Language, SanitisedSubject } from "^types/entities"
+import { Language } from "^types/entities"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
 import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
 import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
+import { StaticDataWrapper } from "^types/staticData"
+import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
 
-export type StaticData = {
-  recordedEvents: {
-    entities: RecordedEventAsSummary[]
-    languages: Language[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
+type PageData = {
+  recordedEvents: RecordedEventAsSummary[]
+  languages: Language[]
 }
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
 
   const processedRecordedEvents = await handleProcessRecordedEvents({
-    validLanguages: globalData.languages,
+    validLanguages: globalData.validatedData.allLanguages,
   })
 
   return {
     props: {
-      recordedEvents: processedRecordedEvents,
-      header: {
-        subjects: globalData.subjects.entities,
+      globalData: globalData.globalContextData,
+      pageData: {
+        languages: processedRecordedEvents.languages,
+        recordedEvents: processedRecordedEvents.entities,
       },
-      isMultipleAuthors: globalData.isMultipleAuthors,
     },
   }
 }
@@ -50,9 +48,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 async function handleProcessRecordedEvents({
   validLanguages,
 }: {
-  validLanguages: Awaited<
-    ReturnType<typeof fetchAndValidateGlobalData>
-  >["languages"]
+  validLanguages: Awaited<ReturnType<typeof fetchAndValidateLanguages>>
 }) {
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: "all",

@@ -1,7 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import { SanitisedSubject, Tag } from "^types/entities"
-
 import { fetchAndValidateSubjects } from "^helpers/fetch-and-validate/subjects"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
@@ -11,7 +9,6 @@ import { processSubjectForOwnPage } from "^helpers/process-fetched-data/subject/
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
-import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
 import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
@@ -19,6 +16,7 @@ import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/
 import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
+import { StaticDataWrapper } from "^types/staticData"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validSubjects = await fetchAndValidateSubjects({ ids: "all" })
@@ -42,17 +40,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
-export type StaticData = {
-  subject: ReturnType<typeof processSubjectForOwnPage> & {
-    collections: ReturnType<typeof processCollectionAsSummary>[]
-    recordedEvents: ReturnType<typeof processRecordedEventAsSummary>[]
-    tags: Tag[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
+type PageData = ReturnType<typeof processSubjectForOwnPage> & {
+  collections: ReturnType<typeof processCollectionAsSummary>[]
+  recordedEvents: ReturnType<typeof processRecordedEventAsSummary>[]
 }
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticProps: GetStaticProps<
   StaticData,
@@ -61,7 +54,7 @@ export const getStaticProps: GetStaticProps<
   const globalData = await fetchAndValidateGlobalData()
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const subject = globalData.subjects.entities.find(
+  const subject = globalData.validatedData.allSubjects.entities.find(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     (subject) => subject.id === params!.id
   )!
@@ -79,9 +72,6 @@ export const getStaticProps: GetStaticProps<
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: subject.recordedEventsIds,
     validLanguageIds,
-  })
-  const validTags = await fetchAndValidateTags({
-    ids: subject.tagsIds,
   })
 
   const validCollections = await fetchAndValidateCollections({
@@ -159,16 +149,12 @@ export const getStaticProps: GetStaticProps<
   })
 
   const pageData: StaticData = {
-    subject: {
+    globalData: globalData.globalContextData,
+    pageData: {
       ...processedSubject,
       collections: processedCollections,
       recordedEvents: processedRecordedEvents,
-      tags: validTags.entities,
     },
-    header: {
-      subjects: globalData.subjects.entities,
-    },
-    isMultipleAuthors: globalData.isMultipleAuthors,
   }
 
   return {

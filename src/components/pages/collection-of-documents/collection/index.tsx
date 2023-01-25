@@ -7,15 +7,15 @@ import ChildDocuments from "./ChildDocuments"
 import { $CenterMaxWidth_ } from "^page-presentation"
 import { PageLayout_ } from "^components/pages/_containers"
 
-const PageContent = ({ header, collection, isMultipleAuthors }: StaticData) => {
+const PageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_ staticData={{ isMultipleAuthors, subjects: header.subjects }}>
+    <PageLayout_ globalData={globalData}>
       <>
         <div>
-          <DocumentHeader collection={collection} />
+          <DocumentHeader collection={pageData.collection} />
           <$CenterMaxWidth_ maxWidth={tw`max-w-[700px]`}>
             <div css={[tw`border-l border-r`]}>
-              <ChildDocuments collection={collection} />
+              <ChildDocuments collection={pageData.collection} />
             </div>
           </$CenterMaxWidth_>
         </div>

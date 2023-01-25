@@ -1,15 +1,11 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
-import { SanitisedSubject, Tag } from "^types/entities"
-
-import { filterAndMapEntitiesById } from "^helpers/data"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
-import { fetchCollection, fetchImages } from "^lib/firebase/firestore"
+import { fetchImages } from "^lib/firebase/firestore"
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
-import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
 import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
@@ -18,6 +14,11 @@ import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { processCollectionForOwnPage } from "^helpers/process-fetched-data/collection/process"
 import { getCollectionUniqueChildImageIds } from "^helpers/process-fetched-data/collection/query"
+import { StaticDataWrapper } from "^types/staticData"
+
+type PageData = { collection: ReturnType<typeof processCollectionForOwnPage> }
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validCollections = await fetchAndValidateCollections({ ids: "all" })
@@ -41,26 +42,18 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
-export type StaticData = {
-  collection: ReturnType<typeof processCollectionForOwnPage> & {
-    tags: Tag[]
-    subjects: SanitisedSubject[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
-}
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
-  // const allValidLanguageIds = globalData.languages.ids
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const fetchedCollection = await fetchCollection(params!.id)
+  const fetchedCollection =
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    globalData.validatedData.allCollections.entities.find(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      (collection) => collection.id === params!.id
+    )!
 
   const validLanguageIds = [fetchedCollection.languageId]
 
@@ -75,9 +68,6 @@ export const getStaticProps: GetStaticProps<
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: fetchedCollection.recordedEventsIds,
     validLanguageIds,
-  })
-  const validTags = await fetchAndValidateTags({
-    ids: fetchedCollection.tagsIds,
   })
 
   const imageIds = [
@@ -149,18 +139,8 @@ export const getStaticProps: GetStaticProps<
   })
 
   const pageData: StaticData = {
-    collection: {
-      ...processedCollection,
-      tags: validTags.entities,
-      subjects: filterAndMapEntitiesById(
-        fetchedCollection.subjectsIds,
-        globalData.subjects.entities
-      ),
-    },
-    header: {
-      subjects: globalData.subjects.entities,
-    },
-    isMultipleAuthors: globalData.isMultipleAuthors,
+    globalData: globalData.globalContextData,
+    pageData: { collection: processedCollection },
   }
 
   return {
