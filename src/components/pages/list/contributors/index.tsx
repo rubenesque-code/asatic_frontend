@@ -44,11 +44,15 @@ const PageBody = ({ authors }: { authors: StaticData["authors"] }) => {
   return (
     <div>
       <div css={[tw`border-b`]}>
-        <$SectionContent css={[tw`px-sm pt-xl pb-md border-r-0 border-l-0`]}>
-          <h1 css={[tw`text-3xl capitalize text-gray-700 text-center`]}>
+        <$SectionContent css={[tw`px-xl pt-xl pb-md border-r-0 border-l-0`]}>
+          <h1
+            css={[
+              tw`text-3xl capitalize text-gray-700 tracking-wide font-bold`,
+            ]}
+          >
             {siteTranslations.authors[siteLanguage.id]}
           </h1>
-          <div css={[tw`pt-sm`]}>
+          <div css={[tw`pt-lg`]}>
             <Languages_
               documentLanguage={filterLanguage}
               documentLanguages={authors.languages}
