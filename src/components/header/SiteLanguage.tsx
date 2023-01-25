@@ -2,16 +2,16 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import tw from "twin.macro"
 
-import { TranslateIcon } from "^components/Icons"
-import { siteTranslations } from "^constants/siteTranslations"
+import { useGlobalDataContext } from "^context/GlobalData"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 
-export type SiteLanguageProps = {
-  documentLanguageIds?: string[]
-}
+import { TranslateIcon } from "^components/Icons"
+import { siteTranslations } from "^constants/siteTranslations"
 
-const SiteLanguage = ({ documentLanguageIds }: SiteLanguageProps) => {
+const SiteLanguage = () => {
   const { siteLanguage } = useSiteLanguageContext()
+  const { documentLanguageIds } = useGlobalDataContext()
+
   const router = useRouter()
 
   const siteLanguageIdOnToggle =

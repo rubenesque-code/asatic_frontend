@@ -1,15 +1,14 @@
 import Link from "next/link"
 import tw from "twin.macro"
+
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
+
+import SideBar from "./SideBar"
+import SiteLanguage from "./SiteLanguage"
 import { $link } from "^styles/global"
 
-import SideBar, { SideBarProps } from "./SideBar"
-import SiteLanguage, { SiteLanguageProps } from "./SiteLanguage"
-
-export type HeaderProps = SideBarProps & SiteLanguageProps
-
-const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
+const Header = () => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
@@ -19,7 +18,7 @@ const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
       ]}
     >
       <div>
-        <SideBar subjects={subjects} />
+        <SideBar />
       </div>
       <div
         css={[tw`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`]}
@@ -33,7 +32,7 @@ const Header = ({ subjects, documentLanguageIds }: HeaderProps) => {
           </div>
         </Link>
       </div>
-      <SiteLanguage documentLanguageIds={documentLanguageIds} />
+      <SiteLanguage />
     </div>
   )
 }

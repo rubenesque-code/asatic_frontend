@@ -4,9 +4,9 @@ import { useLayoutEffect } from "react"
 
 import { routes } from "^constants/routes"
 
-import { StaticData } from "^components/pages/list/article-like/_types"
-import PageContent from "^components/pages/list/article-like/blogs"
-export { getStaticProps } from "^components/pages/list/article-like/blogs/staticData"
+import { StaticData } from "^components/pages/collection-of-documents/article-like/_types"
+import PageContent from "^components/pages/collection-of-documents/article-like/blogs"
+export { getStaticProps } from "^components/pages/collection-of-documents/article-like/blogs/staticData"
 
 const BlogsPage: NextPage<StaticData> = (staticData) => {
   const isBlog = staticData.articleLikeEntities.entities.length

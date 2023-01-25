@@ -16,9 +16,9 @@ import { mapLanguageIds } from "^helpers/data"
 // TODO: handle no custom section components: site in progress. for each language
 
 const PageBody = ({
-  landingSections,
+  pageData: { landingSections },
 }: {
-  landingSections: StaticData["landingSections"]
+  pageData: StaticData["pageData"]
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
@@ -70,7 +70,7 @@ const CustomSection = ({
   components,
   section,
 }: {
-  components: StaticData["landingSections"]["firstSectionComponents"]
+  components: StaticData["pageData"]["landingSections"]["firstSectionComponents"]
   section: 0 | 1
 }) => {
   const { siteLanguage } = useSiteLanguageContext()

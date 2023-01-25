@@ -9,24 +9,28 @@ import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 
-import { StaticData } from "../_types"
+import { PageData } from "../_types"
 import { mapLanguageIds } from "^helpers/data"
 import { removeArrDuplicates } from "^helpers/general"
+import { StaticDataWrapper } from "^types/staticData"
+import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
 
   const processedBlogs = await handleProcessBlogs({
-    validLanguages: globalData.languages,
+    validLanguages: globalData.validatedData.allLanguages,
   })
 
   return {
     props: {
-      articleLikeEntities: processedBlogs,
-      header: {
-        subjects: globalData.subjects.entities,
+      globalData: globalData.globalContextData,
+      pageData: {
+        articleLikeEntities: processedBlogs.entities,
+        languages: processedBlogs.languages,
       },
-      isMultipleAuthors: globalData.isMultipleAuthors,
     },
   }
 }
@@ -34,9 +38,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 async function handleProcessBlogs({
   validLanguages,
 }: {
-  validLanguages: Awaited<
-    ReturnType<typeof fetchAndValidateGlobalData>
-  >["languages"]
+  validLanguages: Awaited<ReturnType<typeof fetchAndValidateLanguages>>
 }) {
   const validBlogs = await fetchAndValidateBlogs({
     ids: "all",

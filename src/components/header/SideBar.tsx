@@ -6,19 +6,13 @@ import tw from "twin.macro"
 
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 
-import { SanitisedSubject } from "^types/entities"
-
 import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
 import { $link } from "^styles/global"
+import { useGlobalDataContext } from "^context/GlobalData"
+import { SanitisedSubject } from "^types/entities"
 
-export type SideBarProps = SubjectsProp
-
-type SubjectsProp = {
-  subjects: SanitisedSubject[]
-}
-
-const SideBar = (subjectsProp: SideBarProps) => {
+const SideBar = () => {
   return (
     <Menu>
       {({ open }) => (
@@ -36,7 +30,7 @@ const SideBar = (subjectsProp: SideBarProps) => {
             ]}
             static
           >
-            <Content {...subjectsProp} />
+            <Content />
           </Menu.Items>
           <div
             css={[
@@ -59,7 +53,7 @@ const CloseButton = () => (
   </Menu.Item>
 )
 
-const Content = (subjectsProp: SubjectsProp) => {
+const Content = () => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
@@ -72,36 +66,25 @@ const Content = (subjectsProp: SubjectsProp) => {
       ]}
     >
       <CloseButton />
-      <div css={[tw`flex flex-col gap-md min-w-[200px] mt-md`]}>
-        <div css={[tw`pt-md border-t`]}>
-          <PageLink
-            label={siteTranslations.home[siteLanguage.id]}
-            pathname={routes.landing}
-          />
-        </div>
-        <div css={[tw`pt-md border-t`]}>
-          <PageLink
-            label={siteTranslations.articles[siteLanguage.id]}
-            pathname={routes.articles}
-          />
-        </div>
-        <div css={[tw`pt-md border-t`]}>
-          <PageLink
-            label={siteTranslations.blogs[siteLanguage.id]}
-            pathname={routes.blogs}
-          />
-        </div>
-        <div css={[tw`pt-md border-t`]}>
-          <PageLink
-            label={siteTranslations.recordedEvents[siteLanguage.id]}
-            pathname={routes.recordedEvents}
-          />
-        </div>
-        {!subjectsProp.subjects.length ? null : (
-          <div css={[tw`pt-md border-t`]}>
-            <Subjects {...subjectsProp} />
-          </div>
-        )}
+      <div css={[tw`flex flex-col gap-md mt-md min-w-[200px]`]}>
+        <PageLink
+          label={siteTranslations.home[siteLanguage.id]}
+          pathname={routes.landing}
+        />
+        <PageLink
+          label={siteTranslations.articles[siteLanguage.id]}
+          pathname={routes.articles}
+        />
+        <PageLink
+          label={siteTranslations.blogs[siteLanguage.id]}
+          pathname={routes.blogs}
+        />
+        <PageLink
+          label={siteTranslations.recordedEvents[siteLanguage.id]}
+          pathname={routes.recordedEvents}
+        />
+        <CollectionsLink />
+        <Subjects />
       </div>
     </div>
   )
@@ -115,23 +98,30 @@ const PageLink = ({ label, pathname }: { label: string; pathname: string }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
-    <Link href={{ pathname, query: { siteLanguageId: siteLanguage.id } }}>
-      <div css={[$text, $link]}>{label}</div>
-    </Link>
+    <div css={[tw`pt-md border-t`]}>
+      <Link href={{ pathname, query: { siteLanguageId: siteLanguage.id } }}>
+        <div css={[$text, $link]}>{label}</div>
+      </Link>
+    </div>
   )
 }
 
-const Subjects = ({ subjects }: { subjects: SanitisedSubject[] }) => {
+const Subjects = () => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { siteLanguage } = useSiteLanguageContext()
+  const { subjects } = useGlobalDataContext()
+
+  if (!subjects.length) {
+    return null
+  }
 
   const subjectsForSiteLanguage = subjects.filter(
     (subject) => subject.languageId === siteLanguage.id
   )
 
   return (
-    <div>
+    <div css={[tw`pt-md border-t`]}>
       <div
         css={[tw`flex items-center justify-between cursor-pointer`]}
         className="group"
@@ -164,5 +154,21 @@ const Subject = ({ subject }: { subject: SanitisedSubject }) => {
     <Link href={`/subjects/${subject.id}`} passHref>
       <div css={[$text, $link]}>{subject.title}</div>
     </Link>
+  )
+}
+
+const CollectionsLink = () => {
+  const { siteLanguage } = useSiteLanguageContext()
+  const { isCollection } = useGlobalDataContext()
+
+  if (!isCollection) {
+    return null
+  }
+
+  return (
+    <PageLink
+      label={siteTranslations.collections[siteLanguage.id]}
+      pathname={routes.collections}
+    />
   )
 }

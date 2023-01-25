@@ -1,21 +1,37 @@
+import { GlobalDataValue } from "^context/GlobalData"
+import { MyOmit } from "^types/utilities"
 import { fetchAndValidateAuthors } from "./authors"
+import { fetchAndValidateCollections } from "./collections"
 import { fetchAndValidateLanguages } from "./languages"
 import { fetchAndValidateSubjects } from "./subjects"
 
 export async function fetchAndValidateGlobalData() {
   const validLanguages = await fetchAndValidateLanguages("all")
-  const subjects = await fetchAndValidateSubjects({
+  const validSubjects = await fetchAndValidateSubjects({
     ids: "all",
     validLanguageIds: validLanguages.ids,
   })
-  const authors = await fetchAndValidateAuthors({
+  const validAuthors = await fetchAndValidateAuthors({
+    ids: "all",
+    validLanguageIds: validLanguages.ids,
+  })
+  const validCollections = await fetchAndValidateCollections({
     ids: "all",
     validLanguageIds: validLanguages.ids,
   })
 
+  const globalContextData: MyOmit<GlobalDataValue, "documentLanguageIds"> = {
+    isCollection: validCollections.entities.length > 0,
+    isMultipleAuthors: validAuthors.entities.length > 1,
+    subjects: validSubjects.entities,
+  }
+
   return {
-    subjects,
-    languages: validLanguages,
-    isMultipleAuthors: authors.entities.length > 1,
+    globalContextData,
+    validatedData: {
+      allSubjects: validSubjects,
+      allCollections: validCollections,
+      allLanguages: validLanguages,
+    },
   }
 }

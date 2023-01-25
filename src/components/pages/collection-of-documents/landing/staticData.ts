@@ -1,12 +1,11 @@
 import { GetStaticProps } from "next"
 
-import { SanitisedSubject } from "^types/entities"
+import { SanitisedCollection } from "^types/entities"
 
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { fetchImages, fetchLanding } from "^lib/firebase/firestore"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
-import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
 import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
@@ -17,43 +16,46 @@ import { getLandingUserSectionsUniqueChildIds } from "^helpers/process-fetched-d
 import { processCustomSection } from "^helpers/process-fetched-data/landing/process"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 import { fetchAndValidateDocumentEntities } from "^helpers/fetch-and-validate/_helpers"
+import { StaticDataWrapper } from "^types/staticData"
 
-export type StaticData = {
+type PageData = {
   landingSections: Awaited<ReturnType<typeof handleProcessSections>>
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
 }
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
-  const allValidLanguageIds = globalData.languages.ids
 
   const processedSections = await handleProcessSections({
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds: globalData.validatedData.allLanguages.ids,
+    validCollections: globalData.validatedData.allCollections.entities,
   })
 
   return {
     props: {
-      header: {
-        subjects: globalData.subjects.entities,
+      globalData: globalData.globalContextData,
+      pageData: {
+        landingSections: processedSections,
       },
-      landingSections: processedSections,
-      isMultipleAuthors: globalData.isMultipleAuthors,
     },
   }
 }
 
 async function handleProcessSections({
   validLanguageIds,
+  validCollections,
 }: {
   validLanguageIds: string[]
+  validCollections: SanitisedCollection[]
 }) {
   const { firstSectionComponents, secondSectionComponents } =
     await handleProcessCustomSections({ validLanguageIds })
   const { collections, recordedEvents } =
-    await handleProcessAutoSectionChildEntities({ validLanguageIds })
+    await handleProcessAutoSectionChildEntities({
+      validLanguageIds,
+      validCollections,
+    })
 
   return {
     firstSectionComponents,
@@ -150,24 +152,19 @@ async function handleProcessCustomSections({
 
 async function handleProcessAutoSectionChildEntities({
   validLanguageIds,
+  validCollections,
 }: {
   validLanguageIds: string[]
+  validCollections: SanitisedCollection[]
 }) {
-  // 1. fetch and validate child entities
-  // 2. process sections; populate components
-
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
-    ids: "all",
-    validLanguageIds,
-  })
-  const validCollections = await fetchAndValidateCollections({
     ids: "all",
     validLanguageIds,
   })
 
   const imageIds = getUniqueChildEntitiesImageIds({
-    recordedEvents: validRecordedEvents?.entities,
-    collections: validCollections?.entities,
+    recordedEvents: validRecordedEvents.entities,
+    collections: validCollections,
   })
   const fetchedImages = await fetchImages(imageIds)
 
@@ -202,7 +199,7 @@ async function handleProcessAutoSectionChildEntities({
         validRecordedEventTypes: validRecordedEventTypes.entities,
       })
   )
-  const processedCollections = validCollections?.entities.map((collection) =>
+  const processedCollections = validCollections.map((collection) =>
     processCollectionAsSummary(collection, {
       validImages: fetchedImages,
     })

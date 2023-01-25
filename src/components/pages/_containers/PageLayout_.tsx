@@ -1,26 +1,24 @@
-import { ReactElement } from "react"
+import { ComponentProps, ReactElement } from "react"
 import tw from "twin.macro"
-import Header from "^components/header"
-import { GlobalDataProvider } from "^context/GlobalData"
 
+import { GlobalDataProvider } from "^context/GlobalData"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
-import { SanitisedSubject } from "^types/entities"
+
+import Header from "^components/header"
+
+import { MyOmit } from "^types/utilities"
 
 export const PageLayout_ = ({
   children: pageBody,
-  staticData: { isMultipleAuthors, subjects, documentLanguageIds },
+  globalData,
 }: {
   children: ReactElement
-  staticData: {
-    isMultipleAuthors: boolean
-    subjects: SanitisedSubject[]
-    documentLanguageIds?: string[]
-  }
+  globalData: MyOmit<ComponentProps<typeof GlobalDataProvider>, "children">
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
-    <GlobalDataProvider isMultipleAuthors={isMultipleAuthors}>
+    <GlobalDataProvider {...globalData}>
       <div
         css={[
           siteLanguage.id === "tamil"
@@ -28,7 +26,7 @@ export const PageLayout_ = ({
             : tw`font-serif-primary`,
         ]}
       >
-        <Header subjects={subjects} documentLanguageIds={documentLanguageIds} />
+        <Header />
         {pageBody}
       </div>
     </GlobalDataProvider>

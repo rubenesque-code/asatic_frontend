@@ -1,50 +1,39 @@
 import tw from "twin.macro"
 
-import { StaticData } from "../_types"
+import { StaticData } from "./staticData"
 
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
-import { findTranslationByLanguageId, mapIds } from "^helpers/data"
+import { findTranslationByLanguageId } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
-const ArticlesPageContent = ({
-  articleLikeEntities: articles,
-  header,
-  isMultipleAuthors,
-}: StaticData) => {
+const BlogsPageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_
-      staticData={{
-        isMultipleAuthors,
-        subjects: header.subjects,
-        documentLanguageIds: mapIds(articles.languages),
-      }}
-    >
-      <PageBody articles={articles} />
+    <PageLayout_ globalData={globalData}>
+      <PageBody pageData={pageData} />
     </PageLayout_>
   )
 }
 
-export default ArticlesPageContent
+export default BlogsPageContent
 
 const PageBody = ({
-  articles,
+  pageData: { articleLikeEntities: blogs, languages },
 }: {
-  articles: StaticData["articleLikeEntities"]
+  pageData: StaticData["pageData"]
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
-  const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    articles.languages
-  )
+  const { documentLanguage: filterLanguage } =
+    useDetermineDocumentLanguage(languages)
 
-  const articlesProcessed = sortEntitiesByDate(
-    articles.entities.filter((article) =>
-      findTranslationByLanguageId(article.translations, filterLanguage.id)
+  const blogsProcessed = sortEntitiesByDate(
+    blogs.filter((blog) =>
+      findTranslationByLanguageId(blog.translations, filterLanguage.id)
     )
   )
 
@@ -53,37 +42,37 @@ const PageBody = ({
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`px-sm pt-xl pb-md border-r-0 border-l-0`]}>
           <h1 css={[tw`text-3xl capitalize text-gray-700 text-center`]}>
-            {siteTranslations.articles[siteLanguage.id]}
+            {siteTranslations.blogs[siteLanguage.id]}
           </h1>
           <div css={[tw`pt-sm`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={articles.languages}
+              documentLanguages={languages}
             />
           </div>
         </$SectionContent>
       </div>
       <div css={[tw`border-b`]}>
         <$SectionContent css={[tw`grid grid-cols-1 sm:grid-cols-2`]}>
-          {articlesProcessed.map((article, i) => {
+          {blogsProcessed.map((blog, i) => {
             return (
               <$SummaryContainer
                 css={[
                   i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
-                  i < articlesProcessed.length ? tw`border-b` : tw`border-b-0`,
-                  articlesProcessed.length % 2 === 0
-                    ? i < articlesProcessed.length - 2
+                  i < blogsProcessed.length ? tw`border-b` : tw`border-b-0`,
+                  blogsProcessed.length % 2 === 0
+                    ? i < blogsProcessed.length - 2
                       ? tw`sm:border-b`
                       : tw`sm:border-b-0`
-                    : articlesProcessed.length % 2 === 1 &&
-                      i < articlesProcessed.length - 1
+                    : blogsProcessed.length % 2 === 1 &&
+                      i < blogsProcessed.length - 1
                     ? tw`sm:border-b`
                     : tw`sm:border-b-0`,
                 ]}
-                key={article.id}
+                key={blog.id}
               >
                 <ArticleLikeSummaryDefault
-                  articleLikeEntity={article}
+                  articleLikeEntity={blog}
                   isSmall={false}
                   parentCurrentLanguageId={filterLanguage.id}
                   useImage={true}
