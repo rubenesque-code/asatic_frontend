@@ -114,7 +114,9 @@ export function processAuthorAsParent(
       ])
 
       return {
+        id: author.id,
         languageId: authorTranslation.languageId,
+        name: authorTranslation.name,
         documents: documentsOrdered,
       }
     }

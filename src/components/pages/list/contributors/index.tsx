@@ -55,10 +55,40 @@ const PageBody = ({ authors }: { authors: StaticData["authors"] }) => {
         </$SectionContent>
       </div>
       <div css={[tw`border-b`]}>
-        <$SectionContent>{JSON.stringify(authorsForLanguage)}</$SectionContent>
+        <$SectionContent>
+          {authorsForLanguage.map((author) => (
+            <Author
+              author={author}
+              languageId={filterLanguage.id}
+              key={author.id}
+            />
+          ))}
+        </$SectionContent>
       </div>
     </div>
   )
 }
 
 const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
+
+const Author = ({
+  author,
+  languageId,
+}: {
+  author: StaticData["authors"]["entities"][number]
+  languageId: string
+}) => {
+  const authorTranslation = author.find(
+    (authorTranslation) => authorTranslation.languageId === languageId
+  )
+
+  if (!authorTranslation) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>{authorTranslation.name}</h2>
+    </div>
+  )
+}
