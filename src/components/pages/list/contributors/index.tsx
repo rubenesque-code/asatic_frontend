@@ -7,6 +7,8 @@ import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
 import { mapIds, mapLanguageIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
+import { EntityLink_ } from "^entity-summary/_containers"
+import { $link } from "^styles/global"
 
 const AuthorsPageContent = ({
   authors,
@@ -36,7 +38,7 @@ const PageBody = ({ authors }: { authors: StaticData["authors"] }) => {
   )
 
   const authorsForLanguage = authors.entities.filter((author) =>
-    mapLanguageIds(author).includes(filterLanguage.id)
+    mapLanguageIds(author.translations).includes(filterLanguage.id)
   )
 
   return (
@@ -56,20 +58,22 @@ const PageBody = ({ authors }: { authors: StaticData["authors"] }) => {
       </div>
       <div css={[tw`border-b`]}>
         <$SectionContent>
-          {authorsForLanguage.map((author) => (
-            <Author
-              author={author}
-              languageId={filterLanguage.id}
-              key={author.id}
-            />
-          ))}
+          <div css={[tw`grid grid-cols-2 gap-lg row-gap[2em] p-xl`]}>
+            {authorsForLanguage.map((author) => (
+              <Author
+                author={author}
+                languageId={filterLanguage.id}
+                key={author.id}
+              />
+            ))}
+          </div>
         </$SectionContent>
       </div>
     </div>
   )
 }
 
-const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
+const $SectionContent = tw.div`mx-xxs sm:mx-sm md:mx-md`
 
 const Author = ({
   author,
@@ -78,7 +82,7 @@ const Author = ({
   author: StaticData["authors"]["entities"][number]
   languageId: string
 }) => {
-  const authorTranslation = author.find(
+  const authorTranslation = author.translations.find(
     (authorTranslation) => authorTranslation.languageId === languageId
   )
 
@@ -87,8 +91,15 @@ const Author = ({
   }
 
   return (
-    <div>
-      <h2>{authorTranslation.name}</h2>
-    </div>
+    <EntityLink_
+      documentLanguageId={languageId}
+      entityId={author.id}
+      routeKey="contributors"
+    >
+      <div css={[tw`col-span-1`, $link]}>
+        <h2 css={[tw`text-xl`]}>{authorTranslation.name}</h2>
+        <div css={[tw`border-b border-b-gray-100 mt-sm`]} />
+      </div>
+    </EntityLink_>
   )
 }

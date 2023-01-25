@@ -43,7 +43,7 @@ export function processAuthorAsParent(
       (recordedEvent) => author.recordedEventsIds.includes(recordedEvent.id)
     )
 
-  const processedAuthor = basicValidatedTranslations.map(
+  const processedAuthorTranslations = basicValidatedTranslations.map(
     (authorTranslation) => {
       const entities = {
         articles: authorArticles
@@ -114,7 +114,6 @@ export function processAuthorAsParent(
       ])
 
       return {
-        id: author.id,
         languageId: authorTranslation.languageId,
         name: authorTranslation.name,
         documents: documentsOrdered,
@@ -122,7 +121,7 @@ export function processAuthorAsParent(
     }
   )
 
-  return processedAuthor
+  return { id: author.id, translations: processedAuthorTranslations }
 }
 
 export function processAuthorsAsParents(

@@ -51,7 +51,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   })
 
   const authorLanguageIds = removeArrDuplicates(
-    processedAuthors.flatMap((author) => mapLanguageIds(author))
+    processedAuthors.flatMap((author) => mapLanguageIds(author.translations))
   )
   const authorLanguages = authorLanguageIds.map(
     (languageId) =>
