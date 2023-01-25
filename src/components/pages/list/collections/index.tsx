@@ -36,7 +36,6 @@ const PageBody = ({
 }: {
   collections: StaticData["collections"]
 }) => {
-  console.log("collections:", collections)
   const { siteLanguage } = useSiteLanguageContext()
 
   const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
@@ -82,10 +81,16 @@ const PageBody = ({
                       i < collectionsProcessed.length - 1
                     ? tw`sm:border-b`
                     : tw`sm:border-b-0`,
+                  collection.languageId === "tamil"
+                    ? tw`font-serif-primary-tamil`
+                    : tw`font-serif-primary`,
                 ]}
                 key={collection.id}
               >
-                <CollectionSummary collection={collection} />
+                <CollectionSummary
+                  collection={collection}
+                  maxCharacters={300}
+                />
               </$SummaryContainer>
             )
           })}

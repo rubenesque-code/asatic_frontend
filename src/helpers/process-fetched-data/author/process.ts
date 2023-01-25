@@ -1,70 +1,151 @@
-import produce from "immer"
+import { mapLanguageIds } from "^helpers/data"
+import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
 import {
   Author,
-  AuthorChildEntitiesKeysTuple,
-  AuthorRelatedEntityFields,
+  SanitisedArticle,
+  SanitisedBlog,
+  SanitisedRecordedEvent,
 } from "^types/entities"
-import { validateTranslation, ValidTranslation } from "./validate"
-
-const removeInvalidChildEntityIds = ({
-  childEntityIdArr,
-  validIdArr,
-}: {
-  childEntityIdArr: string[]
-  validIdArr: string[]
-}) => {
-  childEntityIdArr.forEach((id, i) => {
-    if (!validIdArr.includes(id)) {
-      childEntityIdArr.splice(i, 1)
-    }
-  })
-}
+import { getArticleLikeSummaryText } from "../article-like"
+import {
+  validateTranslation,
+  ValidTranslation as BasicValidatedTranslation,
+} from "./validate"
 
 /**Used within getStaticProps after validation has occurred in getStaticPaths; remove invalid translations and child entities.*/
-export function processValidatedAuthor({
-  entity,
-  validLanguageIds,
-  validRelatedEntitiesIds,
-}: {
-  entity: Author
-  validLanguageIds: string[]
-  validRelatedEntitiesIds: AuthorRelatedEntityFields
-}) {
-  const processed = produce(entity, (draft) => {
-    for (let i = 0; i < draft.translations.length; i++) {
-      const translation = draft.translations[i]
-      const translationIsValid = validateTranslation(
-        translation,
-        validLanguageIds
-      )
+export function processAuthorAsParent(
+  author: Author,
+  {
+    validLanguageIds,
+    allAuthorsValidChildDocumentEntities,
+  }: {
+    validLanguageIds: string[]
+    allAuthorsValidChildDocumentEntities: {
+      articles: SanitisedArticle[]
+      blogs: SanitisedBlog[]
+      recordedEvents: SanitisedRecordedEvent[]
+    }
+  }
+) {
+  const basicValidatedTranslations = author.translations.filter((translation) =>
+    validateTranslation(translation, validLanguageIds)
+  ) as BasicValidatedTranslation[]
 
-      if (!translationIsValid) {
-        const translationIndex = draft.translations.findIndex(
-          (t) => t.id === translation.id
-        )
-        draft.translations.splice(translationIndex, 1)
+  const authorArticles = allAuthorsValidChildDocumentEntities.articles.filter(
+    (article) => author.articlesIds.includes(article.id)
+  )
+  const authorBlogs = allAuthorsValidChildDocumentEntities.blogs.filter(
+    (blog) => author.blogsIds.includes(blog.id)
+  )
+  const authorRecordedEvents =
+    allAuthorsValidChildDocumentEntities.recordedEvents.filter(
+      (recordedEvent) => author.recordedEventsIds.includes(recordedEvent.id)
+    )
+
+  const processedAuthor = basicValidatedTranslations.map(
+    (authorTranslation) => {
+      const entities = {
+        articles: authorArticles
+          .filter((article) =>
+            mapLanguageIds(article.translations).includes(
+              authorTranslation.languageId
+            )
+          )
+          .map((article) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const translation = article.translations.find(
+              (t) => t.languageId === authorTranslation.languageId
+            )!
+
+            return {
+              id: article.id,
+              title: translation.id,
+              text: getArticleLikeSummaryText(translation),
+              publishDate: article.publishDate,
+              type: "article",
+            }
+          }),
+        blogs: authorBlogs
+          .filter((blog) =>
+            mapLanguageIds(blog.translations).includes(
+              authorTranslation.languageId
+            )
+          )
+          .map((blog) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const translation = blog.translations.find(
+              (t) => t.languageId === authorTranslation.languageId
+            )!
+
+            return {
+              id: blog.id,
+              title: translation.id,
+              text: getArticleLikeSummaryText(translation),
+              publishDate: blog.publishDate,
+              type: "blog",
+            }
+          }),
+        recordedEvents: authorRecordedEvents
+          .filter((recordedEvent) =>
+            mapLanguageIds(recordedEvent.translations).includes(
+              authorTranslation.languageId
+            )
+          )
+          .map((recordedEvent) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const translation = recordedEvent.translations.find(
+              (t) => t.languageId === authorTranslation.languageId
+            )!
+
+            return {
+              id: recordedEvent.id,
+              title: translation.id,
+              publishDate: recordedEvent.publishDate,
+              type: "recordedEvent",
+            }
+          }),
+      }
+
+      const documentsOrdered = sortEntitiesByDate([
+        ...entities.articles,
+        ...entities.blogs,
+        ...entities.recordedEvents,
+      ])
+
+      return {
+        languageId: authorTranslation.languageId,
+        documents: documentsOrdered,
       }
     }
+  )
 
-    const childKeysArr: AuthorChildEntitiesKeysTuple = [
-      "articlesIds",
-      "blogsIds",
-      "recordedEventsIds",
-    ]
-
-    childKeysArr.forEach((key) =>
-      removeInvalidChildEntityIds({
-        childEntityIdArr: draft[key],
-        validIdArr: validRelatedEntitiesIds[key],
-      })
-    )
-  })
-
-  return processed
+  return processedAuthor
 }
 
-export function processAuthor(
+export function processAuthorsAsParents(
+  authors: Author[],
+  {
+    validLanguageIds,
+    allAuthorsValidChildDocumentEntities,
+  }: {
+    validLanguageIds: string[]
+    allAuthorsValidChildDocumentEntities: {
+      articles: SanitisedArticle[]
+      blogs: SanitisedBlog[]
+      recordedEvents: SanitisedRecordedEvent[]
+    }
+  }
+) {
+  return authors.map((author) =>
+    processAuthorAsParent(author, {
+      validLanguageIds,
+      allAuthorsValidChildDocumentEntities,
+    })
+  )
+}
+
+export function processAuthorAsChild(
   author: Author,
   {
     validLanguageIds,
@@ -74,7 +155,7 @@ export function processAuthor(
 ) {
   const validTranslations = author.translations.filter((translation) =>
     validateTranslation(translation, validLanguageIds)
-  ) as ValidTranslation[]
+  ) as BasicValidatedTranslation[]
 
   return {
     id: author.id,
@@ -82,7 +163,7 @@ export function processAuthor(
   }
 }
 
-export function processAuthors(
+export function processAuthorsAsChildren(
   authors: Author[],
   {
     validLanguageIds,
@@ -90,5 +171,7 @@ export function processAuthors(
     validLanguageIds: string[]
   }
 ) {
-  return authors.map((author) => processAuthor(author, { validLanguageIds }))
+  return authors.map((author) =>
+    processAuthorAsChild(author, { validLanguageIds })
+  )
 }

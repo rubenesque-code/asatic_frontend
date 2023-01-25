@@ -7,7 +7,13 @@ import { EntityLink_ } from "^entity-summary/_containers"
 import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
 import { $Title } from "^entity-summary/_styles/$swiper-summary"
 
-const Collection = ({ collection }: { collection: CollectionAsSummary }) => {
+const Collection = ({
+  collection,
+  maxCharacters = 150,
+}: {
+  collection: CollectionAsSummary
+  maxCharacters?: number
+}) => {
   return (
     <>
       <$SummaryImage image={collection.summaryImage!} styles={tw`mb-xs`} />
@@ -22,7 +28,7 @@ const Collection = ({ collection }: { collection: CollectionAsSummary }) => {
         <$SummaryText
           htmlStr={collection.text}
           languageId={collection.languageId}
-          maxCharacters={150}
+          maxCharacters={maxCharacters}
         />
       ) : null}
     </>
