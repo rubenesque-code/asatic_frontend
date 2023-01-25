@@ -28,7 +28,6 @@ export const ArticleLikeSummaryDefault = ({
   isSmall: boolean
   isDouble?: boolean
 }) => {
-  console.log("isSmall:", isSmall)
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId

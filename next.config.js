@@ -7,7 +7,10 @@ const nextConfig = {
     formats: ["image/webp"],
   },
   async redirects() {
-    return [{ source: "/collections", destination: "/", permanent: true }]
+    return [
+      // { source: "/collections", destination: "/", permanent: true },
+      { source: "/subjects", destination: "/", permanent: true },
+    ]
   },
 }
 

@@ -74,5 +74,6 @@ export function processCollectionForOwnPage(
     title: collection.title,
     description: collection.description,
     childDocumentEntities: orderedChildDocumentEntities,
+    languageId: collection.languageId,
   }
 }

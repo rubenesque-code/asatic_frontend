@@ -33,7 +33,7 @@ const RecordedEvent = ({
           youtubeId={recordedEvent.youtubeId}
         />
       </$ImageContainer>
-      <div css={[tw`pt-xs sm:pt-sm`]}>
+      <div>
         <Type_
           type={recordedEvent.recordedEventType}
           parentLanguageId={translation.languageId}
@@ -50,7 +50,7 @@ const RecordedEvent = ({
           parentLanguageId={translation.languageId}
           styles={$authors}
         />
-        <$Date>
+        <$Date languageId={parentCurrentLanguageId}>
           <DateString_
             engDateStr={recordedEvent.publishDate}
             languageId={translation.languageId}

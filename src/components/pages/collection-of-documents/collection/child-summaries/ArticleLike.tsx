@@ -8,7 +8,6 @@ import { EntityLink_ } from "^entity-summary/_containers"
 import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
 import { $Title, $authors, $Date } from "^entity-summary/_styles/$summary"
 import { $ImageContainer } from "../_styles"
-import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 const ArticleLikeEntity = ({
   articleLikeEntity,
@@ -17,14 +16,12 @@ const ArticleLikeEntity = ({
   articleLikeEntity: ArticleLikeEntityAsSummary
   parentCurrentLanguageId: string
 }) => {
-  const { siteLanguage } = useSiteLanguageContext()
-
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId
   )
 
-  const maxBodyCharacters = articleLikeEntity.summaryImage ? 300 : 300
+  const maxBodyCharacters = articleLikeEntity.summaryImage ? 200 : 300
 
   return (
     <div css={[tw`w-full min-h-[180px]`]}>
@@ -49,7 +46,7 @@ const ArticleLikeEntity = ({
           parentLanguageId={translation.languageId}
           styles={$authors}
         />
-        <$Date languageId={siteLanguage.id}>
+        <$Date languageId={parentCurrentLanguageId}>
           <DateString_
             engDateStr={articleLikeEntity.publishDate}
             languageId={translation.languageId}

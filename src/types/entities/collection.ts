@@ -8,6 +8,7 @@ import {
 import { ImageFields, SummaryImageField } from "./entity-image"
 import { TupleToUnion } from "./utilities"
 import { MyOmit } from "^types/utilities"
+import { SiteLanguageId } from "^constants/languages"
 
 type CollectionRelatedEntityTuple = EntityNameTupleSubset<
   "article" | "blog" | "recordedEvent" | "subject" | "tag"
@@ -21,7 +22,7 @@ export type DbCollection = EntityGlobalFields<"collection"> & {
   PublishFields &
   SaveFields &
   SummaryImageField<"isNotToggleable"> & {
-    languageId: string
+    languageId: SiteLanguageId
     description?: string
     summary?: string
     title: string

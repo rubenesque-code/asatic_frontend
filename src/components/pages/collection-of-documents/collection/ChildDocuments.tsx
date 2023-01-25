@@ -1,34 +1,30 @@
 import tw from "twin.macro"
 
 import { RecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
-import { Language } from "^types/entities"
 import { StaticData } from "./staticData"
 
 import ArticleLikeEntity from "./child-summaries/ArticleLike"
 import RecordedEvent from "./child-summaries/RecordedEvent"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 
-// TODO: responsive child docs
-
 const ChildDocuments = ({
-  documentLanguage,
-  childDocumentEntities,
+  collection,
 }: {
-  documentLanguage: Language
-  childDocumentEntities: StaticData["collection"]["childDocumentEntities"]
+  collection: StaticData["collection"]
 }) => {
+  console.log("collection:", collection)
   return (
     <div css={[tw`pb-xl`]}>
-      {childDocumentEntities.reverse().map((entity) => (
+      {collection.childDocumentEntities.map((entity) => (
         <$SummaryContainer css={[tw`border-b`]} key={entity.id}>
           {entity.type === "article" || entity.type === "blog" ? (
             <ArticleLikeEntity
               articleLikeEntity={entity}
-              parentCurrentLanguageId={documentLanguage.id}
+              parentCurrentLanguageId={collection.languageId}
             />
           ) : (
             <RecordedEvent
-              parentCurrentLanguageId={documentLanguage.id}
+              parentCurrentLanguageId={collection.languageId}
               recordedEvent={entity as RecordedEventAsSummary}
             />
           )}

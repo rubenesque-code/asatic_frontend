@@ -4,29 +4,17 @@ import tw from "twin.macro"
 import { CollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
 
 import { EntityLink_ } from "^entity-summary/_containers"
-import {
-  $SwiperSlideContainer,
-  $SummaryImage,
-  $SummaryText,
-} from "^entity-summary/_presentation"
+import { $SummaryImage, $SummaryText } from "^entity-summary/_presentation"
 import { $Title } from "^entity-summary/_styles/$swiper-summary"
 
-const Collection = ({
-  collection,
-  index,
-  rightBorder,
-}: {
-  collection: CollectionAsSummary
-  index: number
-  rightBorder: boolean
-}) => {
+const Collection = ({ collection }: { collection: CollectionAsSummary }) => {
   return (
-    <$SwiperSlideContainer index={index} rightBorder={rightBorder}>
+    <>
       <$SummaryImage image={collection.summaryImage!} styles={tw`mb-xs`} />
       <EntityLink_
         entityId={collection.id}
         documentLanguageId={collection.languageId}
-        routeKey="recordedEvents"
+        routeKey="collections"
       >
         <$Title>{collection.title}</$Title>
       </EntityLink_>
@@ -37,7 +25,7 @@ const Collection = ({
           maxCharacters={150}
         />
       ) : null}
-    </$SwiperSlideContainer>
+    </>
   )
 }
 

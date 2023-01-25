@@ -54,14 +54,11 @@ export type StaticData = {
   isMultipleAuthors: boolean
 }
 
-// TODO: child documents, e.g. article, should only be valid and only need translation for parent id.
 export const getStaticProps: GetStaticProps<
   StaticData,
   { id: string }
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
-
-  const allValidLanguageIds = globalData.languages.ids
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const subject = globalData.subjects.entities.find(
@@ -69,17 +66,19 @@ export const getStaticProps: GetStaticProps<
     (subject) => subject.id === params!.id
   )!
 
+  const validLanguageIds = [subject.languageId]
+
   const validArticles = await fetchAndValidateArticles({
     ids: subject.articlesIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
   const validBlogs = await fetchAndValidateBlogs({
     ids: subject.blogsIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: subject.recordedEventsIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
   const validTags = await fetchAndValidateTags({
     ids: subject.tagsIds,
@@ -88,7 +87,7 @@ export const getStaticProps: GetStaticProps<
   const validCollections = await fetchAndValidateCollections({
     ids: subject.collectionsIds,
     collectionRelation: "default",
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
 
   const imageIds = getSubjectChildImageIds({
@@ -109,7 +108,7 @@ export const getStaticProps: GetStaticProps<
   ).authorsIds
   const validAuthors = await fetchAndValidateAuthors({
     ids: authorIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
 
   const recordedEventTypeIds = getRecordedEventTypeIds(
@@ -117,33 +116,33 @@ export const getStaticProps: GetStaticProps<
   )
   const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
     ids: recordedEventTypeIds,
-    validLanguageIds: allValidLanguageIds,
+    validLanguageIds,
   })
+
+  const processDocumentEntitySharedArgs = {
+    validAuthors: validAuthors.entities,
+    validImages: fetchedImages,
+    validLanguageIds,
+  }
 
   const processedArticles = validArticles.entities.map((article) =>
     processArticleLikeEntityAsSummary({
       entity: article,
-      validAuthors: validAuthors.entities,
-      validImages: fetchedImages,
-      validLanguageIds: allValidLanguageIds,
+      ...processDocumentEntitySharedArgs,
     })
   )
   const processedBlogs = validBlogs.entities.map((blog) =>
     processArticleLikeEntityAsSummary({
       entity: blog,
-      validAuthors: validAuthors.entities,
-      validImages: fetchedImages,
-      validLanguageIds: allValidLanguageIds,
+      ...processDocumentEntitySharedArgs,
     })
   )
   const processedRecordedEvents = validRecordedEvents.entities.map(
     (recordedEvent) =>
       processRecordedEventAsSummary({
         recordedEvent,
-        validAuthors: validAuthors.entities,
-        validImages: fetchedImages,
-        validLanguageIds: allValidLanguageIds,
         validRecordedEventTypes: validRecordedEventTypes.entities,
+        ...processDocumentEntitySharedArgs,
       })
   )
   const processedCollections = validCollections.entities.map((collection) =>

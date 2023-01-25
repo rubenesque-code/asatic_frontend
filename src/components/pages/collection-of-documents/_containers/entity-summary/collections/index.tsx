@@ -6,6 +6,7 @@ import Summary from "./Summary"
 import { $SwiperSectionLayout } from "../_presentation/$SwiperSectionLayout"
 import { siteTranslations } from "^constants/siteTranslations"
 import { SiteLanguageId } from "^constants/languages"
+import { $SwiperSlideContainer } from "^entity-summary/_presentation"
 
 const Collections = ({
   collections,
@@ -31,15 +32,16 @@ const Collections = ({
         <Swiper_
           slides={({ numSlidesPerView }) =>
             orderedCollections.map((collection, i) => (
-              <Summary
-                collection={collection}
+              <$SwiperSlideContainer
                 index={i}
                 rightBorder={
                   orderedCollections.length < numSlidesPerView &&
                   i === orderedCollections.length - 1
                 }
                 key={collection.id}
-              />
+              >
+                <Summary collection={collection} />
+              </$SwiperSlideContainer>
             ))
           }
         />
