@@ -20,7 +20,6 @@ export const Document_ = ({
   const translation = article.translations.find(
     (translation) => translation.languageId === documentLanguage.id
   )!
-  console.log("translation:", translation)
 
   return (
     <>
