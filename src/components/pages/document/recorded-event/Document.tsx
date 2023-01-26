@@ -26,10 +26,12 @@ const $bodyText = tw`py-sm sm:py-md border-l pl-sm sm:pl-md`
 
 const $textSectionPadding = tw`px-sm sm:px-md`
 
-const Document = (recordedEvent: StaticData["recordedEvent"]) => {
-  const { documentLanguage } = useDetermineDocumentLanguage(
-    recordedEvent.languages
-  )
+const Document = ({
+  pageData: { authors, languages, recordedEvent },
+}: {
+  pageData: StaticData["pageData"]
+}) => {
+  const { documentLanguage } = useDetermineDocumentLanguage(languages)
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const translation = findTranslationByLanguageId(
@@ -47,7 +49,7 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
           <div css={[tw`mb-md`]}>
             <Languages_
               documentLanguage={documentLanguage}
-              documentLanguages={recordedEvent.languages}
+              documentLanguages={languages}
             />
           </div>
           <$Type>
@@ -58,7 +60,7 @@ const Document = (recordedEvent: StaticData["recordedEvent"]) => {
           </$Type>
           <$Title>{translation.title}</$Title>
           <Authors_
-            authors={recordedEvent.authors}
+            authors={authors}
             documentLanguageId={documentLanguage.id}
             styles={$authors}
           />

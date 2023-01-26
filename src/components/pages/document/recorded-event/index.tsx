@@ -1,21 +1,15 @@
-import { mapIds } from "^helpers/data"
-
-import Header from "^components/header"
 import { StaticData } from "./staticData"
 import Document from "./Document"
 import { $PageBody } from "^components/pages/_styles"
+import { PageLayout_ } from "^components/pages/_containers"
 
-const PageContent = ({ header, recordedEvent }: StaticData) => {
+const PageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <>
-      <Header
-        {...header}
-        documentLanguageIds={mapIds(recordedEvent.languages)}
-      />
+    <PageLayout_ globalData={globalData}>
       <$PageBody>
-        <Document {...recordedEvent} />
+        <Document pageData={pageData} />
       </$PageBody>
-    </>
+    </PageLayout_>
   )
 }
 

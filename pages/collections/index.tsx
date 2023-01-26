@@ -10,7 +10,7 @@ import PageContent from "^components/pages/list/collections"
 export { getStaticProps } from "^components/pages/list/collections/staticData"
 
 const CollectionsPage: NextPage<StaticData> = (staticData) => {
-  const isCollection = staticData.collections.entities.length
+  const isCollection = staticData.pageData.collections.length
 
   const router = useRouter()
 

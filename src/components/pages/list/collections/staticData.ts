@@ -1,44 +1,34 @@
 import { GetStaticProps } from "next"
-import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
 
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { removeArrDuplicates } from "^helpers/general"
-import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
+import { processCollectionsAsSummary } from "^helpers/process-fetched-data/collection/process"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 import { fetchImages } from "^lib/firebase/firestore"
 
-import { Language, SanitisedSubject } from "^types/entities"
+import { Language } from "^types/entities"
+import { StaticDataWrapper } from "^types/staticData"
 
-export type StaticData = {
-  collections: {
-    entities: ReturnType<typeof processCollectionAsSummary>[]
-    languages: Language[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
+type PageData = {
+  collections: ReturnType<typeof processCollectionsAsSummary>
+  languages: Language[]
 }
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
 
-  const validCollections = await fetchAndValidateCollections({
-    ids: "all",
-    collectionRelation: "default",
-    validLanguageIds: globalData.languages.ids,
-  })
+  const validCollections = globalData.validatedData.allCollections.entities
 
   const imageIds = getUniqueChildEntitiesImageIds({
-    collections: validCollections.entities,
+    collections: validCollections,
   })
   const fetchedImages = await fetchImages(imageIds)
 
-  const processedCollections = validCollections.entities.map((collection) =>
-    processCollectionAsSummary(collection, {
-      validImages: fetchedImages,
-    })
-  )
+  const processedCollections = processCollectionsAsSummary(validCollections, {
+    validImages: fetchedImages,
+  })
 
   const collectionLanguagesIds = removeArrDuplicates(
     processedCollections.flatMap((subject) => subject.languageId)
@@ -46,21 +36,18 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const collectionLanguages = collectionLanguagesIds.map(
     (languageId) =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      globalData.languages.entities.find(
+      globalData.validatedData.allLanguages.entities.find(
         (validLanguage) => validLanguage.id === languageId
       )!
   )
 
   return {
     props: {
-      collections: {
-        entities: processedCollections,
+      globalData: globalData.globalContextData,
+      pageData: {
+        collections: processedCollections,
         languages: collectionLanguages,
       },
-      header: {
-        subjects: globalData.subjects.entities,
-      },
-      isMultipleAuthors: globalData.isMultipleAuthors,
     },
   }
 }

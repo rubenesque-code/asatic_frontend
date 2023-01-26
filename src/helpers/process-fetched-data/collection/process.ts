@@ -42,6 +42,19 @@ export function processCollectionAsSummary(
   }
 }
 
+export function processCollectionsAsSummary(
+  collections: SanitisedCollection[],
+  {
+    validImages,
+  }: {
+    validImages: Image[]
+  }
+) {
+  return collections.map((collection) =>
+    processCollectionAsSummary(collection, { validImages })
+  )
+}
+
 /**occurs after validation; requirements already met. */
 export function processCollectionForOwnPage(
   collection: SanitisedCollection,

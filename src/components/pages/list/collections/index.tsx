@@ -5,26 +5,15 @@ import { StaticData } from "./staticData"
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
-import { mapIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import CollectionSummary from "^entity-summary/collections/Summary"
 
-const SubjectsPageContent = ({
-  collections,
-  header,
-  isMultipleAuthors,
-}: StaticData) => {
+const SubjectsPageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_
-      staticData={{
-        isMultipleAuthors,
-        subjects: header.subjects,
-        documentLanguageIds: mapIds(collections.languages),
-      }}
-    >
-      <PageBody collections={collections} />
+    <PageLayout_ globalData={globalData}>
+      <PageBody pageData={pageData} />
     </PageLayout_>
   )
 }
@@ -32,18 +21,17 @@ const SubjectsPageContent = ({
 export default SubjectsPageContent
 
 const PageBody = ({
-  collections,
+  pageData: { collections, languages },
 }: {
-  collections: StaticData["collections"]
+  pageData: StaticData["pageData"]
 }) => {
   const { siteLanguage } = useSiteLanguageContext()
 
-  const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    collections.languages
-  )
+  const { documentLanguage: filterLanguage } =
+    useDetermineDocumentLanguage(languages)
 
   const collectionsProcessed = sortEntitiesByDate(
-    collections.entities.filter(
+    collections.filter(
       (collection) => collection.languageId === filterLanguage.id
     )
   )
@@ -58,7 +46,7 @@ const PageBody = ({
           <div css={[tw`pt-sm`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={collections.languages}
+              documentLanguages={languages}
             />
           </div>
         </$SectionContent>

@@ -5,39 +5,32 @@ import { StaticData } from "./staticData"
 import { Languages_, PageLayout_ } from "^components/pages/_containers"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
-import { mapIds, mapLanguageIds } from "^helpers/data"
+import { mapLanguageIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { EntityLink_ } from "^entity-summary/_containers"
 import { $link } from "^styles/global"
 
-const AuthorsPageContent = ({
-  authors,
-  header,
-  isMultipleAuthors,
-}: StaticData) => {
+const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_
-      staticData={{
-        isMultipleAuthors,
-        subjects: header.subjects,
-        documentLanguageIds: mapIds(authors.languages),
-      }}
-    >
-      <PageBody authors={authors} />
+    <PageLayout_ globalData={globalData}>
+      <PageBody pageData={pageData} />
     </PageLayout_>
   )
 }
 
 export default AuthorsPageContent
 
-const PageBody = ({ authors }: { authors: StaticData["authors"] }) => {
+const PageBody = ({
+  pageData: { authors, languages },
+}: {
+  pageData: StaticData["pageData"]
+}) => {
   const { siteLanguage } = useSiteLanguageContext()
 
-  const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
-    authors.languages
-  )
+  const { documentLanguage: filterLanguage } =
+    useDetermineDocumentLanguage(languages)
 
-  const authorsForLanguage = authors.entities.filter((author) =>
+  const authorsForLanguage = authors.filter((author) =>
     mapLanguageIds(author.translations).includes(filterLanguage.id)
   )
 
@@ -55,7 +48,7 @@ const PageBody = ({ authors }: { authors: StaticData["authors"] }) => {
           <div css={[tw`pt-lg`]}>
             <Languages_
               documentLanguage={filterLanguage}
-              documentLanguages={authors.languages}
+              documentLanguages={languages}
             />
           </div>
         </$SectionContent>
@@ -83,7 +76,7 @@ const Author = ({
   author,
   languageId,
 }: {
-  author: StaticData["authors"]["entities"][number]
+  author: StaticData["pageData"]["authors"][number]
   languageId: string
 }) => {
   const authorTranslation = author.translations.find(

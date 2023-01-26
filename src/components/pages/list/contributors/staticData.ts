@@ -1,53 +1,47 @@
 import { GetStaticProps } from "next"
-import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { fetchAndValidateDocumentEntities } from "^helpers/fetch-and-validate/_helpers"
 
-import { Language, SanitisedSubject } from "^types/entities"
+import { Language } from "^types/entities"
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { processAuthorsAsParents } from "^helpers/process-fetched-data/author/process"
 import { mapLanguageIds } from "^helpers/data"
 import { removeArrDuplicates } from "^helpers/general"
+import { StaticDataWrapper } from "^types/staticData"
 
-export type StaticData = {
-  authors: {
-    entities: ReturnType<typeof processAuthorsAsParents>
-    languages: Language[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
-  isMultipleAuthors: boolean
+type PageData = {
+  authors: ReturnType<typeof processAuthorsAsParents>
+  languages: Language[]
 }
+
+export type StaticData = StaticDataWrapper<PageData>
 
 export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
 
-  const validAuthors = await fetchAndValidateAuthors({
-    ids: "all",
-    validLanguageIds: globalData.languages.ids,
-  })
+  const validAuthors = globalData.validatedData.allAuthors.entities
 
-  const childDocumentEntityIds = getUniqueChildEntitiesIds(
-    validAuthors.entities,
-    ["articlesIds", "blogsIds", "recordedEventsIds"]
-  )
+  const childDocumentEntityIds = getUniqueChildEntitiesIds(validAuthors, [
+    "articlesIds",
+    "blogsIds",
+    "recordedEventsIds",
+  ])
   const validChildDocumentEntities = await fetchAndValidateDocumentEntities({
     articleIds: childDocumentEntityIds.articlesIds,
     blogIds: childDocumentEntityIds.blogsIds,
     recordedEventIds: childDocumentEntityIds.recordedEventsIds,
-    validLanguageIds: globalData.languages.ids,
+    validLanguageIds: globalData.validatedData.allLanguages.ids,
   })
 
-  const processedAuthors = processAuthorsAsParents(validAuthors.entities, {
+  const processedAuthors = processAuthorsAsParents(validAuthors, {
     allAuthorsValidChildDocumentEntities: {
       articles: validChildDocumentEntities.articles.entities,
       blogs: validChildDocumentEntities.blogs.entities,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       recordedEvents: validChildDocumentEntities.recordedEvents!.entities,
     },
-    validLanguageIds: globalData.languages.ids,
+    validLanguageIds: globalData.validatedData.allLanguages.ids,
   })
 
   const authorLanguageIds = removeArrDuplicates(
@@ -56,21 +50,15 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const authorLanguages = authorLanguageIds.map(
     (languageId) =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      globalData.languages.entities.find(
+      globalData.validatedData.allLanguages.entities.find(
         (validLanguage) => validLanguage.id === languageId
       )!
   )
 
   return {
     props: {
-      authors: {
-        entities: processedAuthors,
-        languages: authorLanguages,
-      },
-      header: {
-        subjects: globalData.subjects.entities,
-      },
-      isMultipleAuthors: globalData.isMultipleAuthors,
+      globalData: globalData.globalContextData,
+      pageData: { authors: processedAuthors, languages: authorLanguages },
     },
   }
 }
