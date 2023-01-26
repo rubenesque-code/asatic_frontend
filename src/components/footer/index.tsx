@@ -18,7 +18,9 @@ const Footer = () => {
             </h3>
           </div>
           <div css={[tw`flex items-center`]}>
-            <a css={[tw`font-sans-primary`, $link]}>asatic@gmail.com</a>
+            <a css={[tw`font-sans-primary font-light`, $link]}>
+              asatic@gmail.com
+            </a>
           </div>
         </div>
       </$ContentSectionMaxWidthWrapper>

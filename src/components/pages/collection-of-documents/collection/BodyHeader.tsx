@@ -7,8 +7,9 @@ import { SiteLanguageId } from "^constants/languages"
 
 import StorageImage from "^components/StorageImage"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
+import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
 
-const DocumentHeader = ({
+const BodyHeader = ({
   collection,
 }: {
   collection: StaticData["pageData"]["collection"]
@@ -20,7 +21,7 @@ const DocumentHeader = ({
   }
 
   return (
-    <$CenterMaxWidth_ maxWidth={tw`max-w-[1400px]`}>
+    <$CenterMaxWidth_ maxWidth={tw`max-w-[3500px]`}>
       <div>
         <div
           css={[
@@ -41,7 +42,7 @@ const DocumentHeader = ({
   )
 }
 
-export default DocumentHeader
+export default BodyHeader
 
 type MetaProps = {
   languageId: SiteLanguageId
@@ -51,29 +52,33 @@ type MetaProps = {
 
 const MetaContentLarge = ({ title, description, languageId }: MetaProps) => {
   return (
-    <div
-      css={[
-        tw`absolute inset-lg hidden sm:block sm:inset-auto sm:left-xl sm:translate-x-0 sm:top-1/2 sm:-translate-y-1/2 z-10 max-w-[500px] p-lg bg-white bg-opacity-80`,
-      ]}
-    >
-      <$SubHeading css={[tw`mb-sm`]}>
-        {siteTranslations.collection[languageId]}
-      </$SubHeading>
-      <$Title css={[tw`text-5xl`]}>{title}</$Title>
-      <div css={[tw`mt-md`]}>
-        <$Description text={description} />
-      </div>
+    <div css={[tw`absolute left-0 w-full top-1/2 -translate-y-1/2`]}>
+      <$ContentSectionMaxWidthWrapper styles={tw`pl-md md:pl-lg`}>
+        <div
+          css={[
+            tw` hidden sm:block z-10 max-w-[500px] p-lg bg-white bg-opacity-80`,
+          ]}
+        >
+          <$SubHeading css={[tw`mb-sm`]}>
+            {siteTranslations.collection[languageId]}
+          </$SubHeading>
+          <$Title css={[tw`text-3xl`]}>{title}</$Title>
+          <div css={[tw`mt-md`]}>
+            <$Description text={description} />
+          </div>
+        </div>
+      </$ContentSectionMaxWidthWrapper>
     </div>
   )
 }
 
 const MetaContentSmall = ({ title, description, languageId }: MetaProps) => {
   return (
-    <div css={[tw`sm:hidden border-t border-b px-sm pt-sm pb-md`]}>
+    <div css={[tw`sm:hidden border-t border-b px-sm pt-sm pb-md mb-sm`]}>
       <$SubHeading css={[tw`mb-xs`]}>
         {siteTranslations["collection"][languageId]}
       </$SubHeading>
-      <$Title css={[tw`text-4xl`]}>{title}</$Title>
+      <$Title css={[tw`text-3xl`]}>{title}</$Title>
       <div css={[tw`mt-sm`]}>
         <$Description text={description} />
       </div>

@@ -17,8 +17,12 @@ export const $CenterMaxWidth_ = ({
 
 export const $ContentSectionMaxWidthWrapper = ({
   children,
+  styles,
 }: {
   children: ReactElement
+  styles?: TwStyle
 }) => (
-  <$CenterMaxWidth_ maxWidth={tw`max-w-[1300px]`}>{children}</$CenterMaxWidth_>
+  <$CenterMaxWidth_ maxWidth={tw`max-w-[1300px]`} styles={styles}>
+    {children}
+  </$CenterMaxWidth_>
 )
