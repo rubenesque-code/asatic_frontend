@@ -9,7 +9,7 @@ import Header from "^components/header"
 import { MyOmit } from "^types/utilities"
 import Head from "^components/Head"
 
-export const PageLayout_ = ({
+export const PageWrapper_ = ({
   children: pageBody,
   globalData,
   pageTitle,

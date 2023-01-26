@@ -6,11 +6,17 @@ import { $PageBody } from "^components/pages/_styles"
 import { Document_ } from "../_containers"
 import { $textSectionMaxWidth } from "^styles/global"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
-import { PageLayout_ } from "^components/pages/_containers"
+import { PageWrapper_ } from "^components/pages/_containers"
+import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 
 const PageContent = ({ globalData, pageData }: StaticData) => {
+  const { documentLanguage } = useDetermineDocumentLanguage(pageData.languages)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const translation = pageData.articleLikeEntity.translations.find(
+    (translation) => translation.languageId === documentLanguage.id
+  )!
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_ globalData={globalData} pageTitle={translation.title}>
       <$PageBody>
         <$CenterMaxWidth_
           maxWidth={$textSectionMaxWidth}
@@ -19,7 +25,7 @@ const PageContent = ({ globalData, pageData }: StaticData) => {
           <Document_ pageData={pageData} />
         </$CenterMaxWidth_>
       </$PageBody>
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 

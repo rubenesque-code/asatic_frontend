@@ -8,15 +8,20 @@ import { siteTranslations } from "^constants/siteTranslations"
 import { findTranslationByLanguageId } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
-import { Languages_, PageLayout_ } from "^components/pages/_containers"
+import { Languages_, PageWrapper_ } from "^components/pages/_containers"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import { Summary_ } from "^entity-summary/recorded-events/_containers"
 
 const RecordedEventsPageContent = ({ globalData, pageData }: StaticData) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_
+      globalData={globalData}
+      pageTitle={siteTranslations.recordedEvents[siteLanguage.id]}
+    >
       <PageBody pageData={pageData} />
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 

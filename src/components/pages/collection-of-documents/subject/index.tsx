@@ -5,14 +5,14 @@ import DocumentHeader from "./Header"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import DocumentBody from "./Body"
 import { $nonDocumentMaxWidth } from "^styles/global"
-import { PageLayout_ } from "^components/pages/_containers"
+import { PageWrapper_ } from "^components/pages/_containers"
 
 const PageContent = ({
   globalData,
   pageData: { title, languageId, collections, customSections, recordedEvents },
 }: StaticData) => {
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_ globalData={globalData} pageTitle={title}>
       <$PageBody>
         <$CenterMaxWidth_ maxWidth={$nonDocumentMaxWidth}>
           <div>
@@ -32,7 +32,7 @@ const PageContent = ({
           </div>
         </$CenterMaxWidth_>
       </$PageBody>
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 

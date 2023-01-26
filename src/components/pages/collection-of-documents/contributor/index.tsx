@@ -2,15 +2,24 @@ import tw from "twin.macro"
 
 import { StaticData } from "./staticData"
 
-import { Languages_, PageLayout_ } from "^components/pages/_containers"
+import { Languages_, PageWrapper_ } from "^components/pages/_containers"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import Summary from "./Summary"
 
 const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
+  const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
+    pageData.languages
+  )
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const translation = pageData.author.translations.find(
+    (author) => author.languageId === filterLanguage.id
+  )!
+
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_ globalData={globalData} pageTitle={translation.name}>
       <PageBody pageData={pageData} />
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 

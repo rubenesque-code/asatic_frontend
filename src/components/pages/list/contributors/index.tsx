@@ -2,7 +2,7 @@ import tw from "twin.macro"
 
 import { StaticData } from "./staticData"
 
-import { Languages_, PageLayout_ } from "^components/pages/_containers"
+import { Languages_, PageWrapper_ } from "^components/pages/_containers"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
 import { mapLanguageIds } from "^helpers/data"
@@ -11,10 +11,15 @@ import { EntityLink_ } from "^entity-summary/_containers"
 import { $link } from "^styles/global"
 
 const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_
+      globalData={globalData}
+      pageTitle={siteTranslations.authors[siteLanguage.id]}
+    >
       <PageBody pageData={pageData} />
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 

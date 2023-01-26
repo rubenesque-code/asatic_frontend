@@ -5,11 +5,11 @@ import { StaticData } from "./staticData"
 import DocumentHeader from "./Header"
 import ChildDocuments from "./ChildDocuments"
 import { $CenterMaxWidth_ } from "^page-presentation"
-import { PageLayout_ } from "^components/pages/_containers"
+import { PageWrapper_ } from "^components/pages/_containers"
 
 const PageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_ globalData={globalData} pageTitle={pageData.collection.title}>
       <>
         <div>
           <DocumentHeader collection={pageData.collection} />
@@ -20,7 +20,7 @@ const PageContent = ({ globalData, pageData }: StaticData) => {
           </$CenterMaxWidth_>
         </div>
       </>
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 

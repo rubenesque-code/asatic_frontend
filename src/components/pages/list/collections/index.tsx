@@ -2,7 +2,7 @@ import tw from "twin.macro"
 
 import { StaticData } from "./staticData"
 
-import { Languages_, PageLayout_ } from "^components/pages/_containers"
+import { Languages_, PageWrapper_ } from "^components/pages/_containers"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
@@ -10,15 +10,20 @@ import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import CollectionSummary from "^entity-summary/collections/Summary"
 
-const SubjectsPageContent = ({ globalData, pageData }: StaticData) => {
+const CollectionsPageContent = ({ globalData, pageData }: StaticData) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
   return (
-    <PageLayout_ globalData={globalData}>
+    <PageWrapper_
+      globalData={globalData}
+      pageTitle={siteTranslations.collections[siteLanguage.id]}
+    >
       <PageBody pageData={pageData} />
-    </PageLayout_>
+    </PageWrapper_>
   )
 }
 
-export default SubjectsPageContent
+export default CollectionsPageContent
 
 const PageBody = ({
   pageData: { collections, languages },
