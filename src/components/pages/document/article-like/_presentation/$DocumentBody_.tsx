@@ -9,7 +9,8 @@ import { Video_ } from "../../_containers"
 
 import { $Caption } from "../_styles"
 
-type Section = StaticData["entity"]["translations"][number]["body"][number]
+type Section =
+  StaticData["pageData"]["articleLikeEntity"]["translations"][number]["body"][number]
 
 type ImageSection = Extract<Section, { type: "image" }>
 type VideoSection = Extract<Section, { type: "video" }>

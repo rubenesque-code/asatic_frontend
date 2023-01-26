@@ -2,18 +2,15 @@ import { GetStaticPaths, GetStaticProps } from "next"
 
 import { fetchArticle, fetchImages } from "^lib/firebase/firestore"
 
-import { filterAndMapEntitiesById } from "^helpers/data"
+import { mapLanguageIds } from "^helpers/data"
 import {
   getArticleLikeDocumentImageIds,
   processArticleLikeEntityForOwnPage,
 } from "^helpers/process-fetched-data/article-like"
-import { mapEntityLanguageIds } from "^helpers/process-fetched-data/general"
-import { StaticData } from "../_types"
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
-import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
-import { fetchAndValidateTags } from "^helpers/fetch-and-validate/tags"
+
+import { StaticData } from "../_types"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const fetchedArticles = await fetchAndValidateArticles({ ids: "all" })
@@ -43,47 +40,40 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
   const globalData = await fetchAndValidateGlobalData()
 
-  const fetchedArticle = await fetchArticle(params?.id || "")
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const fetchedArticle = await fetchArticle(params!.id)
 
-  const validAuthors = await fetchAndValidateAuthors({
-    ids: fetchedArticle.authorsIds,
-    validLanguageIds: globalData.languages.ids,
-  })
-  const validCollections = await fetchAndValidateCollections({
-    ids: fetchedArticle.collectionsIds,
-    collectionRelation: "child-of-document",
-    validLanguageIds: globalData.languages.ids,
-  })
-  const validTags = await fetchAndValidateTags({
-    ids: fetchedArticle.tagsIds,
-  })
+  const validAuthors = fetchedArticle.authorsIds.map(
+    (authorId) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      globalData.validatedData.allAuthors.entities.find(
+        (author) => author.id === authorId
+      )!
+  )
 
   const imageIds = getArticleLikeDocumentImageIds(fetchedArticle.translations)
   const fetchedImages = await fetchImages(imageIds)
 
-  const processedArticle = processArticleLikeEntityForOwnPage({
-    entity: fetchedArticle,
-    validLanguageIds: globalData.languages.ids,
+  const processedArticle = processArticleLikeEntityForOwnPage(fetchedArticle, {
+    validLanguageIds: globalData.validatedData.allLanguages.ids,
     validImages: fetchedImages,
   })
 
+  const articleLanguageIds = mapLanguageIds(processedArticle.translations)
+  const articleLanguages = articleLanguageIds.map(
+    (languageId) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      globalData.validatedData.allLanguages.entities.find(
+        (validLanguage) => validLanguage.id === languageId
+      )!
+  )
+
   const pageData: StaticData = {
-    entity: {
-      ...processedArticle,
-      authors: validAuthors.entities,
-      collections: validCollections.entities,
-      languages: filterAndMapEntitiesById(
-        mapEntityLanguageIds(processedArticle),
-        globalData.languages.entities
-      ),
-      subjects: filterAndMapEntitiesById(
-        fetchedArticle.subjectsIds,
-        globalData.subjects.entities
-      ),
-      tags: validTags.entities,
-    },
-    header: {
-      subjects: globalData.subjects.entities,
+    globalData: globalData.globalContextData,
+    pageData: {
+      articleLikeEntity: processedArticle,
+      authors: validAuthors,
+      languages: articleLanguages,
     },
   }
 

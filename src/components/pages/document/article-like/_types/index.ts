@@ -1,21 +1,11 @@
 import { processArticleLikeEntityForOwnPage } from "^helpers/process-fetched-data/article-like"
-import {
-  Author,
-  Language,
-  SanitisedCollection,
-  SanitisedSubject,
-  Tag,
-} from "^types/entities"
+import { Author, Language } from "^types/entities"
+import { StaticDataWrapper } from "^types/staticData"
 
-export type StaticData = {
-  entity: ReturnType<typeof processArticleLikeEntityForOwnPage> & {
-    subjects: SanitisedSubject[]
-    languages: Language[]
-    authors: Author[]
-    collections: SanitisedCollection[]
-    tags: Tag[]
-  }
-  header: {
-    subjects: SanitisedSubject[]
-  }
+type PageData = {
+  articleLikeEntity: ReturnType<typeof processArticleLikeEntityForOwnPage>
+  languages: Language[]
+  authors: Author[]
 }
+
+export type StaticData = StaticDataWrapper<PageData>

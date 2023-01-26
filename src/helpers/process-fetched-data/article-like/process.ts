@@ -1,121 +1,94 @@
 import produce from "immer"
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
-import {
-  SanitisedArticle,
-  SanitisedBlog,
-  Image,
-  TextSection,
-  ImageSection,
-  VideoSection,
-  Author,
-} from "^types/entities"
-import { DeepRequired, MakeRequired, MyOmit } from "^types/utilities"
+import { SanitisedArticle, SanitisedBlog, Image, Author } from "^types/entities"
+import { MakeRequired } from "^types/utilities"
 import {
   getArticleLikeDocumentImageIds,
   getArticleLikeSummaryText,
 } from "./query"
 import { validateTranslation } from "./validate"
 
-type ProcessedTranslationBody =
-  | MakeRequired<TextSection, "text">
-  | DeepRequired<ImageSection, ["image", "imageId"]>
-  | MakeRequired<VideoSection, "youtubeId">
-
-type ProcessedTranslationForOwnPage = MakeRequired<
-  MyOmit<SanitisedArticle["translations"][number], "body">,
-  "title"
-> & {
-  body: ProcessedTranslationBody[]
-}
-
 export function processArticleLikeEntityForOwnPage<
   TEntity extends SanitisedArticle | SanitisedBlog
->({
-  entity,
-  validLanguageIds,
-  validImages,
-}: {
-  entity: TEntity
-  validLanguageIds: string[]
-  validImages: Image[]
-}) {
-  // remove invalid translations; remove empty translation sections.
-  const processedTranslations = produce(entity.translations, (draft) => {
-    for (let i = 0; i < draft.length; i++) {
-      const translation = draft[i]
+>(
+  entity: TEntity,
+  {
+    validLanguageIds,
+    validImages,
+  }: {
+    validLanguageIds: string[]
+    validImages: Image[]
+  }
+) {
+  const translationsProcessed = entity.translations
+    .filter((translation) => validateTranslation(translation, validLanguageIds))
+    .map((translation) => ({
+      id: translation.id,
+      languageId: translation.languageId,
+      body: translation.body,
+      title: translation.title as string,
+    }))
+    .map((translation) =>
+      produce(translation, (draft) => {
+        for (let j = 0; j < translation.body.length; j++) {
+          const bodySection = draft.body[j]
 
-      const translationIsValid = validateTranslation(
-        translation,
-        validLanguageIds
-      )
-
-      if (!translationIsValid) {
-        // const translationIndex = draft.findIndex((t) => t.id === translation.id)
-        draft.splice(i, 1)
-        break
-      }
-
-      for (let j = 0; j < translation.body.length; j++) {
-        const section = translation.body[j]
-        // const index = translation.body.findIndex((s) => s.id === section.id)
-        if (section.type === "image") {
-          if (
-            !section.image.imageId ||
-            !mapIds(validImages).includes(section.image.imageId)
-          ) {
-            translation.body.splice(j, 1)
-          }
-          break
-        }
-        if (section.type === "text") {
-          if (!section.text?.length) {
-            translation.body.splice(j, 1)
-          }
-          break
-        }
-        if (section.type === "video") {
-          if (!section.youtubeId) {
-            translation.body.splice(j, 1)
+          if (bodySection.type === "image") {
+            if (
+              !bodySection.image.imageId ||
+              !mapIds(validImages).includes(bodySection.image.imageId)
+            ) {
+              draft.body.splice(j, 1)
+            }
+            break
+          } else if (bodySection.type === "text") {
+            if (!bodySection.text?.length) {
+              draft.body.splice(j, 1)
+            }
+            break
+          } else {
+            if (!bodySection.youtubeId) {
+              draft.body.splice(j, 1)
+            }
           }
         }
-      }
-    }
-  }) as ProcessedTranslationForOwnPage[]
+      })
+    )
+    .map((translation) => {
+      const { body, ...restOfTranslation } = translation
 
-  const collatedTranslationsData = processedTranslations.map((translation) => {
-    const { body, ...restOfTranslation } = translation
+      const translationBodyDataMerged = body.map((section) => {
+        if (section.type !== "image") {
+          return section
+        }
 
-    const bodyCollated = body.map((section) => {
-      if (section.type !== "image") {
-        return section
-      }
+        const { image, ...restOfSection } = section
+        const { imageId, ...restOfImage } = image
 
-      const { image, ...restOfSection } = section
-      const { imageId, ...restOfImage } = image
+        return {
+          ...restOfSection,
+          image: {
+            ...restOfImage,
+            storageImage:
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              validImages.find((image) => image.id === imageId)!,
+          },
+        }
+      })
 
       return {
-        ...restOfSection,
-        image: {
-          ...restOfImage,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          storageImage: validImages.find((image) => image.id === imageId)!,
-        },
+        ...restOfTranslation,
+        body: translationBodyDataMerged,
       }
     })
 
-    return {
-      ...restOfTranslation,
-      body: bodyCollated,
-    }
-  })
-
-  const processed = {
+  const articleProcessed = {
     id: entity.id,
     publishDate: entity.publishDate,
-    translations: collatedTranslationsData,
+    translations: translationsProcessed,
   }
 
-  return processed
+  return articleProcessed
 }
 
 type AsSummaryValidTranslation = MakeRequired<

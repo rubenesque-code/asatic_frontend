@@ -12,7 +12,7 @@ import Prose_ from "../../_containers/Prose_"
 export const DocumentBody_ = ({
   body,
 }: {
-  body: StaticData["entity"]["translations"][number]["body"]
+  body: StaticData["pageData"]["articleLikeEntity"]["translations"][number]["body"]
 }) => {
   const ordered = reorderSections(body)
 

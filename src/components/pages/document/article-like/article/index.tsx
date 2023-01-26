@@ -1,28 +1,25 @@
 import tw from "twin.macro"
 
-import { mapIds } from "^helpers/data"
-
 import { StaticData } from "../_types"
 
-import Header from "^components/header"
 import { $PageBody } from "^components/pages/_styles"
 import { Document_ } from "../_containers"
 import { $textSectionMaxWidth } from "^styles/global"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
+import { PageLayout_ } from "^components/pages/_containers"
 
-const PageContent = ({ entity: article, header }: StaticData) => {
+const PageContent = ({ globalData, pageData }: StaticData) => {
   return (
-    <>
-      <Header {...header} documentLanguageIds={mapIds(article.languages)} />
+    <PageLayout_ globalData={globalData}>
       <$PageBody>
         <$CenterMaxWidth_
           maxWidth={$textSectionMaxWidth}
           styles={tw`px-sm sm:px-md`}
         >
-          <Document_ {...article} />
+          <Document_ pageData={pageData} />
         </$CenterMaxWidth_>
       </$PageBody>
-    </>
+    </PageLayout_>
   )
 }
 
