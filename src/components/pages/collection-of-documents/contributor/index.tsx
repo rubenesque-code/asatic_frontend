@@ -5,6 +5,7 @@ import { StaticData } from "./staticData"
 import { Languages_, PageWrapper_ } from "^components/pages/_containers"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import Summary from "./Summary"
+import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
 
 const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
   const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
@@ -41,25 +42,26 @@ const PageBody = ({
   return (
     <div>
       <div css={[tw`border-b`]}>
-        <$SectionContent css={[tw`px-xl pt-xl pb-md border-r-0 border-l-0`]}>
-          <h1
-            css={[
-              tw`text-3xl capitalize text-gray-700 tracking-wide font-bold`,
-            ]}
-          >
-            {translation.name}
-          </h1>
-          <div css={[tw`pt-lg`]}>
+        <$ContentSectionMaxWidthWrapper styles={tw`px-md sm:px-lg md:px-xl`}>
+          <$SectionContent css={[tw`pt-xl pb-md`]}>
+            <h1
+              css={[
+                tw`text-3xl capitalize text-gray-700 tracking-wide font-bold`,
+              ]}
+            >
+              {translation.name}
+            </h1>
             <Languages_
               documentLanguage={filterLanguage}
               documentLanguages={languages}
+              styles={tw`pt-lg`}
             />
-          </div>
-        </$SectionContent>
+          </$SectionContent>
+        </$ContentSectionMaxWidthWrapper>
       </div>
-      <div>
+      <$ContentSectionMaxWidthWrapper styles={tw`p-md sm:p-lg md:p-xl`}>
         <$SectionContent>
-          <div css={[tw`p-xl flex flex-col gap-lg`]}>
+          <div css={[tw`flex flex-col gap-lg`]}>
             {translation.documents.map((entity) => (
               <Summary
                 entity={entity}
@@ -69,7 +71,7 @@ const PageBody = ({
             ))}
           </div>
         </$SectionContent>
-      </div>
+      </$ContentSectionMaxWidthWrapper>
     </div>
   )
 }

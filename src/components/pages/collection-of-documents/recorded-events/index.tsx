@@ -8,10 +8,11 @@ import { siteTranslations } from "^constants/siteTranslations"
 import { findTranslationByLanguageId } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
-import { Languages_, PageWrapper_ } from "^components/pages/_containers"
+import { PageWrapper_ } from "^components/pages/_containers"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import { Summary_ } from "^entity-summary/recorded-events/_containers"
-import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
+import { $ContentSectionLayout_ } from "^components/pages/_presentation"
+import { BodyHeaderLayout_ } from "^components/pages/_containers/BodyHeaderLayout_"
 
 const RecordedEventsPageContent = ({ globalData, pageData }: StaticData) => {
   const { siteLanguage } = useSiteLanguageContext()
@@ -52,24 +53,16 @@ const PageBody = ({
           : tw`font-serif-primary`,
       ]}
     >
+      <BodyHeaderLayout_
+        title={siteTranslations.recordedEvents[siteLanguage.id]}
+        languages={{
+          documentLanguage: filterLanguage,
+          documentLanguages: languages,
+        }}
+      />
       <div css={[tw`border-b`]}>
-        <$ContentSectionMaxWidthWrapper>
-          <$SectionContent css={[tw`px-sm pt-xl pb-md border-r-0 border-l-0`]}>
-            <h1 css={[tw`text-3xl capitalize text-gray-700 text-center`]}>
-              {siteTranslations.recordedEvents[siteLanguage.id]}
-            </h1>
-            <div css={[tw`pt-sm`]}>
-              <Languages_
-                documentLanguage={filterLanguage}
-                documentLanguages={languages}
-              />
-            </div>
-          </$SectionContent>
-        </$ContentSectionMaxWidthWrapper>
-      </div>
-      <div css={[tw`border-b`]}>
-        <$ContentSectionMaxWidthWrapper>
-          <$SectionContent css={[tw`grid grid-cols-1 sm:grid-cols-2`]}>
+        <$ContentSectionLayout_>
+          <div css={[tw`border-l border-r grid grid-cols-1 sm:grid-cols-2`]}>
             {recordedEventsProcessed.map((recordedEvent, i) => {
               return (
                 <$SummaryContainer
@@ -96,11 +89,9 @@ const PageBody = ({
                 </$SummaryContainer>
               )
             })}
-          </$SectionContent>
-        </$ContentSectionMaxWidthWrapper>
+          </div>
+        </$ContentSectionLayout_>
       </div>
     </div>
   )
 }
-
-const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
