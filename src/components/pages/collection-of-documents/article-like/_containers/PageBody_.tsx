@@ -10,10 +10,13 @@ import { siteTranslations } from "^constants/siteTranslations"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import { findTranslationByLanguageId } from "^helpers/data"
 
-import { Languages_ } from "^components/pages/_containers"
+import {
+  BodyFontWrapper,
+  BodyHeaderLayout_,
+} from "^components/pages/_containers"
 import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
-import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
+import { $ContentSectionLayout_ } from "^page-presentation"
 
 export const PageBody_ = ({
   pageData: { articleLikeEntities, languages },
@@ -35,24 +38,17 @@ export const PageBody_ = ({
   )
 
   return (
-    <div>
+    <BodyFontWrapper documentLanguageId={filterLanguage.id}>
+      <BodyHeaderLayout_
+        title={siteTranslations.articles[siteLanguage.id]}
+        languages={{
+          documentLanguage: filterLanguage,
+          documentLanguages: languages,
+        }}
+      />
       <div css={[tw`border-b`]}>
-        <$ContentSectionMaxWidthWrapper>
-          <$SectionContent css={[tw`px-sm pt-xl pb-md border-r-0 border-l-0`]}>
-            <h1 css={[tw`text-3xl capitalize text-gray-700 text-center`]}>
-              {siteTranslations.articles[siteLanguage.id]}
-            </h1>
-            <Languages_
-              documentLanguage={filterLanguage}
-              documentLanguages={languages}
-              styles={tw`pt-md`}
-            />
-          </$SectionContent>
-        </$ContentSectionMaxWidthWrapper>
-      </div>
-      <div css={[tw`border-b`]}>
-        <$ContentSectionMaxWidthWrapper>
-          <$SectionContent css={[tw`grid grid-cols-1 sm:grid-cols-2`]}>
+        <$ContentSectionLayout_>
+          <div css={[tw`border-l border-r grid grid-cols-1 sm:grid-cols-2`]}>
             {articleLikeEntitiesProcessed.map((article, i) => {
               return (
                 <$SummaryContainer
@@ -81,11 +77,9 @@ export const PageBody_ = ({
                 </$SummaryContainer>
               )
             })}
-          </$SectionContent>
-        </$ContentSectionMaxWidthWrapper>
+          </div>
+        </$ContentSectionLayout_>
       </div>
-    </div>
+    </BodyFontWrapper>
   )
 }
-
-const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
