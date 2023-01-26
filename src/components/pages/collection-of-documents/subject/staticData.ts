@@ -17,6 +17,7 @@ import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { processCollectionAsSummary } from "^helpers/process-fetched-data/collection/process"
 import { StaticDataWrapper } from "^types/staticData"
+import { MyOmit } from "^types/utilities"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validSubjects = await fetchAndValidateSubjects({ ids: "all" })
@@ -40,7 +41,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 }
 
-type PageData = ReturnType<typeof processSubjectForOwnPage> & {
+type PageData = {
+  subject: MyOmit<ReturnType<typeof processSubjectForOwnPage>, "customSections">
+  customSections: ReturnType<typeof processSubjectForOwnPage>["customSections"]
   collections: ReturnType<typeof processCollectionAsSummary>[]
   recordedEvents: ReturnType<typeof processRecordedEventAsSummary>[]
 }
@@ -147,11 +150,13 @@ export const getStaticProps: GetStaticProps<
       blogs: processedBlogs,
     },
   })
+  const { customSections, ...restOfProcessedSubject } = processedSubject
 
   const pageData: StaticData = {
     globalData: globalData.globalContextData,
     pageData: {
-      ...processedSubject,
+      subject: restOfProcessedSubject,
+      customSections,
       collections: processedCollections,
       recordedEvents: processedRecordedEvents,
     },

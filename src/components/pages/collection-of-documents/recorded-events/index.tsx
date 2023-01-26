@@ -8,11 +8,14 @@ import { siteTranslations } from "^constants/siteTranslations"
 import { findTranslationByLanguageId } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
-import { PageWrapper_ } from "^components/pages/_containers"
+import {
+  BodyFontWrapper,
+  PageWrapper_,
+  BodyHeaderLayout_,
+} from "^components/pages/_containers"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import { Summary_ } from "^entity-summary/recorded-events/_containers"
 import { $ContentSectionLayout_ } from "^components/pages/_presentation"
-import { BodyHeaderLayout_ } from "^components/pages/_containers/BodyHeaderLayout_"
 
 const RecordedEventsPageContent = ({ globalData, pageData }: StaticData) => {
   const { siteLanguage } = useSiteLanguageContext()
@@ -46,13 +49,7 @@ const PageBody = ({
   )
 
   return (
-    <div
-      css={[
-        filterLanguage.id === "tamil"
-          ? tw`font-serif-primary-tamil`
-          : tw`font-serif-primary`,
-      ]}
-    >
+    <BodyFontWrapper documentLanguageId={filterLanguage.id}>
       <BodyHeaderLayout_
         title={siteTranslations.recordedEvents[siteLanguage.id]}
         languages={{
@@ -92,6 +89,6 @@ const PageBody = ({
           </div>
         </$ContentSectionLayout_>
       </div>
-    </div>
+    </BodyFontWrapper>
   )
 }
