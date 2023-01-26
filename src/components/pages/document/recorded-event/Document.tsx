@@ -9,8 +9,8 @@ import { Authors_ } from "../_containers"
 import { RecordedEventType } from "^types/entities"
 import { Video_ } from "../_containers"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
-import { $textSectionMaxWidth } from "^styles/global"
 import Prose_ from "../_containers/Prose_"
+import { $DocumentMaxWidthContainer } from "../_presentation"
 
 const $DocumentHeader = tw.div`sm:pb-xs`
 
@@ -40,49 +40,51 @@ const Document = ({
   )!
 
   return (
-    <>
-      <$CenterMaxWidth_
-        maxWidth={$textSectionMaxWidth}
-        styles={$textSectionPadding}
-      >
-        <$DocumentHeader>
-          <div css={[tw`mb-md`]}>
+    <div
+      css={[
+        tw`mt-xl`,
+        documentLanguage.id === "tamil"
+          ? tw`font-serif-primary-tamil`
+          : tw`font-serif-primary`,
+      ]}
+    >
+      <div css={[tw``]}>
+        <$DocumentMaxWidthContainer styles={tw`px-sm`}>
+          <$DocumentHeader>
+            <$Type>
+              <Type_
+                parentRecordedEventLanguageId={translation.languageId}
+                recordedEventType={recordedEvent.recordedEventType}
+              />
+            </$Type>
+            <$Title>{translation.title}</$Title>
+            <Authors_
+              authors={authors}
+              documentLanguageId={documentLanguage.id}
+              styles={$authors}
+            />
             <Languages_
               documentLanguage={documentLanguage}
               documentLanguages={languages}
+              styles={tw`mt-md`}
             />
-          </div>
-          <$Type>
-            <Type_
-              parentRecordedEventLanguageId={translation.languageId}
-              recordedEventType={recordedEvent.recordedEventType}
-            />
-          </$Type>
-          <$Title>{translation.title}</$Title>
-          <Authors_
-            authors={authors}
-            documentLanguageId={documentLanguage.id}
-            styles={$authors}
-          />
-        </$DocumentHeader>
-      </$CenterMaxWidth_>
-      <$DocumentBody>
-        <$CenterMaxWidth_
-          maxWidth={tw`max-w-[1000px]`}
-          styles={tw`border-t border-b py-md px-xxs`}
-        >
-          <Video_ youtubeId={recordedEvent.youtubeId} />
-        </$CenterMaxWidth_>
-        {translation.body?.length ? (
+          </$DocumentHeader>
+        </$DocumentMaxWidthContainer>
+        <$DocumentBody>
           <$CenterMaxWidth_
-            maxWidth={$textSectionMaxWidth}
-            styles={$textSectionPadding}
+            maxWidth={tw`max-w-[1000px]`}
+            styles={tw`border-t border-b py-md px-xxs`}
           >
-            <Prose_ htmlStr={translation.body} styles={$bodyText} />
+            <Video_ youtubeId={recordedEvent.youtubeId} />
           </$CenterMaxWidth_>
-        ) : null}
-      </$DocumentBody>
-    </>
+          {translation.body?.length ? (
+            <$DocumentMaxWidthContainer styles={$textSectionPadding}>
+              <Prose_ htmlStr={translation.body} styles={$bodyText} />
+            </$DocumentMaxWidthContainer>
+          ) : null}
+        </$DocumentBody>
+      </div>
+    </div>
   )
 }
 

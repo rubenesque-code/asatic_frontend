@@ -65,16 +65,17 @@ export const getStaticProps: GetStaticProps<
       )!
   )
 
-  const pageData: StaticData = {
-    globalData: globalData.globalContextData,
-    pageData: {
-      articleLikeEntity: processedBlog,
-      authors: validAuthors,
-      languages: blogLanguages,
-    },
-  }
-
   return {
-    props: pageData,
+    props: {
+      globalData: {
+        ...globalData.globalContextData,
+        documentLanguageIds: blogLanguageIds,
+      },
+      pageData: {
+        articleLikeEntity: processedBlog,
+        authors: validAuthors,
+        languages: blogLanguages,
+      },
+    },
   }
 }

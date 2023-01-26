@@ -10,7 +10,7 @@ import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 
 import { PageData } from "../_types"
-import { mapLanguageIds } from "^helpers/data"
+import { mapIds, mapLanguageIds } from "^helpers/data"
 import { removeArrDuplicates } from "^helpers/general"
 import { StaticDataWrapper } from "^types/staticData"
 import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
@@ -26,7 +26,10 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 
   return {
     props: {
-      globalData: globalData.globalContextData,
+      globalData: {
+        ...globalData.globalContextData,
+        documentLanguageIds: mapIds(processedBlogs.languages),
+      },
       pageData: {
         articleLikeEntities: processedBlogs.entities,
         languages: processedBlogs.languages,

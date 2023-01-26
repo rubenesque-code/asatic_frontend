@@ -76,15 +76,16 @@ export const getStaticProps: GetStaticProps<
       )!
   )
 
-  const pageData: StaticData = {
-    globalData: globalData.globalContextData,
-    pageData: {
-      author: processedAuthor,
-      languages: authorLanguages,
-    },
-  }
-
   return {
-    props: pageData,
+    props: {
+      globalData: {
+        ...globalData.globalContextData,
+        documentLanguageIds: authorLanguageIds,
+      },
+      pageData: {
+        author: processedAuthor,
+        languages: authorLanguages,
+      },
+    },
   }
 }

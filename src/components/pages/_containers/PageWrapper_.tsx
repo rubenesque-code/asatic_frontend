@@ -8,6 +8,7 @@ import Header from "^components/header"
 
 import { MyOmit } from "^types/utilities"
 import Head from "^components/Head"
+import Footer from "^components/footer"
 
 export const PageWrapper_ = ({
   children: pageBody,
@@ -29,10 +30,12 @@ export const PageWrapper_ = ({
             siteLanguage.id === "tamil"
               ? tw`font-serif-primary-tamil`
               : tw`font-serif-primary`,
+            tw`min-h-screen flex flex-col`,
           ]}
         >
           <Header />
-          {pageBody}
+          <div css={[tw`flex-grow`]}>{pageBody}</div>
+          <Footer />
         </div>
       </GlobalDataProvider>
     </>

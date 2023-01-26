@@ -5,6 +5,7 @@ import { useRouter } from "next/router"
 import Link from "next/link"
 
 import { routes } from "^constants/routes"
+import { SiteLanguageId } from "^constants/languages"
 
 import {
   $SectionContent,
@@ -14,8 +15,8 @@ import {
   $SectionHeaderSeeAllText,
   $SectionHeaderSeeAllArrowIcon,
 } from "../_styles/$swiper-section"
+import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
 import { $link } from "^styles/global"
-import { SiteLanguageId } from "^constants/languages"
 
 export const $SwiperSectionLayout = ({
   swiper,
@@ -38,22 +39,28 @@ export const $SwiperSectionLayout = ({
 
   return (
     <div css={[tw`border-b`]}>
-      <$SectionHeaderContainer>
-        <$SectionHeaderTitle>{title}</$SectionHeaderTitle>
-        {seeAllText ? (
-          <Link href={{ pathname, query: router.query }}>
-            <$SectionHeaderSeeAllContainer css={[$link]}>
-              <$SectionHeaderSeeAllText languageId={languageId}>
-                {seeAllText}
-              </$SectionHeaderSeeAllText>
-              <$SectionHeaderSeeAllArrowIcon>
-                <ArrowRight weight="light" />
-              </$SectionHeaderSeeAllArrowIcon>
-            </$SectionHeaderSeeAllContainer>
-          </Link>
-        ) : null}
-      </$SectionHeaderContainer>
-      <$SectionContent>{swiper}</$SectionContent>
+      <div css={[tw`border-b`]}>
+        <$ContentSectionMaxWidthWrapper>
+          <$SectionHeaderContainer>
+            <$SectionHeaderTitle>{title}</$SectionHeaderTitle>
+            {seeAllText ? (
+              <Link href={{ pathname, query: router.query }}>
+                <$SectionHeaderSeeAllContainer css={[$link]}>
+                  <$SectionHeaderSeeAllText languageId={languageId}>
+                    {seeAllText}
+                  </$SectionHeaderSeeAllText>
+                  <$SectionHeaderSeeAllArrowIcon>
+                    <ArrowRight weight="light" />
+                  </$SectionHeaderSeeAllArrowIcon>
+                </$SectionHeaderSeeAllContainer>
+              </Link>
+            ) : null}
+          </$SectionHeaderContainer>
+        </$ContentSectionMaxWidthWrapper>
+      </div>
+      <$ContentSectionMaxWidthWrapper>
+        <$SectionContent>{swiper}</$SectionContent>
+      </$ContentSectionMaxWidthWrapper>
     </div>
   )
 }

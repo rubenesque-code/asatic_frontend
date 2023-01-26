@@ -4,6 +4,7 @@ import { useWindowSize } from "react-use"
 
 import { StaticData } from "./staticData"
 
+import { mapLanguageIds } from "^helpers/data"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { LandingCustomSectionComponent } from "^types/entities"
 
@@ -11,15 +12,40 @@ import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import CollectionsSection from "^entity-summary/collections"
 import RecordedEventsSection from "^entity-summary/recorded-events/swiper"
-import { mapLanguageIds } from "^helpers/data"
-
-// TODO: handle no custom section components: site in progress. for each language
+import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
 
 const PageBody = ({
   pageData: { landingSections },
 }: {
   pageData: StaticData["pageData"]
 }) => {
+  const { siteLanguage } = useSiteLanguageContext()
+
+  const { collections, firstSection, recordedEvents, secondSection } =
+    useGetSectionComponentsForLanguage(landingSections)
+
+  return (
+    <div>
+      <CustomSection components={firstSection} section={0} />
+      <CollectionsSection
+        collections={collections}
+        parentCurrentLanguageId={siteLanguage.id}
+      />
+      <RecordedEventsSection
+        recordedEvents={recordedEvents}
+        parentCurrentLanguageId={siteLanguage.id}
+        showSeeAllElement
+      />
+      <CustomSection components={secondSection} section={1} />
+    </div>
+  )
+}
+
+export default PageBody
+
+const useGetSectionComponentsForLanguage = (
+  landingSections: StaticData["pageData"]["landingSections"]
+) => {
   const { siteLanguage } = useSiteLanguageContext()
 
   const firstSectionComponentsForSiteLanguage =
@@ -41,30 +67,13 @@ const PageBody = ({
       mapLanguageIds(recordedEvent.translations).includes(siteLanguage.id)
     ) || null
 
-  return (
-    <div css={[tw`pb-xl`]}>
-      <CustomSection
-        components={firstSectionComponentsForSiteLanguage}
-        section={0}
-      />
-      <CollectionsSection
-        collections={collectionsForSiteLanguage}
-        parentCurrentLanguageId={siteLanguage.id}
-      />
-      <RecordedEventsSection
-        recordedEvents={recordedEventsForSiteLanguage}
-        parentCurrentLanguageId={siteLanguage.id}
-        showSeeAllElement
-      />
-      <CustomSection
-        components={secondSectionComponentsForSiteLanguage}
-        section={1}
-      />
-    </div>
-  )
+  return {
+    firstSection: firstSectionComponentsForSiteLanguage,
+    secondSection: secondSectionComponentsForSiteLanguage,
+    collections: collectionsForSiteLanguage,
+    recordedEvents: recordedEventsForSiteLanguage,
+  }
 }
-
-export default PageBody
 
 const CustomSection = ({
   components,
@@ -88,37 +97,41 @@ const CustomSection = ({
 
   return (
     <div css={[tw`border-b`, section === 1 && tw`mt-xl border-t`]}>
-      <$SectionContent css={[tw`grid grid-cols-4`]}>
-        {components.map((component, i) => {
-          const useImage = windowSize.width < 1024 || component.width === 2
+      <$ContentSectionMaxWidthWrapper>
+        <$SectionContent css={[tw`grid grid-cols-4`]}>
+          {components.map((component, i) => {
+            const useImage = windowSize.width < 1024 || component.width === 2
 
-          return (
-            <$SummaryContainer
-              css={[
-                tw`col-span-4`,
-                i + 1 < components.length ? tw`border-b` : tw`border-b-0`,
-                tw`md:col-span-2`,
-                i % 2 === 0 ? tw`md:border-r` : tw`md:border-r-0`,
-                (components.length % 2 === 1 && i < components.length - 1) ||
-                (components.length % 2 === 0 && i < components.length - 2)
-                  ? tw`md:border-b`
-                  : tw`md:border-b-0`,
-                component.width === 2 ? tw`lg:col-span-2` : tw`lg:col-span-1`,
-                rightBorderArr[i] ? tw`lg:border-r` : tw`lg:border-r-0`,
-                bottomBorderArr[i] ? tw`lg:border-b` : tw`lg:border-b-0`,
-              ]}
-              key={component.id}
-            >
-              <ArticleLikeSummaryDefault
-                articleLikeEntity={component.entity}
-                parentCurrentLanguageId={siteLanguage.id}
-                useImage={useImage}
-                isSmall={windowSize.width >= 1024 && component.width === 1}
-              />
-            </$SummaryContainer>
-          )
-        })}
-      </$SectionContent>
+            return (
+              <$SummaryContainer
+                css={[
+                  tw`col-span-4`,
+                  i + 1 < components.length ? tw`border-b` : tw`border-b-0`,
+                  components.length % 2 === 1 && i === components.length - 1
+                    ? tw`md:col-span-4`
+                    : tw`md:col-span-2`,
+                  i % 2 === 0 ? tw`md:border-r` : tw`md:border-r-0`,
+                  (components.length % 2 === 1 && i < components.length - 1) ||
+                  (components.length % 2 === 0 && i < components.length - 2)
+                    ? tw`md:border-b`
+                    : tw`md:border-b-0`,
+                  component.width === 2 ? tw`lg:col-span-2` : tw`lg:col-span-1`,
+                  rightBorderArr[i] ? tw`lg:border-r` : tw`lg:border-r-0`,
+                  bottomBorderArr[i] ? tw`lg:border-b` : tw`lg:border-b-0`,
+                ]}
+                key={component.id}
+              >
+                <ArticleLikeSummaryDefault
+                  articleLikeEntity={component.entity}
+                  parentCurrentLanguageId={siteLanguage.id}
+                  useImage={useImage}
+                  isSmall={windowSize.width >= 1024 && component.width === 1}
+                />
+              </$SummaryContainer>
+            )
+          })}
+        </$SectionContent>
+      </$ContentSectionMaxWidthWrapper>
     </div>
   )
 }

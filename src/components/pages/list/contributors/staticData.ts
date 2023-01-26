@@ -57,7 +57,10 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 
   return {
     props: {
-      globalData: globalData.globalContextData,
+      globalData: {
+        ...globalData.globalContextData,
+        documentLanguageIds: authorLanguageIds,
+      },
       pageData: { authors: processedAuthors, languages: authorLanguages },
     },
   }

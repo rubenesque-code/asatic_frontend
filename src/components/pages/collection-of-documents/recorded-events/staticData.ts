@@ -7,7 +7,7 @@ import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 
-import { mapLanguageIds } from "^helpers/data"
+import { mapIds, mapLanguageIds } from "^helpers/data"
 import { removeArrDuplicates } from "^helpers/general"
 import {
   processRecordedEventAsSummary,
@@ -36,7 +36,10 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 
   return {
     props: {
-      globalData: globalData.globalContextData,
+      globalData: {
+        ...globalData.globalContextData,
+        documentLanguageIds: mapIds(processedRecordedEvents.languages),
+      },
       pageData: {
         languages: processedRecordedEvents.languages,
         recordedEvents: processedRecordedEvents.entities,

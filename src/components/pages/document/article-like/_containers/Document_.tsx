@@ -1,3 +1,5 @@
+import tw from "twin.macro"
+
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 
 import { StaticData } from "../_types"
@@ -7,7 +9,7 @@ import { Authors_ } from "../../_containers"
 import { DocumentBody_ } from "./DocumentBody_"
 
 import { $DocumentHeader, $Title, $authors, $Date } from "../_styles"
-import tw from "twin.macro"
+import { $DocumentMaxWidthContainer } from "../../_presentation"
 
 export const Document_ = ({
   pageData: { articleLikeEntity: article, authors, languages },
@@ -23,22 +25,26 @@ export const Document_ = ({
 
   return (
     <>
-      <$DocumentHeader>
-        <div css={[tw`mb-sm sm:mb-md`]}>
-          <Languages_
-            documentLanguage={documentLanguage}
-            documentLanguages={languages}
-          />
+      <$DocumentMaxWidthContainer>
+        <div>
+          <$DocumentHeader>
+            <div css={[tw`mb-sm sm:mb-md`]}>
+              <Languages_
+                documentLanguage={documentLanguage}
+                documentLanguages={languages}
+              />
+            </div>
+            <$Date>{article.publishDate}</$Date>
+            <$Title>{translation.title}</$Title>
+            <Authors_
+              authors={authors}
+              documentLanguageId={documentLanguage.id}
+              styles={$authors}
+            />
+          </$DocumentHeader>
+          <DocumentBody_ body={translation.body} />
         </div>
-        <$Date>{article.publishDate}</$Date>
-        <$Title>{translation.title}</$Title>
-        <Authors_
-          authors={authors}
-          documentLanguageId={documentLanguage.id}
-          styles={$authors}
-        />
-      </$DocumentHeader>
-      <DocumentBody_ body={translation.body} />
+      </$DocumentMaxWidthContainer>
     </>
   )
 }

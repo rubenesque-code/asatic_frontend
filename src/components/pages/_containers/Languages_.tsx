@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
-import tw from "twin.macro"
+import tw, { TwStyle } from "twin.macro"
 import { TranslateIcon } from "^components/Icons"
 import { sortLanguages } from "^helpers/manipulateEntity"
 
@@ -10,12 +10,14 @@ export type Languages_Props = {
   documentLanguages: Language[]
   documentLanguage: Language
   color?: "light" | "dark"
+  styles?: TwStyle
 }
 
 export const Languages_ = ({
   documentLanguages,
   documentLanguage,
   color = "light",
+  styles,
 }: Languages_Props) => {
   const router = useRouter()
 
@@ -26,7 +28,7 @@ export const Languages_ = ({
   const processedLanguages = sortLanguages(documentLanguages)
 
   return (
-    <div css={[tw`flex items-center gap-sm`]}>
+    <div css={[tw`flex items-center gap-sm`, styles]}>
       <div css={[color === "light" ? tw` text-gray-400` : tw`text-gray-500`]}>
         <TranslateIcon weight="light" />
       </div>
