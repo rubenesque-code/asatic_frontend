@@ -9,7 +9,7 @@ import { routes } from "^constants/routes"
 export { getStaticProps } from "^components/pages/list/contributors/staticData"
 
 const ContributorsPage: NextPage<StaticData> = (staticData) => {
-  const isMultipleAuthors = staticData.isMultipleAuthors
+  const isMultipleAuthors = staticData.globalData.isMultipleAuthors
 
   const router = useRouter()
 
