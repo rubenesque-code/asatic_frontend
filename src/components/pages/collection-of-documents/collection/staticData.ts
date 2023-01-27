@@ -1,20 +1,18 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
 import { fetchImages } from "^lib/firebase/firestore"
 import { fetchAndValidateArticles } from "^helpers/fetch-and-validate/articles"
 import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
 import { fetchAndValidateCollections } from "^helpers/fetch-and-validate/collections"
-import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
-import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
-import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
 import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
 import { processRecordedEventAsSummary } from "^helpers/process-fetched-data/recorded-event/process"
 import { processCollectionForOwnPage } from "^helpers/process-fetched-data/collection/process"
 import { getCollectionUniqueChildImageIds } from "^helpers/process-fetched-data/collection/query"
 import { StaticDataWrapper } from "^types/staticData"
+import { handleProcessAuthorsAsChildren } from "^helpers/process-fetched-data/author/compose"
+import { handleProcessRecordedEventTypesAsChildren } from "^helpers/process-fetched-data/recorded-event-type/compose"
 
 type PageData = { collection: ReturnType<typeof processCollectionForOwnPage> }
 
@@ -81,50 +79,46 @@ export const getStaticProps: GetStaticProps<
   ]
   const fetchedImages = await fetchImages(imageIds)
 
-  const authorIds = getUniqueChildEntitiesIds(
+  const processedAuthors = await handleProcessAuthorsAsChildren(
     [
       ...validArticles.entities,
       ...validBlogs.entities,
       ...validRecordedEvents.entities,
     ],
-    ["authorsIds"]
-  ).authorsIds
-  const validAuthors = await fetchAndValidateAuthors({
-    ids: authorIds,
-    validLanguageIds,
-  })
-
-  const recordedEventTypeIds = getRecordedEventTypeIds(
-    validRecordedEvents.entities
+    {
+      validLanguageIds: globalData.validatedData.allLanguages.ids,
+      allValidAuthors: globalData.validatedData.allAuthors.entities,
+    }
   )
-  const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
-    ids: recordedEventTypeIds,
-    validLanguageIds,
-  })
+
+  const processedRecordedEventTypes =
+    await handleProcessRecordedEventTypesAsChildren(
+      validRecordedEvents.entities,
+      {
+        validLanguageIds: globalData.validatedData.allLanguages.ids,
+      }
+    )
 
   const processDocumentEntitySharedArgs = {
-    validAuthors: validAuthors.entities,
+    processedAuthors,
     validImages: fetchedImages,
     validLanguageIds,
   }
 
   const processedArticles = validArticles.entities.map((article) =>
-    processArticleLikeEntityAsSummary({
-      entity: article,
+    processArticleLikeEntityAsSummary(article, {
       ...processDocumentEntitySharedArgs,
     })
   )
   const processedBlogs = validBlogs.entities.map((blog) =>
-    processArticleLikeEntityAsSummary({
-      entity: blog,
+    processArticleLikeEntityAsSummary(blog, {
       ...processDocumentEntitySharedArgs,
     })
   )
   const processedRecordedEvents = validRecordedEvents.entities.map(
     (recordedEvent) =>
-      processRecordedEventAsSummary({
-        recordedEvent,
-        validRecordedEventTypes: validRecordedEventTypes.entities,
+      processRecordedEventAsSummary(recordedEvent, {
+        processedRecordedEventTypes,
         ...processDocumentEntitySharedArgs,
       })
   )

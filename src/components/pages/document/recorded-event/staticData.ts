@@ -7,9 +7,9 @@ import { Author, Language } from "^types/entities"
 import { mapLanguageIds } from "^helpers/data"
 import { processRecordedEventForOwnPage } from "^helpers/process-fetched-data/recorded-event/process"
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
 import { StaticDataWrapper } from "^types/staticData"
+import { handleProcessRecordedEventTypesAsChildren } from "^helpers/process-fetched-data/recorded-event-type/compose"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
@@ -60,20 +60,24 @@ export const getStaticProps: GetStaticProps<
       )!
   )
 
-  const validRecordedEventType = !fetchedRecordedEvent.recordedEventTypeId
+  const processedRecordedEventType = !fetchedRecordedEvent.recordedEventTypeId
     ? null
     : (
-        await fetchAndValidateRecordedEventTypes({
-          ids: [fetchedRecordedEvent.recordedEventTypeId],
-          validLanguageIds: globalData.validatedData.allLanguages.ids,
-        })
-      ).entities[0]
+        await handleProcessRecordedEventTypesAsChildren(
+          [fetchedRecordedEvent],
+          {
+            validLanguageIds: globalData.validatedData.allLanguages.ids,
+          }
+        )
+      )[0]
 
-  const processedRecordedEvent = processRecordedEventForOwnPage({
-    recordedEvent: fetchedRecordedEvent,
-    recordedEventType: validRecordedEventType,
-    validLanguageIds: globalData.validatedData.allLanguages.ids,
-  })
+  const processedRecordedEvent = processRecordedEventForOwnPage(
+    fetchedRecordedEvent,
+    {
+      processedRecordedEventType,
+      validLanguageIds: globalData.validatedData.allLanguages.ids,
+    }
+  )
 
   const recordedEventLanguageIds = mapLanguageIds(
     processedRecordedEvent.translations

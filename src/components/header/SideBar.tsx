@@ -10,7 +10,7 @@ import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
 import { $link } from "^styles/global"
 import { useGlobalDataContext } from "^context/GlobalData"
-import { SanitisedSubject } from "^types/entities"
+import { processSubjectsAsLinks } from "^helpers/process-fetched-data/subject/process"
 
 const SideBar = () => {
   return (
@@ -149,7 +149,11 @@ const Subjects = () => {
   )
 }
 
-const Subject = ({ subject }: { subject: SanitisedSubject }) => {
+const Subject = ({
+  subject,
+}: {
+  subject: ReturnType<typeof processSubjectsAsLinks>[number]
+}) => {
   return (
     <Link href={`/subjects/${subject.id}`} passHref>
       <div css={[$text, $link]}>{subject.title}</div>

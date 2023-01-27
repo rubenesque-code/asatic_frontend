@@ -2,23 +2,23 @@ import { GetStaticProps } from "next"
 
 import { fetchImages } from "^lib/firebase/firestore"
 
-import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
-import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
+import {
+  fetchAndValidateGlobalData,
+  GlobalDataValidated,
+} from "^helpers/fetch-and-validate/global"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 
-import { mapIds, mapLanguageIds } from "^helpers/data"
-import { removeArrDuplicates } from "^helpers/general"
+import { mapIds } from "^helpers/data"
 import {
   processRecordedEventAsSummary,
   RecordedEventAsSummary,
 } from "^helpers/process-fetched-data/recorded-event/process"
 import { Language } from "^types/entities"
 import { fetchAndValidateRecordedEvents } from "^helpers/fetch-and-validate/recordedEvents"
-import { getRecordedEventTypeIds } from "^helpers/process-fetched-data/recorded-event/query"
-import { fetchAndValidateRecordedEventTypes } from "^helpers/fetch-and-validate/recordedEventTypes"
 import { StaticDataWrapper } from "^types/staticData"
-import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
+import { handleProcessRecordedEventTypesAsChildren } from "^helpers/process-fetched-data/recorded-event-type/compose"
+import { handleProcessAuthorsAsChildren } from "^helpers/process-fetched-data/author/compose"
+import { getEntitiesUniqueLanguagesAndProcess } from "^helpers/process-fetched-data/language/compose"
 
 type PageData = {
   recordedEvents: RecordedEventAsSummary[]
@@ -31,7 +31,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
 
   const processedRecordedEvents = await handleProcessRecordedEvents({
-    validLanguages: globalData.validatedData.allLanguages,
+    globalData: globalData.validatedData,
   })
 
   return {
@@ -49,59 +49,53 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 }
 
 async function handleProcessRecordedEvents({
-  validLanguages,
+  globalData,
 }: {
-  validLanguages: Awaited<ReturnType<typeof fetchAndValidateLanguages>>
+  globalData: GlobalDataValidated
 }) {
   const validRecordedEvents = await fetchAndValidateRecordedEvents({
     ids: "all",
-    validLanguageIds: validLanguages.ids,
+    validLanguageIds: globalData.allLanguages.ids,
   })
 
-  const recordedEventTypeIds = getRecordedEventTypeIds(
-    validRecordedEvents.entities
+  const processedRecordedEventTypes =
+    await handleProcessRecordedEventTypesAsChildren(
+      validRecordedEvents.entities,
+      {
+        validLanguageIds: globalData.allLanguages.ids,
+      }
+    )
+
+  const processedAuthors = await handleProcessAuthorsAsChildren(
+    validRecordedEvents.entities,
+    {
+      validLanguageIds: globalData.allLanguages.ids,
+      allValidAuthors: globalData.allAuthors.entities,
+    }
   )
-  const validRecordedEventTypes = await fetchAndValidateRecordedEventTypes({
-    ids: recordedEventTypeIds,
-    validLanguageIds: validLanguages.ids,
-  })
-
-  const authorIds = getUniqueChildEntitiesIds(validRecordedEvents.entities, [
-    "authorsIds",
-  ]).authorsIds
-  const validAuthors = await fetchAndValidateAuthors({
-    ids: authorIds,
-    validLanguageIds: validLanguages.ids,
-  })
 
   const imageIds = getUniqueChildEntitiesImageIds({
     recordedEvents: validRecordedEvents.entities,
   })
   const fetchedImages = await fetchImages(imageIds)
 
-  const processedArticles = validRecordedEvents.entities.map((recordedEvent) =>
-    processRecordedEventAsSummary({
-      recordedEvent,
-      validAuthors: validAuthors.entities,
-      validImages: fetchedImages,
-      validLanguageIds: validLanguages.ids,
-      validRecordedEventTypes: validRecordedEventTypes.entities,
-    })
+  const processedRecordedEvents = validRecordedEvents.entities.map(
+    (recordedEvent) =>
+      processRecordedEventAsSummary(recordedEvent, {
+        processedAuthors,
+        processedRecordedEventTypes,
+        validImages: fetchedImages,
+        validLanguageIds: globalData.allLanguages.ids,
+      })
   )
 
-  const articleLanguageIds = removeArrDuplicates(
-    mapLanguageIds(processedArticles.flatMap((article) => article.translations))
-  )
-  const articleLanguages = articleLanguageIds.map(
-    (languageId) =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      validLanguages.entities.find(
-        (validLanguage) => validLanguage.id === languageId
-      )!
+  const recordedEventLanguages = getEntitiesUniqueLanguagesAndProcess(
+    processedRecordedEvents,
+    globalData.allLanguages.entities
   )
 
   return {
-    entities: processedArticles,
-    languages: articleLanguages,
+    entities: processedRecordedEvents,
+    languages: recordedEventLanguages,
   }
 }

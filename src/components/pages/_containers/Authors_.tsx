@@ -3,11 +3,13 @@ import Link from "next/link"
 import tw, { TwStyle } from "twin.macro"
 import { routes } from "^constants/routes"
 import { useGlobalDataContext } from "^context/GlobalData"
+import { processAuthorsAsChildren } from "^helpers/process-fetched-data/author/process"
 import { $link } from "^styles/global"
 
-import { Author as AuthorType } from "^types/entities"
-
-function filterAuthorsForLanguage(authors: AuthorType[], languageId: string) {
+function filterAuthorsForLanguage(
+  authors: ReturnType<typeof processAuthorsAsChildren>,
+  languageId: string
+) {
   return authors.filter((author) =>
     author.translations.find(
       (translation) =>
@@ -22,7 +24,7 @@ export const Authors_ = ({
   styles,
 }: {
   parentLanguageId: string
-  authors: AuthorType[]
+  authors: ReturnType<typeof processAuthorsAsChildren>
   styles: TwStyle
 }) => {
   if (!authors.length) {

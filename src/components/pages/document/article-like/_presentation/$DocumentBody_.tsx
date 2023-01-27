@@ -26,7 +26,8 @@ export const $ImageSection_ = ({ section }: { section: ImageSection }) => (
 
 export const $VideoSection_ = ({ section }: { section: VideoSection }) => (
   <div>
-    <Video_ youtubeId={section.youtubeId} />
+    {/*  eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
+    <Video_ youtubeId={section.youtubeId!} />
     {section.caption ? <$Caption>{section.caption}</$Caption> : null}
   </div>
 )

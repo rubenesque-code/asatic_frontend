@@ -6,7 +6,6 @@ import { Languages_ } from "^components/pages/_containers"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { findTranslationByLanguageId } from "^helpers/data"
 import { Authors_ } from "../_containers"
-import { RecordedEventType } from "^types/entities"
 import { Video_ } from "../_containers"
 import { $CenterMaxWidth_ } from "^components/pages/_presentation"
 import Prose_ from "../_containers/Prose_"
@@ -94,7 +93,7 @@ const Type_ = ({
   recordedEventType,
   parentRecordedEventLanguageId,
 }: {
-  recordedEventType: RecordedEventType | undefined | null
+  recordedEventType: StaticData["pageData"]["recordedEvent"]["recordedEventType"]
   parentRecordedEventLanguageId: string
 }) => {
   if (!recordedEventType) {

@@ -1,11 +1,7 @@
 import { sanitize } from "isomorphic-dompurify"
 
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
-import {
-  Image,
-  RecordedEventType,
-  SanitisedRecordedEvent,
-} from "^types/entities"
+import { Image, SanitisedRecordedEvent } from "^types/entities"
 import { processAuthorsAsChildren } from "../author/process"
 import { validateTranslation } from "./validate"
 import { processRecordedEventTypesAsChildren } from "../recorded-event-type/process"
@@ -14,10 +10,13 @@ export function processRecordedEventForOwnPage(
   recordedEvent: SanitisedRecordedEvent,
   {
     validLanguageIds,
-    recordedEventType,
+    processedRecordedEventType,
   }: {
     validLanguageIds: string[]
-    recordedEventType: RecordedEventType | null | undefined
+    processedRecordedEventType:
+      | ReturnType<typeof processRecordedEventTypesAsChildren>[number]
+      | null
+      | undefined
   }
 ) {
   const translationsProcessed = recordedEvent.translations
@@ -36,7 +35,9 @@ export function processRecordedEventForOwnPage(
     translations: translationsProcessed,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     youtubeId: recordedEvent.youtubeId!,
-    ...(recordedEventType && { recordedEventType }),
+    ...(processedRecordedEventType && {
+      recordedEventType: processedRecordedEventType,
+    }),
   }
 }
 

@@ -3,17 +3,18 @@ import { GetStaticProps } from "next"
 import { fetchImages } from "^lib/firebase/firestore"
 
 import { fetchAndValidateBlogs } from "^helpers/fetch-and-validate/blogs"
-import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
-import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
-import { processArticleLikeEntityAsSummary } from "^helpers/process-fetched-data/article-like"
-import { getUniqueChildEntitiesIds } from "^helpers/process-fetched-data/general"
+import {
+  fetchAndValidateGlobalData,
+  GlobalDataValidated,
+} from "^helpers/fetch-and-validate/global"
+import { processArticleLikeEntitiesAsSummarries } from "^helpers/process-fetched-data/article-like"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 
 import { PageData } from "../_types"
-import { mapIds, mapLanguageIds } from "^helpers/data"
-import { removeArrDuplicates } from "^helpers/general"
+import { mapIds } from "^helpers/data"
 import { StaticDataWrapper } from "^types/staticData"
-import { fetchAndValidateLanguages } from "^helpers/fetch-and-validate/languages"
+import { handleProcessAuthorsAsChildren } from "^helpers/process-fetched-data/author/compose"
+import { getEntitiesUniqueLanguagesAndProcess } from "^helpers/process-fetched-data/language/compose"
 
 export type StaticData = StaticDataWrapper<PageData>
 
@@ -21,7 +22,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   const globalData = await fetchAndValidateGlobalData()
 
   const processedBlogs = await handleProcessBlogs({
-    validLanguages: globalData.validatedData.allLanguages,
+    globalData: globalData.validatedData,
   })
 
   return {
@@ -39,46 +40,39 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
 }
 
 async function handleProcessBlogs({
-  validLanguages,
+  globalData,
 }: {
-  validLanguages: Awaited<ReturnType<typeof fetchAndValidateLanguages>>
+  globalData: GlobalDataValidated
 }) {
   const validBlogs = await fetchAndValidateBlogs({
     ids: "all",
-    validLanguageIds: validLanguages.ids,
+    validLanguageIds: globalData.allLanguages.ids,
   })
 
-  const authorIds = getUniqueChildEntitiesIds(validBlogs.entities, [
-    "authorsIds",
-  ]).authorsIds
-  const validAuthors = await fetchAndValidateAuthors({
-    ids: authorIds,
-    validLanguageIds: validLanguages.ids,
-  })
+  const processedAuthors = await handleProcessAuthorsAsChildren(
+    validBlogs.entities,
+    {
+      validLanguageIds: globalData.allLanguages.ids,
+    }
+  )
 
   const imageIds = getUniqueChildEntitiesImageIds({
     articleLikeEntities: validBlogs.entities,
   })
   const fetchedImages = await fetchImages(imageIds)
 
-  const processedBlogs = validBlogs.entities.map((articleLikeEntity) =>
-    processArticleLikeEntityAsSummary({
-      entity: articleLikeEntity,
-      processedAuthors: validAuthors.entities,
+  const processedBlogs = processArticleLikeEntitiesAsSummarries(
+    validBlogs.entities,
+    {
+      processedAuthors,
       validImages: fetchedImages,
-      validLanguageIds: validLanguages.ids,
-    })
+      validLanguageIds: globalData.allLanguages.ids,
+    }
   )
 
-  const blogLanguageIds = removeArrDuplicates(
-    mapLanguageIds(processedBlogs.flatMap((blog) => blog.translations))
-  )
-  const blogLanguages = blogLanguageIds.map(
-    (languageId) =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      validLanguages.entities.find(
-        (validLanguage) => validLanguage.id === languageId
-      )!
+  const blogLanguages = getEntitiesUniqueLanguagesAndProcess(
+    processedBlogs,
+    globalData.allLanguages.entities
   )
 
   return {

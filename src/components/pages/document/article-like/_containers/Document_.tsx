@@ -26,7 +26,7 @@ export const Document_ = ({
   return (
     <>
       <$DocumentMaxWidthContainer>
-        <div>
+        <div css={[tw`mt-xl`]}>
           <$DocumentHeader>
             <div css={[tw`mb-sm sm:mb-md`]}>
               <Languages_

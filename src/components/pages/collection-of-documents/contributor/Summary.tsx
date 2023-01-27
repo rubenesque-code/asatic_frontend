@@ -1,16 +1,18 @@
-import { StaticData } from "./staticData"
+import tw from "twin.macro"
 
 import { EntityLink_ } from "^entity-summary/_containers"
 import { DateString_ } from "^components/pages/_containers"
 import { $Title, $Date } from "^entity-summary/_styles/$summary"
 import { siteTranslations } from "^constants/siteTranslations"
-import tw from "twin.macro"
+import { processAuthorAsParent } from "^helpers/process-fetched-data/author/process"
 
 const Summary = ({
   entity,
   languageId,
 }: {
-  entity: StaticData["author"]["translations"][number]["documents"][number]
+  entity: ReturnType<
+    typeof processAuthorAsParent
+  >["translations"][number]["documents"][number]
   languageId: string
 }) => {
   return (

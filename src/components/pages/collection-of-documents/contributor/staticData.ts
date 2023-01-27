@@ -8,6 +8,7 @@ import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { fetchAndValidateAuthors } from "^helpers/fetch-and-validate/authors"
 import { processAuthorAsParent } from "^helpers/process-fetched-data/author/process"
 import { fetchAndValidateDocumentEntities } from "^helpers/fetch-and-validate/_helpers"
+import { processLanguages } from "^helpers/process-fetched-data/language/process"
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const validAuthors = await fetchAndValidateAuthors({ ids: "all" })
@@ -84,7 +85,7 @@ export const getStaticProps: GetStaticProps<
       },
       pageData: {
         author: processedAuthor,
-        languages: authorLanguages,
+        languages: processLanguages(authorLanguages),
       },
     },
   }

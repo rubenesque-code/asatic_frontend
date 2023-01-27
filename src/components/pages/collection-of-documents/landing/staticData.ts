@@ -98,8 +98,7 @@ async function handleProcessCustomSections({
 
   const processedArticleLikeEntities = validArticleLikeEntities.map(
     (articleLikeEntity) =>
-      processArticleLikeEntityAsSummary({
-        entity: articleLikeEntity,
+      processArticleLikeEntityAsSummary(articleLikeEntity, {
         processedAuthors,
         validImages: fetchedImages,
         validLanguageIds: globalData.allLanguages.ids,
