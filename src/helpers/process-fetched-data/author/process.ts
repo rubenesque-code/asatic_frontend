@@ -1,3 +1,4 @@
+import { sanitize } from "dompurify"
 import { mapLanguageIds } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
@@ -154,13 +155,21 @@ export function processAuthorAsChild(
     validLanguageIds: string[]
   }
 ) {
-  const validTranslations = author.translations.filter((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  ) as BasicValidatedTranslation[]
+  const translationsProcessed = author.translations
+    .filter((translation) => validateTranslation(translation, validLanguageIds))
+    .map((translation) => {
+      const { name, ...restOfTranslation } = translation
+
+      return {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        name: sanitize(name!),
+        ...restOfTranslation,
+      }
+    })
 
   return {
     id: author.id,
-    translations: validTranslations,
+    translations: translationsProcessed,
   }
 }
 

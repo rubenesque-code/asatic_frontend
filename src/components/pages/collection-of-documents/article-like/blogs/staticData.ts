@@ -64,7 +64,7 @@ async function handleProcessBlogs({
   const processedBlogs = validBlogs.entities.map((articleLikeEntity) =>
     processArticleLikeEntityAsSummary({
       entity: articleLikeEntity,
-      validAuthors: validAuthors.entities,
+      processedAuthors: validAuthors.entities,
       validImages: fetchedImages,
       validLanguageIds: validLanguages.ids,
     })

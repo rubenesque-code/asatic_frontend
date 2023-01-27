@@ -1,12 +1,14 @@
 import produce from "immer"
+import { sanitize } from "dompurify"
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
-import { SanitisedArticle, SanitisedBlog, Image, Author } from "^types/entities"
+import { SanitisedArticle, SanitisedBlog, Image } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
 import {
   getArticleLikeDocumentImageIds,
   getArticleLikeSummaryText,
 } from "./query"
 import { validateTranslation } from "./validate"
+import { processAuthorsAsChildren } from "../author/process"
 
 export function processArticleLikeEntityForOwnPage<
   TEntity extends SanitisedArticle | SanitisedBlog
@@ -26,10 +28,12 @@ export function processArticleLikeEntityForOwnPage<
       id: translation.id,
       languageId: translation.languageId,
       body: translation.body,
-      title: translation.title as string,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      title: sanitize(translation.title!),
     }))
     .map((translation) =>
       produce(translation, (draft) => {
+        // · remove invalid sections
         for (let j = 0; j < translation.body.length; j++) {
           const bodySection = draft.body[j]
 
@@ -55,24 +59,38 @@ export function processArticleLikeEntityForOwnPage<
       })
     )
     .map((translation) => {
+      // · merge data · sanitise text
       const { body, ...restOfTranslation } = translation
 
       const translationBodyDataMerged = body.map((section) => {
-        if (section.type !== "image") {
-          return section
-        }
+        if (section.type === "text") {
+          const { text, ...restOfSection } = section
+          return {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            text: sanitize(text!),
+            ...restOfSection,
+          }
+        } else if (section.type === "video") {
+          const { caption, ...restOfSection } = section
 
-        const { image, ...restOfSection } = section
-        const { imageId, ...restOfImage } = image
+          return {
+            ...(caption && { caption: sanitize(caption) }),
+            ...restOfSection,
+          }
+        } else {
+          const { image, caption, ...restOfSection } = section
+          const { imageId, ...restOfImage } = image
 
-        return {
-          ...restOfSection,
-          image: {
-            ...restOfImage,
-            storageImage:
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              validImages.find((image) => image.id === imageId)!,
-          },
+          return {
+            ...restOfSection,
+            ...(caption && { caption: sanitize(caption) }),
+            image: {
+              ...restOfImage,
+              storageImage:
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                validImages.find((image) => image.id === imageId)!,
+            },
+          }
         }
       })
 
@@ -106,12 +124,12 @@ export function processArticleLikeEntityAsSummary<
   entity,
   validLanguageIds,
   validImages,
-  validAuthors,
+  processedAuthors,
 }: {
   entity: TEntity
   validLanguageIds: string[]
   validImages: Image[]
-  validAuthors: Author[]
+  processedAuthors: ReturnType<typeof processAuthorsAsChildren>
 }) {
   let summaryImage: Image | null = null
 
@@ -145,10 +163,10 @@ export function processArticleLikeEntityAsSummary<
 
   const processedTranslations = validTranslations.map((translation) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const summaryText = getArticleLikeSummaryText(translation)!
+    const summaryText = sanitize(getArticleLikeSummaryText(translation)!)
 
     return {
-      title: translation.title,
+      title: sanitize(translation.title),
       summaryText,
       languageId: translation.languageId,
     }
@@ -165,7 +183,7 @@ export function processArticleLikeEntityAsSummary<
         }
       : null,
     translations: processedTranslations,
-    authors: filterAndMapEntitiesById(entity.authorsIds, validAuthors),
+    authors: filterAndMapEntitiesById(entity.authorsIds, processedAuthors),
   }
 
   return processed

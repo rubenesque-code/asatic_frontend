@@ -36,3 +36,7 @@ export async function fetchAndValidateGlobalData() {
     },
   }
 }
+
+export type GlobalDataValidated = Awaited<
+  ReturnType<typeof fetchAndValidateGlobalData>
+>["validatedData"]

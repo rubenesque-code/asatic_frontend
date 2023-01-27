@@ -1,3 +1,4 @@
+import { sanitize } from "dompurify"
 import { findEntityById } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import { Image, SanitisedCollection } from "^types/entities"
@@ -26,6 +27,8 @@ export function processCollectionAsSummary(
       findEntityById(validImages, collection.bannerImage.imageId) || null
   }
 
+  const summaryText = getCollectionSummaryText(collection)
+
   return {
     id: collection.id,
     type: collection.type,
@@ -36,13 +39,13 @@ export function processCollectionAsSummary(
           storageImage: summaryImage,
         }
       : null,
-    title: collection.title,
-    text: getCollectionSummaryText(collection),
+    title: sanitize(collection.title),
     languageId: collection.languageId,
+    ...(summaryText && { text: sanitize(summaryText) }),
   }
 }
 
-export function processCollectionsAsSummary(
+export function processCollectionsAsSummaries(
   collections: SanitisedCollection[],
   {
     validImages,
@@ -84,9 +87,11 @@ export function processCollectionForOwnPage(
     id: collection.id,
     publishDate: collection.publishDate,
     bannerImage,
-    title: collection.title,
-    description: collection.description,
+    title: sanitize(collection.title),
     childDocumentEntities: orderedChildDocumentEntities,
     languageId: collection.languageId,
+    ...(collection.description && {
+      description: sanitize(collection.description),
+    }),
   }
 }

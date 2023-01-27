@@ -1,14 +1,16 @@
+import { sanitize } from "dompurify"
 import produce from "immer"
 
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import {
-  Author,
   Image,
   RecordedEventType,
   SanitisedRecordedEvent,
 } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
+import { processAuthorsAsChildren } from "../author/process"
 import { validateTranslation } from "./validate"
+import { processRecordedEventTypesAsChildren } from "../recorded-event-type/process"
 
 type ProcessedTranslation = MakeRequired<
   SanitisedRecordedEvent["translations"][number],
@@ -57,28 +59,22 @@ export function processRecordedEventForOwnPage({
   return processed
 }
 
-type AsSummaryValidTranslation = MakeRequired<
-  SanitisedRecordedEvent["translations"][number],
-  "title"
->
-
-export type RecordedEventAsSummary = ReturnType<
-  typeof processRecordedEventAsSummary
->
-
-export function processRecordedEventAsSummary({
-  recordedEvent,
-  validLanguageIds,
-  validImages,
-  validAuthors,
-  validRecordedEventTypes,
-}: {
-  recordedEvent: SanitisedRecordedEvent
-  validLanguageIds: string[]
-  validImages: Image[]
-  validAuthors: Author[]
-  validRecordedEventTypes: RecordedEventType[]
-}) {
+export function processRecordedEventAsSummary(
+  recordedEvent: SanitisedRecordedEvent,
+  {
+    validLanguageIds,
+    validImages,
+    processedAuthors,
+    processedRecordedEventTypes,
+  }: {
+    validLanguageIds: string[]
+    validImages: Image[]
+    processedAuthors: ReturnType<typeof processAuthorsAsChildren>
+    processedRecordedEventTypes: ReturnType<
+      typeof processRecordedEventTypesAsChildren
+    >
+  }
+) {
   let summaryImage: Image | null = null
 
   if (recordedEvent.summaryImage.imageId) {
@@ -91,22 +87,23 @@ export function processRecordedEventAsSummary({
     }
   }
 
-  const validTranslations = recordedEvent.translations.filter((translation) =>
-    validateTranslation(translation, validLanguageIds)
-  ) as AsSummaryValidTranslation[]
-
-  const processedTranslations = validTranslations.map((translation) => {
-    return {
-      title: translation.title,
-      languageId: translation.languageId,
-    }
-  })
+  const processedTranslations = recordedEvent.translations
+    .filter((translation) => validateTranslation(translation, validLanguageIds))
+    .map((translation) => {
+      return {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        title: sanitize(translation.title!),
+        languageId: translation.languageId,
+      }
+    })
 
   const recordedEventType =
     recordedEvent.recordedEventTypeId &&
-    mapIds(validRecordedEventTypes).includes(recordedEvent.recordedEventTypeId)
+    mapIds(processedRecordedEventTypes).includes(
+      recordedEvent.recordedEventTypeId
+    )
       ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        validRecordedEventTypes.find(
+        processedRecordedEventTypes.find(
           (recordedEventType) =>
             recordedEventType.id === recordedEvent.recordedEventTypeId
         )!
@@ -125,9 +122,42 @@ export function processRecordedEventAsSummary({
         }
       : null,
     translations: processedTranslations,
-    authors: filterAndMapEntitiesById(recordedEvent.authorsIds, validAuthors),
+    authors: filterAndMapEntitiesById(
+      recordedEvent.authorsIds,
+      processedAuthors
+    ),
     recordedEventType,
   }
 
   return processed
+}
+
+export type RecordedEventAsSummary = ReturnType<
+  typeof processRecordedEventAsSummary
+>
+
+export function processRecordedEventsAsSummarries(
+  recordedEvents: SanitisedRecordedEvent[],
+  {
+    validLanguageIds,
+    validImages,
+    processedAuthors,
+    processedRecordedEventTypes,
+  }: {
+    validLanguageIds: string[]
+    validImages: Image[]
+    processedAuthors: ReturnType<typeof processAuthorsAsChildren>
+    processedRecordedEventTypes: ReturnType<
+      typeof processRecordedEventTypesAsChildren
+    >
+  }
+) {
+  return recordedEvents.map((recordedEvent) =>
+    processRecordedEventAsSummary(recordedEvent, {
+      processedAuthors,
+      processedRecordedEventTypes,
+      validImages,
+      validLanguageIds,
+    })
+  )
 }

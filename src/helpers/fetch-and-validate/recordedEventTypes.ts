@@ -4,13 +4,14 @@ import { mapIds } from "^helpers/data"
 import { fetchAndValidateLanguages } from "./languages"
 import { filterValidRecordedEventTypesAsChildren } from "^helpers/process-fetched-data/recorded-event-type/validate"
 
-export async function fetchAndValidateRecordedEventTypes({
-  ids,
-  validLanguageIds: passedValidLanguageIds,
-}: {
-  ids: string[] | "all"
-  validLanguageIds?: string[]
-}) {
+export async function fetchAndValidateRecordedEventTypes(
+  ids: string[] | "all",
+  {
+    validLanguageIds: passedValidLanguageIds,
+  }: {
+    validLanguageIds?: string[]
+  }
+) {
   const fetchedRecordedEventTypes = await fetchRecordedEventTypes(ids)
 
   if (!fetchedRecordedEventTypes.length) {

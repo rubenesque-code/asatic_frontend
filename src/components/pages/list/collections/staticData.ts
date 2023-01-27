@@ -2,7 +2,7 @@ import { GetStaticProps } from "next"
 
 import { fetchAndValidateGlobalData } from "^helpers/fetch-and-validate/global"
 import { removeArrDuplicates } from "^helpers/general"
-import { processCollectionsAsSummary } from "^helpers/process-fetched-data/collection/process"
+import { processCollectionsAsSummaries } from "^helpers/process-fetched-data/collection/process"
 import { getUniqueChildEntitiesImageIds } from "^helpers/process-fetched-data/_helpers/query"
 import { fetchImages } from "^lib/firebase/firestore"
 
@@ -10,7 +10,7 @@ import { Language } from "^types/entities"
 import { StaticDataWrapper } from "^types/staticData"
 
 type PageData = {
-  collections: ReturnType<typeof processCollectionsAsSummary>
+  collections: ReturnType<typeof processCollectionsAsSummaries>
   languages: Language[]
 }
 
@@ -26,7 +26,7 @@ export const getStaticProps: GetStaticProps<StaticData> = async () => {
   })
   const fetchedImages = await fetchImages(imageIds)
 
-  const processedCollections = processCollectionsAsSummary(validCollections, {
+  const processedCollections = processCollectionsAsSummaries(validCollections, {
     validImages: fetchedImages,
   })
 
