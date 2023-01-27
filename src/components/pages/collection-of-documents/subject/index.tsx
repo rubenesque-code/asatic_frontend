@@ -37,9 +37,10 @@ const PageBody = ({
       <BodyHeaderLayout_
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         title={subject.title!}
+        useMargin
       />
       <div css={[tw`border-b`]}>
-        <$ContentSectionLayout_>
+        <$ContentSectionLayout_ useMargin>
           <div css={[tw`border-l border-r grid grid-cols-12 lg:grid-rows-2`]}>
             {customSections.first.map((entity, i) => (
               <$SummaryContainer
@@ -76,7 +77,7 @@ const PageBody = ({
       />
       {customSections.second.length ? (
         <div css={[tw`border-b border-t mt-xl`]}>
-          <$ContentSectionLayout_>
+          <$ContentSectionLayout_ useMargin>
             <div css={[tw`border-l border-r grid grid-cols-12`]}>
               {customSections.second.map((entity, i) => (
                 <$SummaryContainer

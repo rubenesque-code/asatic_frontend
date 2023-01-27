@@ -12,7 +12,7 @@ import { ArticleLikeSummaryDefault } from "^entity-summary/article-like"
 import { $SummaryContainer } from "^entity-summary/_styles/$summary"
 import CollectionsSection from "^entity-summary/collections"
 import RecordedEventsSection from "^entity-summary/recorded-events/swiper"
-import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
+import { $ContentSectionLayout_ } from "^components/pages/_presentation"
 
 const PageBody = ({
   pageData: { landingSections },
@@ -97,8 +97,8 @@ const CustomSection = ({
 
   return (
     <div css={[tw`border-b`, section === 1 && tw`mt-xl border-t`]}>
-      <$ContentSectionMaxWidthWrapper>
-        <$SectionContent css={[tw`grid grid-cols-4`]}>
+      <$ContentSectionLayout_ useMargin>
+        <div css={[tw`border-l border-r grid grid-cols-4`]}>
           {components.map((component, i) => {
             const useImage = windowSize.width < 1024 || component.width === 2
 
@@ -130,13 +130,11 @@ const CustomSection = ({
               </$SummaryContainer>
             )
           })}
-        </$SectionContent>
-      </$ContentSectionMaxWidthWrapper>
+        </div>
+      </$ContentSectionLayout_>
     </div>
   )
 }
-
-const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
 
 const calcIsRightBorder = (components: LandingCustomSectionComponent[]) => {
   const isRightBorderArr = [] as boolean[]

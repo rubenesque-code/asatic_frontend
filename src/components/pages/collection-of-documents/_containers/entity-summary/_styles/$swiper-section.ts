@@ -1,7 +1,7 @@
 import tw, { styled } from "twin.macro"
 import { SiteLanguageId } from "^constants/languages"
 
-export const $SectionContent = tw.div`border-l border-r mx-xxs sm:mx-sm md:mx-md`
+export const $SectionContent = tw.div`border-l border-r`
 
 export const $SectionHeaderContainer = tw.div`flex justify-between  px-xl pb-sm pt-md`
 export const $SectionHeaderTitle = tw.div`text-2xl capitalize text-gray-700`

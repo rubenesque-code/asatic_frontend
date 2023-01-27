@@ -15,7 +15,7 @@ import {
   $SectionHeaderSeeAllText,
   $SectionHeaderSeeAllArrowIcon,
 } from "../_styles/$swiper-section"
-import { $ContentSectionMaxWidthWrapper } from "^components/pages/_presentation"
+import { $ContentSectionLayout_ } from "^components/pages/_presentation"
 import { $link } from "^styles/global"
 
 export const $SwiperSectionLayout = ({
@@ -40,7 +40,7 @@ export const $SwiperSectionLayout = ({
   return (
     <div css={[tw`border-b`]}>
       <div css={[tw`border-b`]}>
-        <$ContentSectionMaxWidthWrapper>
+        <$ContentSectionLayout_>
           <$SectionHeaderContainer>
             <$SectionHeaderTitle>{title}</$SectionHeaderTitle>
             {seeAllText ? (
@@ -56,11 +56,11 @@ export const $SwiperSectionLayout = ({
               </Link>
             ) : null}
           </$SectionHeaderContainer>
-        </$ContentSectionMaxWidthWrapper>
+        </$ContentSectionLayout_>
       </div>
-      <$ContentSectionMaxWidthWrapper>
+      <$ContentSectionLayout_>
         <$SectionContent>{swiper}</$SectionContent>
-      </$ContentSectionMaxWidthWrapper>
+      </$ContentSectionLayout_>
     </div>
   )
 }

@@ -2,13 +2,18 @@ import tw from "twin.macro"
 
 import { StaticData } from "./staticData"
 
-import { Languages_, PageWrapper_ } from "^components/pages/_containers"
+import {
+  BodyFontWrapper,
+  BodyHeaderLayout_,
+  PageWrapper_,
+} from "^components/pages/_containers"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 import { siteTranslations } from "^constants/siteTranslations"
 import { mapLanguageIds } from "^helpers/data"
 import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguage"
 import { EntityLink_ } from "^entity-summary/_containers"
-import { $link } from "^styles/global"
+import { $link, $pagePx } from "^styles/global"
+import { $ContentSectionLayout_ } from "^page-presentation"
 
 const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
   const { siteLanguage } = useSiteLanguageContext()
@@ -40,42 +45,31 @@ const PageBody = ({
   )
 
   return (
-    <div>
-      <div css={[tw`border-b`]}>
-        <$SectionContent css={[tw`px-xl pt-xl pb-md border-r-0 border-l-0`]}>
-          <h1
-            css={[
-              tw`text-3xl capitalize text-gray-700 tracking-wide font-bold`,
-            ]}
-          >
-            {siteTranslations.authors[siteLanguage.id]}
-          </h1>
-          <div css={[tw`pt-lg`]}>
-            <Languages_
-              documentLanguage={filterLanguage}
-              documentLanguages={languages}
+    <BodyFontWrapper documentLanguageId={filterLanguage.id}>
+      <BodyHeaderLayout_
+        title={siteTranslations.authors[siteLanguage.id]}
+        languages={{
+          documentLanguage: filterLanguage,
+          documentLanguages: languages,
+        }}
+        styles={[$pagePx]}
+      />
+      <$ContentSectionLayout_>
+        <div
+          css={[tw`grid grid-cols-1 md:grid-cols-2 gap-lg row-gap[2em] p-xl`]}
+        >
+          {authorsForLanguage.map((author) => (
+            <Author
+              author={author}
+              languageId={filterLanguage.id}
+              key={author.id}
             />
-          </div>
-        </$SectionContent>
-      </div>
-      <div css={[tw`border-b`]}>
-        <$SectionContent>
-          <div css={[tw`grid grid-cols-2 gap-lg row-gap[2em] p-xl`]}>
-            {authorsForLanguage.map((author) => (
-              <Author
-                author={author}
-                languageId={filterLanguage.id}
-                key={author.id}
-              />
-            ))}
-          </div>
-        </$SectionContent>
-      </div>
-    </div>
+          ))}
+        </div>
+      </$ContentSectionLayout_>
+    </BodyFontWrapper>
   )
 }
-
-const $SectionContent = tw.div`mx-xxs sm:mx-sm md:mx-md`
 
 const Author = ({
   author,

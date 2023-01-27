@@ -30,6 +30,7 @@ const Collections = ({
     <$SwiperSectionLayout
       swiper={
         <Swiper_
+          numSlides={orderedCollections.length}
           slides={({ numSlidesPerView }) =>
             orderedCollections.map((collection, i) => (
               <$SwiperSlideContainer

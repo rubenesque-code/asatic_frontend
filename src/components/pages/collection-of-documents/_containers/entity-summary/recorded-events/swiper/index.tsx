@@ -29,6 +29,7 @@ const RecordedEventSwiperSection = ({
     <$SwiperSectionLayout
       swiper={
         <Swiper_
+          numSlides={orderedRecordedEvents.length}
           slides={({ numSlidesPerView }) =>
             orderedRecordedEvents.map((recordedEvent, i) => (
               <Summary

@@ -9,11 +9,11 @@ const Footer = () => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
-    <div css={[tw`border-t-2 mt-2xl`]}>
+    <div css={[tw`border-t-2 mt-lg sm:mt-xl md:mt-2xl`]}>
       <$ContentSectionMaxWidthWrapper styles={[$pagePx]}>
         <div css={[tw`flex items-center justify-between py-xl`]}>
           <div css={[tw`flex items-center gap-lg`]}>
-            <h3 css={[tw`text-2xl font-bold border-b border-b-gray-300 pb-xs`]}>
+            <h3 css={[tw`text-xl font-bold border-b border-b-gray-300 pb-xs`]}>
               {siteTranslations.siteName[siteLanguage.id]}
             </h3>
           </div>

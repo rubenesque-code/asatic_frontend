@@ -10,16 +10,12 @@ import { PageWrapper_ } from "^components/pages/_containers"
 const PageContent = ({ globalData, pageData }: StaticData) => {
   return (
     <PageWrapper_ globalData={globalData} pageTitle={pageData.collection.title}>
-      <>
-        <div>
-          <BodyHeader collection={pageData.collection} />
-          <$CenterMaxWidth_ maxWidth={tw`max-w-[700px]`}>
-            <div css={[tw`border-l border-r`]}>
-              <ChildDocuments collection={pageData.collection} />
-            </div>
-          </$CenterMaxWidth_>
+      <BodyHeader collection={pageData.collection} />
+      <$CenterMaxWidth_ maxWidth={tw`max-w-[700px]`}>
+        <div css={[tw`border-l border-r`]}>
+          <ChildDocuments collection={pageData.collection} />
         </div>
-      </>
+      </$CenterMaxWidth_>
     </PageWrapper_>
   )
 }

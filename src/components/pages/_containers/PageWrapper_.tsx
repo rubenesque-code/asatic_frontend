@@ -15,7 +15,7 @@ export const PageWrapper_ = ({
   globalData,
   pageTitle,
 }: {
-  children: ReactElement
+  children: ReactElement | (ReactElement | null)[]
   globalData: MyOmit<ComponentProps<typeof GlobalDataProvider>, "children">
   pageTitle?: string
 }) => {

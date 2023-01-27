@@ -10,8 +10,10 @@ import { useWindowSize } from "react-use"
 
 export const Swiper_ = ({
   slides,
+  numSlides,
 }: {
   slides: ({ numSlidesPerView }: { numSlidesPerView: number }) => ReactElement[]
+  numSlides: number
 }) => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null)
 
@@ -24,7 +26,7 @@ export const Swiper_ = ({
 
   const numSlidesPerView =
     windowSize.width >= 1024 ? 3 : windowSize.width >= 768 ? 2 : 1
-  const navigationIsShowing = swiper && slides.length > numSlidesPerView
+  const navigationIsShowing = swiper && numSlides > numSlidesPerView
 
   return (
     <Swiper
@@ -51,7 +53,7 @@ const Navigation_ = ({
   return (
     <div
       css={[
-        tw`z-20 absolute top-0 right-0 min-w-[110px] h-full bg-opacity-70 flex flex-col justify-center`,
+        tw`z-30 absolute top-0 right-0 min-w-[110px] h-full bg-opacity-70 flex flex-col justify-center`,
       ]}
     >
       <div css={[tw`-translate-x-sm`]}>
