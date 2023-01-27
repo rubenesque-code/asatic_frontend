@@ -1,5 +1,4 @@
-import { sanitize } from "dompurify"
-import produce from "immer"
+import { sanitize } from "isomorphic-dompurify"
 
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import {
@@ -7,56 +6,38 @@ import {
   RecordedEventType,
   SanitisedRecordedEvent,
 } from "^types/entities"
-import { MakeRequired } from "^types/utilities"
 import { processAuthorsAsChildren } from "../author/process"
 import { validateTranslation } from "./validate"
 import { processRecordedEventTypesAsChildren } from "../recorded-event-type/process"
 
-type ProcessedTranslation = MakeRequired<
-  SanitisedRecordedEvent["translations"][number],
-  "title"
->
+export function processRecordedEventForOwnPage(
+  recordedEvent: SanitisedRecordedEvent,
+  {
+    validLanguageIds,
+    recordedEventType,
+  }: {
+    validLanguageIds: string[]
+    recordedEventType: RecordedEventType | null | undefined
+  }
+) {
+  const translationsProcessed = recordedEvent.translations
+    .filter((translation) => validateTranslation(translation, validLanguageIds))
+    .map((translation) => ({
+      id: translation.id,
+      languageId: translation.languageId,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      title: sanitize(translation.title!),
+      ...(translation.body && { body: sanitize(translation.body) }),
+    }))
 
-export function processRecordedEventForOwnPage({
-  recordedEvent,
-  validLanguageIds,
-  recordedEventType,
-}: {
-  recordedEvent: SanitisedRecordedEvent
-  validLanguageIds: string[]
-  recordedEventType: RecordedEventType | null | undefined
-}) {
-  // remove invalid translations; remove empty translation sections.
-  const processedTranslations = produce(recordedEvent.translations, (draft) => {
-    for (let i = 0; i < draft.length; i++) {
-      const translation = draft[i]
-
-      const translationIsValid = validateTranslation(
-        translation,
-        validLanguageIds
-      )
-
-      if (!translationIsValid) {
-        // const translationIndex = draft.findIndex((t) => t.id === translation.id)
-        draft.splice(i, 1)
-        break
-      }
-    }
-  }) as ProcessedTranslation[]
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { recordedEventTypeId, ...restRecordedEvent } = recordedEvent
-
-  const processed = {
+  return {
     id: recordedEvent.id,
     publishDate: recordedEvent.publishDate,
-    translations: processedTranslations,
+    translations: translationsProcessed,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     youtubeId: recordedEvent.youtubeId!,
     ...(recordedEventType && { recordedEventType }),
   }
-
-  return processed
 }
 
 export function processRecordedEventAsSummary(

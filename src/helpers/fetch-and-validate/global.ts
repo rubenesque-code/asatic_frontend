@@ -1,4 +1,5 @@
 import { GlobalDataValue } from "^context/GlobalData"
+import { processSubjectsAsLinks } from "^helpers/process-fetched-data/subject/process"
 import { MyOmit } from "^types/utilities"
 import { fetchAndValidateAuthors } from "./authors"
 import { fetchAndValidateCollections } from "./collections"
@@ -11,6 +12,7 @@ export async function fetchAndValidateGlobalData() {
     ids: "all",
     validLanguageIds: validLanguages.ids,
   })
+  const processedSubjects = processSubjectsAsLinks(validSubjects.entities)
   const validAuthors = await fetchAndValidateAuthors({
     ids: "all",
     validLanguageIds: validLanguages.ids,
@@ -23,13 +25,12 @@ export async function fetchAndValidateGlobalData() {
   const globalContextData: MyOmit<GlobalDataValue, "documentLanguageIds"> = {
     isCollection: validCollections.entities.length > 0,
     isMultipleAuthors: validAuthors.entities.length > 1,
-    subjects: validSubjects.entities,
+    subjects: processedSubjects,
   }
 
   return {
     globalContextData,
     validatedData: {
-      allSubjects: validSubjects,
       allCollections: validCollections,
       allLanguages: validLanguages,
       allAuthors: validAuthors,

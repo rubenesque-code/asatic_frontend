@@ -1,3 +1,4 @@
+import { sanitize } from "dompurify"
 import { pipe } from "ramda"
 
 import { SanitisedSubject } from "^types/entities"
@@ -24,7 +25,8 @@ export function processSubjectForOwnPage(
   return {
     id: subject.id,
     publishDate: subject.publishDate,
-    title: subject.title,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    title: sanitize(subject.title!),
     customSections: orderedChildDocumentEntities,
     languageId: subject.languageId,
   }
@@ -51,7 +53,8 @@ function processSubjectAsLink(subject: SanitisedSubject) {
   return {
     id: subject.id,
     publishDate: subject.publishDate,
-    title: subject.title,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    title: sanitize(subject.title!),
     languageId: subject.languageId,
   }
 }

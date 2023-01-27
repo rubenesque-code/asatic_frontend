@@ -1,10 +1,10 @@
 import { createContext, ReactElement, useContext } from "react"
 import { checkObjectHasField } from "^helpers/data"
-import { SanitisedSubject } from "^types/entities"
+import { processSubjectsAsLinks } from "^helpers/process-fetched-data/subject/process"
 
 type Value = {
   isMultipleAuthors: boolean
-  subjects: SanitisedSubject[]
+  subjects: ReturnType<typeof processSubjectsAsLinks>
   isCollection: boolean
   documentLanguageIds?: string[]
 }

@@ -1,5 +1,6 @@
 import produce from "immer"
-import { sanitize } from "dompurify"
+import { sanitize } from "isomorphic-dompurify"
+
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import { SanitisedArticle, SanitisedBlog, Image } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
@@ -120,17 +121,18 @@ export type ArticleLikeEntityAsSummary = ReturnType<
 
 export function processArticleLikeEntityAsSummary<
   TEntity extends SanitisedArticle | SanitisedBlog
->({
-  entity,
-  validLanguageIds,
-  validImages,
-  processedAuthors,
-}: {
-  entity: TEntity
-  validLanguageIds: string[]
-  validImages: Image[]
-  processedAuthors: ReturnType<typeof processAuthorsAsChildren>
-}) {
+>(
+  entity: TEntity,
+  {
+    validLanguageIds,
+    validImages,
+    processedAuthors,
+  }: {
+    validLanguageIds: string[]
+    validImages: Image[]
+    processedAuthors: ReturnType<typeof processAuthorsAsChildren>
+  }
+) {
   let summaryImage: Image | null = null
 
   if (entity.summaryImage.useImage !== false) {
@@ -187,4 +189,27 @@ export function processArticleLikeEntityAsSummary<
   }
 
   return processed
+}
+
+export function processArticleLikeEntitiesAsSummarries<
+  TEntity extends SanitisedArticle | SanitisedBlog
+>(
+  entities: TEntity[],
+  {
+    validLanguageIds,
+    validImages,
+    processedAuthors,
+  }: {
+    validLanguageIds: string[]
+    validImages: Image[]
+    processedAuthors: ReturnType<typeof processAuthorsAsChildren>
+  }
+) {
+  return entities.map((entity) =>
+    processArticleLikeEntityAsSummary(entity, {
+      processedAuthors,
+      validLanguageIds,
+      validImages,
+    })
+  )
 }

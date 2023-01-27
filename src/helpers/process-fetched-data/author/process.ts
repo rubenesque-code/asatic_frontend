@@ -1,5 +1,5 @@
-import { sanitize } from "dompurify"
-import { mapLanguageIds } from "^helpers/data"
+import { sanitize } from "isomorphic-dompurify"
+
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
 import {
@@ -13,6 +13,8 @@ import {
   validateTranslation,
   ValidTranslation as BasicValidatedTranslation,
 } from "./validate"
+import { validateArticleLikeEntity } from "../article-like/validate"
+import { validateRecordedEvent } from "../recorded-event/validate"
 
 /**Used within getStaticProps after validation has occurred in getStaticPaths; remove invalid translations and child entities.*/
 export function processAuthorAsParent(
@@ -47,65 +49,18 @@ export function processAuthorAsParent(
   const processedAuthorTranslations = basicValidatedTranslations.map(
     (authorTranslation) => {
       const entities = {
-        articles: authorArticles
-          .filter((article) =>
-            mapLanguageIds(article.translations).includes(
-              authorTranslation.languageId
-            )
-          )
-          .map((article) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const translation = article.translations.find(
-              (t) => t.languageId === authorTranslation.languageId
-            )!
-
-            return {
-              id: article.id,
-              title: translation.title,
-              text: getArticleLikeSummaryText(translation),
-              publishDate: article.publishDate,
-              type: "article" as const,
-            }
-          }),
-        blogs: authorBlogs
-          .filter((blog) =>
-            mapLanguageIds(blog.translations).includes(
-              authorTranslation.languageId
-            )
-          )
-          .map((blog) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const translation = blog.translations.find(
-              (t) => t.languageId === authorTranslation.languageId
-            )!
-
-            return {
-              id: blog.id,
-              title: translation.title,
-              text: getArticleLikeSummaryText(translation),
-              publishDate: blog.publishDate,
-              type: "blog" as const,
-            }
-          }),
-        recordedEvents: authorRecordedEvents
-          .filter((recordedEvent) =>
-            mapLanguageIds(recordedEvent.translations).includes(
-              authorTranslation.languageId
-            )
-          )
-          .map((recordedEvent) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const translation = recordedEvent.translations.find(
-              (t) => t.languageId === authorTranslation.languageId
-            )!
-
-            return {
-              id: recordedEvent.id,
-              title: translation.title,
-              publishDate: recordedEvent.publishDate,
-              type: "recordedEvent" as const,
-            }
-          }),
+        articles: processArticleLikeEntitiesForAuthorTranslation(
+          authorArticles,
+          authorTranslation.languageId
+        ),
+        blogs: processArticleLikeEntitiesForAuthorTranslation(
+          authorBlogs,
+          authorTranslation.languageId
+        ),
+        recordedEvents: processRecordedEventsForAuthorTranslation(
+          authorRecordedEvents,
+          authorTranslation.languageId
+        ),
       }
 
       const documentsOrdered = sortEntitiesByDate([
@@ -123,6 +78,55 @@ export function processAuthorAsParent(
   )
 
   return { id: author.id, translations: processedAuthorTranslations }
+}
+
+function processArticleLikeEntitiesForAuthorTranslation<
+  TEntity extends SanitisedArticle | SanitisedBlog
+>(entities: TEntity[], authorTranslationlanguageId: string) {
+  return entities
+    .filter((entity) =>
+      validateArticleLikeEntity(entity, [authorTranslationlanguageId])
+    )
+    .map((entity) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const translation = entity.translations.find(
+        (t) => t.languageId === authorTranslationlanguageId
+      )!
+
+      return {
+        id: entity.id,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        title: sanitize(translation.title!),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        text: sanitize(getArticleLikeSummaryText(translation)!),
+        publishDate: entity.publishDate,
+        type: entity.type,
+      }
+    })
+}
+
+function processRecordedEventsForAuthorTranslation(
+  entities: SanitisedRecordedEvent[],
+  authorTranslationlanguageId: string
+) {
+  return entities
+    .filter((recordedEvent) =>
+      validateRecordedEvent(recordedEvent, [authorTranslationlanguageId])
+    )
+    .map((entity) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const translation = entity.translations.find(
+        (t) => t.languageId === authorTranslationlanguageId
+      )!
+
+      return {
+        id: entity.id,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        title: sanitize(translation.title!),
+        publishDate: entity.publishDate,
+        type: entity.type,
+      }
+    })
 }
 
 export function processAuthorsAsParents(
@@ -162,7 +166,7 @@ export function processAuthorAsChild(
 
       return {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        name: sanitize(name!),
+        name: sanitize(name! || ""),
         ...restOfTranslation,
       }
     })

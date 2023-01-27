@@ -1,4 +1,5 @@
-import { sanitize } from "dompurify"
+import { sanitize } from "isomorphic-dompurify"
+
 import { findEntityById } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 import { Image, SanitisedCollection } from "^types/entities"

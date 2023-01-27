@@ -1,4 +1,4 @@
-import { sanitize } from "dompurify"
+import { sanitize } from "isomorphic-dompurify"
 
 import { RecordedEventType } from "^types/entities"
 import { validateTranslation } from "./validate"
