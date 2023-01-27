@@ -6,7 +6,7 @@ import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 import SideBar from "./SideBar"
 import SiteLanguage from "./SiteLanguage"
-import { $link } from "^styles/global"
+import { $link, $pagePx } from "^styles/global"
 
 const Header = () => {
   const { siteLanguage } = useSiteLanguageContext()
@@ -14,7 +14,8 @@ const Header = () => {
   return (
     <div
       css={[
-        tw`relative flex justify-between items-center pt-md px-md pb-md border-b`,
+        tw`relative flex justify-between items-center pt-md pb-md border-b`,
+        $pagePx,
       ]}
     >
       <div>

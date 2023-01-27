@@ -1,3 +1,4 @@
+import { CSSInterpolation } from "@emotion/css"
 import { ReactElement } from "react"
 import tw, { TwStyle } from "twin.macro"
 
@@ -8,7 +9,7 @@ export const $CenterMaxWidth_ = ({
 }: {
   children: ReactElement
   maxWidth: TwStyle
-  styles?: TwStyle
+  styles?: CSSInterpolation
 }) => (
   <div css={[tw`flex justify-center`]}>
     <div css={[tw`w-full box-content`, maxWidth, styles]}>{children}</div>
@@ -20,7 +21,7 @@ export const $ContentSectionMaxWidthWrapper = ({
   styles,
 }: {
   children: ReactElement
-  styles?: TwStyle
+  styles?: CSSInterpolation
 }) => (
   <$CenterMaxWidth_ maxWidth={tw`max-w-[1300px]`} styles={styles}>
     {children}

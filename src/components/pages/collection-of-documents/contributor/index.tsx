@@ -10,10 +10,8 @@ import {
   PageWrapper_,
 } from "^components/pages/_containers"
 import Summary from "./Summary"
-import {
-  $ContentSectionMaxWidthWrapper,
-  $ContentSectionLayout_,
-} from "^components/pages/_presentation"
+import { $ContentSectionLayout_ } from "^components/pages/_presentation"
+import { $pagePx } from "^styles/global"
 
 const AuthorsPageContent = ({ globalData, pageData }: StaticData) => {
   const { documentLanguage: filterLanguage } = useDetermineDocumentLanguage(
@@ -55,9 +53,10 @@ const PageBody = ({
           documentLanguage: filterLanguage,
           documentLanguages: languages,
         }}
+        styles={[$pagePx]}
       />
-      <div css={[tw`mt-md px-sm`]}>
-        <$ContentSectionLayout_>
+      <div css={[tw`mt-md`]}>
+        <$ContentSectionLayout_ styles={[$pagePx]}>
           <div css={[tw`flex flex-col gap-lg `]}>
             {translation.documents.map((entity) => (
               <Summary

@@ -1,6 +1,7 @@
+import { CSSInterpolation } from "@emotion/css"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import tw, { TwStyle } from "twin.macro"
+import tw from "twin.macro"
 import { TranslateIcon } from "^components/Icons"
 import { sortLanguages } from "^helpers/manipulateEntity"
 
@@ -10,7 +11,7 @@ export type Languages_Props = {
   documentLanguages: Language[]
   documentLanguage: Language
   color?: "light" | "dark"
-  styles?: TwStyle
+  styles?: CSSInterpolation
 }
 
 export const Languages_ = ({

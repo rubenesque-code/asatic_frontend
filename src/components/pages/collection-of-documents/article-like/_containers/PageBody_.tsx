@@ -45,9 +45,10 @@ export const PageBody_ = ({
           documentLanguage: filterLanguage,
           documentLanguages: languages,
         }}
+        useMargin
       />
       <div css={[tw`border-b`]}>
-        <$ContentSectionLayout_>
+        <$ContentSectionLayout_ useMargin>
           <div css={[tw`border-l border-r grid grid-cols-1 sm:grid-cols-2`]}>
             {articleLikeEntitiesProcessed.map((article, i) => {
               return (
