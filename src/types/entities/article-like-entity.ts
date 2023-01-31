@@ -32,6 +32,7 @@ export type ImageSection = Section<"image"> &
 
 export type VideoSection = Section<"video"> &
   MediaFields<"caption" | "youtubeId">
+export type Footnote = { id: string; num: number; text: string }
 
 type ArticleLikeTranslationFields = TranslationField<"title"> & {
   body: (Expand<TextSection> | Expand<ImageSection> | Expand<VideoSection>)[]
