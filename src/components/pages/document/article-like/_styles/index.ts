@@ -1,8 +1,13 @@
-import tw from "twin.macro"
+import tw, { styled } from "twin.macro"
 
 export const $DocumentHeader = tw.div`pb-sm sm:pb-md border-b`
 
-export const $Date = tw.h4`tracking-wide text-sm sm:text-base font-light text-gray-600 font-sans-document mb-xs sm:mb-sm`
+export const $Date = styled.p(({ languageId }: { languageId: string }) => [
+  languageId === "tamil"
+    ? tw`font-sans-document-tamil sm:text-lg`
+    : tw`font-sans-document text-sm sm:text-base `,
+  tw`mb-xs sm:mb-sm text-gray-600 font-light tracking-wide`,
+])
 
 export const $Title = tw.h1`text-2xl sm:text-3xl text-gray-900 `
 

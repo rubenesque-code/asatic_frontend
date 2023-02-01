@@ -4,7 +4,11 @@ import { useDetermineDocumentLanguage } from "^hooks/useDetermineDocumentLanguag
 
 import { StaticData } from "../_types"
 
-import { Languages_ } from "^components/pages/_containers"
+import {
+  BodyFontWrapper,
+  Languages_,
+  DateString_,
+} from "^components/pages/_containers"
 import { Authors_ } from "../../_containers"
 import { DocumentBody_ } from "./DocumentBody_"
 
@@ -24,7 +28,7 @@ export const Document_ = ({
   )!
 
   return (
-    <>
+    <BodyFontWrapper documentLanguageId={translation.languageId}>
       <$DocumentMaxWidthContainer>
         <div css={[tw`mt-xl`]}>
           <$DocumentHeader>
@@ -34,7 +38,12 @@ export const Document_ = ({
                 documentLanguages={languages}
               />
             </div>
-            <$Date>{article.publishDate}</$Date>
+            <$Date languageId={translation.languageId}>
+              <DateString_
+                engDateStr={article.publishDate}
+                languageId={translation.languageId}
+              />
+            </$Date>
             <$Title>{translation.title}</$Title>
             <Authors_
               authors={authors}
@@ -45,6 +54,6 @@ export const Document_ = ({
           <DocumentBody_ body={translation.body} />
         </div>
       </$DocumentMaxWidthContainer>
-    </>
+    </BodyFontWrapper>
   )
 }
