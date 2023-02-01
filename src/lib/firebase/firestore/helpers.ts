@@ -56,9 +56,7 @@ export const fetchFirestoreDocuments = async (
     })
 
     return data
-  } catch (error) {
-    console.log("error:", error)
-  }
+  } catch (error) {}
 }
 
 export const fetchFirestoreCollection = async (
@@ -96,9 +94,7 @@ export async function fetchFirestorePublishableDocuments(
     })
 
     return data
-  } catch (error) {
-    console.log("error:", error)
-  }
+  } catch (error) {}
 }
 
 export async function fetchFirestorePublishableCollection(

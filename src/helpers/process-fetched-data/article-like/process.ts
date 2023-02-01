@@ -1,7 +1,7 @@
 import produce from "immer"
 import DOMPurify from "isomorphic-dompurify"
 
-import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
+import { filterAndMapEntitiesById, mapIds } from "^helpers/data"
 import { SanitisedArticle, SanitisedBlog, Image } from "^types/entities"
 import { MakeRequired } from "^types/utilities"
 import {
@@ -164,6 +164,43 @@ export type ArticleLikeEntityAsSummary = ReturnType<
   typeof processArticleLikeEntityAsSummary
 >
 
+const getSummaryImage = (
+  entity: SanitisedArticle | SanitisedBlog,
+  validImages: Image[]
+) => {
+  if (entity.summaryImage.useImage === false) {
+    return null
+  }
+  const summaryImage = entity.summaryImage.imageId
+    ? validImages.find(
+        (validImage) => validImage.id === entity.summaryImage.imageId
+      )
+    : null
+
+  if (summaryImage) {
+    return summaryImage
+  }
+
+  const documentImageIds = getArticleLikeDocumentImageIds(entity.translations)
+
+  if (!documentImageIds.length) {
+    return null
+  }
+
+  let documentImage: null | Image = null
+
+  for (let i = 0; i < documentImageIds.length; i++) {
+    const imageId = documentImageIds[i]
+    const image = validImages.find((validImage) => validImage.id === imageId)
+    if (image) {
+      documentImage = image
+      break
+    }
+  }
+
+  return documentImage ? documentImage : null
+}
+
 export function processArticleLikeEntityAsSummary<
   TEntity extends SanitisedArticle | SanitisedBlog
 >(
@@ -178,31 +215,7 @@ export function processArticleLikeEntityAsSummary<
     processedAuthors: ReturnType<typeof processAuthorsAsChildren>
   }
 ) {
-  let summaryImage: Image | null = null
-
-  if (entity.summaryImage.useImage !== false) {
-    if (entity.summaryImage.imageId) {
-      const storageImage = findEntityById(
-        validImages,
-        entity.summaryImage.imageId
-      )
-      if (storageImage) {
-        summaryImage = storageImage
-      }
-    } else {
-      const documentImageIds = getArticleLikeDocumentImageIds(
-        entity.translations
-      )
-      documentImageIds.some((imageId) => {
-        const storageImage = findEntityById(validImages, imageId)
-        if (storageImage) {
-          summaryImage = storageImage
-        }
-
-        return storageImage
-      })
-    }
-  }
+  const summaryImage = getSummaryImage(entity, validImages)
 
   const validTranslations = entity.translations.filter((translation) =>
     validateTranslation(translation, validLanguageIds)

@@ -112,13 +112,13 @@ const Subjects = () => {
   const { siteLanguage } = useSiteLanguageContext()
   const { subjects } = useGlobalDataContext()
 
-  if (!subjects.length) {
-    return null
-  }
-
-  const subjectsForSiteLanguage = subjects.filter(
+  const subjectsForLanguage = subjects.filter(
     (subject) => subject.languageId === siteLanguage.id
   )
+
+  if (!subjectsForLanguage.length) {
+    return null
+  }
 
   return (
     <div css={[tw`pt-md border-t`]}>
@@ -141,7 +141,7 @@ const Subjects = () => {
           tw`overflow-hidden transition-all ease-in-out duration-150`,
         ]}
       >
-        {subjectsForSiteLanguage.map((subject) => (
+        {subjectsForLanguage.map((subject) => (
           <Subject subject={subject} key={subject.id} />
         ))}
       </div>

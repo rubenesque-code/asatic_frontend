@@ -7,6 +7,7 @@ import {
 } from "^types/entities"
 import { getArticleLikeDocumentImageIds } from "../article-like"
 import { getAllCollectionImageIds } from "../collection/query"
+import { getAllImageIdsFromArticleLikeEntity } from "../article-like/query"
 
 export function getUniqueDocumentEntitiesImageIds({
   articles,
@@ -45,9 +46,11 @@ export function getUniqueChildEntitiesImageIds({
   collections?: SanitisedCollection[]
 }) {
   const articleAndBlogImageIds = articleLikeEntities
-    ? articleLikeEntities.flatMap((articleLikeEntity) =>
-        getArticleLikeDocumentImageIds(articleLikeEntity.translations)
-      )
+    ? articleLikeEntities
+        .flatMap((articleLikeEntity) =>
+          getAllImageIdsFromArticleLikeEntity(articleLikeEntity)
+        )
+        .flatMap((id) => (id ? [id] : []))
     : []
 
   const recordedEventImageIds = recordedEvents

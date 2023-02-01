@@ -12,7 +12,6 @@ const ChildDocuments = ({
 }: {
   collection: StaticData["pageData"]["collection"]
 }) => {
-  console.log("collection:", collection)
   return (
     <div css={[tw`pb-xl`]}>
       {collection.childDocumentEntities.map((entity) => (

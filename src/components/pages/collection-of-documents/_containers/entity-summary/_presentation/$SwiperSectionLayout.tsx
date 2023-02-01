@@ -58,7 +58,7 @@ export const $SwiperSectionLayout = ({
           </$SectionHeaderContainer>
         </$ContentSectionLayout_>
       </div>
-      <$ContentSectionLayout_>
+      <$ContentSectionLayout_ useMargin>
         <$SectionContent>{swiper}</$SectionContent>
       </$ContentSectionLayout_>
     </div>

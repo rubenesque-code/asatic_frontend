@@ -218,7 +218,7 @@ export const fetchRecordedEventTypes = async (ids: string[] | "all") => {
 
 export const fetchSubject = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    firestore_collection_key.articles,
+    firestore_collection_key.subjects,
     docId
   )) as UnsanitizedFirestoreDocument<FetchedSubject>
 

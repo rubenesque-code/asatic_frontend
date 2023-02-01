@@ -49,12 +49,12 @@ const useGetSectionComponentsForLanguage = (
   const { siteLanguage } = useSiteLanguageContext()
 
   const firstSectionComponentsForSiteLanguage =
-    landingSections.firstSectionComponents?.filter((component) =>
-      mapLanguageIds(component.entity.translations).includes(siteLanguage.id)
+    landingSections.firstSectionComponents?.filter(
+      (component) => component.languageId === siteLanguage.id
     ) || null
   const secondSectionComponentsForSiteLanguage =
-    landingSections.secondSectionComponents?.filter((component) =>
-      mapLanguageIds(component.entity.translations).includes(siteLanguage.id)
+    landingSections.secondSectionComponents?.filter(
+      (component) => component.languageId === siteLanguage.id
     ) || null
 
   const collectionsForSiteLanguage =
