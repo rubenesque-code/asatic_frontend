@@ -1,5 +1,5 @@
 import produce from "immer"
-import { sanitize } from "isomorphic-dompurify"
+import DOMPurify from "isomorphic-dompurify"
 
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import { SanitisedArticle, SanitisedBlog, Image } from "^types/entities"
@@ -30,7 +30,7 @@ export function processArticleLikeEntityForOwnPage<
       languageId: translation.languageId,
       body: translation.body,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      title: sanitize(translation.title!),
+      title: DOMPurify.sanitize(translation.title!),
     }))
     .map((translation) =>
       produce(translation, (draft) => {
@@ -51,8 +51,13 @@ export function processArticleLikeEntityForOwnPage<
               draft.body.splice(j, 1)
             }
             break
-          } else {
+          } else if (bodySection.type === "video") {
             if (!bodySection.youtubeId) {
+              draft.body.splice(j, 1)
+            }
+          } else {
+            const { columns, rows } = bodySection
+            if (!columns.length || !rows.length) {
               draft.body.splice(j, 1)
             }
           }
@@ -63,28 +68,48 @@ export function processArticleLikeEntityForOwnPage<
       // · merge data · sanitise text
       const { body, ...restOfTranslation } = translation
 
+      const textSections = body.flatMap((s) => (s.type === "text" ? [s] : []))
+
+      /*       const text = textSections.flatMap((s) => (s.text ? [s.text] : [])).join()
+      const regex = new RegExp(/<(sup).*?id="([^"]*?)".*?>(.+?)<\/\1>/gi)
+      const footnoteTagIds = text.match(regex)?.flatMap((match) => {
+        const a = regex.exec(match)
+        const id = a ? a[2] : null
+
+        return id ? [id] : []
+      }) */
+
+      const footnotesText = textSections
+        .flatMap((s) => (s.footnotes ? s.footnotes : []))
+        .map((footnote, i) => ({
+          ...footnote,
+          num: i + 1,
+          text: DOMPurify.sanitize(footnote.text),
+        }))
+
       const translationBodyDataMerged = body.map((section) => {
         if (section.type === "text") {
-          const { text, ...restOfSection } = section
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { text, footnotes, ...restOfSection } = section
           return {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            text: sanitize(text!),
+            text: DOMPurify.sanitize(text!),
             ...restOfSection,
           }
         } else if (section.type === "video") {
           const { caption, ...restOfSection } = section
 
           return {
-            ...(caption && { caption: sanitize(caption) }),
+            ...(caption && { caption: DOMPurify.sanitize(caption) }),
             ...restOfSection,
           }
-        } else {
+        } else if (section.type === "image") {
           const { image, caption, ...restOfSection } = section
           const { imageId, ...restOfImage } = image
 
           return {
             ...restOfSection,
-            ...(caption && { caption: sanitize(caption) }),
+            ...(caption && { caption: DOMPurify.sanitize(caption) }),
             image: {
               ...restOfImage,
               storageImage:
@@ -92,12 +117,32 @@ export function processArticleLikeEntityForOwnPage<
                 validImages.find((image) => image.id === imageId)!,
             },
           }
+        } else {
+          const { columns, rows, notes, title, ...restOfSection } = section
+
+          return {
+            ...restOfSection,
+            columns: columns.map((column) => ({
+              ...column,
+              Header: DOMPurify.sanitize(column.Header),
+            })),
+            rows: rows.map((row) => {
+              const keys = Object.keys(row)
+              const arr = keys.map((key) => [key, DOMPurify.sanitize(row[key])])
+              const newObj = Object.fromEntries(arr) as typeof row
+
+              return newObj
+            }),
+            notes: notes ? DOMPurify.sanitize(notes) : notes,
+            title: title ? DOMPurify.sanitize(title) : title,
+          }
         }
       })
 
       return {
         ...restOfTranslation,
         body: translationBodyDataMerged,
+        footnotesText,
       }
     })
 
@@ -164,11 +209,13 @@ export function processArticleLikeEntityAsSummary<
   ) as AsSummaryValidTranslation[]
 
   const processedTranslations = validTranslations.map((translation) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const summaryText = sanitize(getArticleLikeSummaryText(translation)!)
+    const summaryText = DOMPurify.sanitize(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      getArticleLikeSummaryText(translation)!
+    )
 
     return {
-      title: sanitize(translation.title),
+      title: DOMPurify.sanitize(translation.title),
       summaryText,
       languageId: translation.languageId,
     }

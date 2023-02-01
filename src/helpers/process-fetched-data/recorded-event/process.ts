@@ -1,4 +1,4 @@
-import { sanitize } from "isomorphic-dompurify"
+import DOMPurify from "isomorphic-dompurify"
 
 import { filterAndMapEntitiesById, findEntityById, mapIds } from "^helpers/data"
 import { Image, SanitisedRecordedEvent } from "^types/entities"
@@ -25,8 +25,8 @@ export function processRecordedEventForOwnPage(
       id: translation.id,
       languageId: translation.languageId,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      title: sanitize(translation.title!),
-      ...(translation.body && { body: sanitize(translation.body) }),
+      title: DOMPurify.sanitize(translation.title!),
+      ...(translation.body && { body: DOMPurify.sanitize(translation.body) }),
     }))
 
   return {
@@ -74,7 +74,7 @@ export function processRecordedEventAsSummary(
     .map((translation) => {
       return {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        title: sanitize(translation.title!),
+        title: DOMPurify.sanitize(translation.title!),
         languageId: translation.languageId,
       }
     })

@@ -1,4 +1,4 @@
-import { sanitize } from "isomorphic-dompurify"
+import DOMPurify from "isomorphic-dompurify"
 
 import { findEntityById } from "^helpers/data"
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
@@ -40,9 +40,9 @@ export function processCollectionAsSummary(
           storageImage: summaryImage,
         }
       : null,
-    title: sanitize(collection.title),
+    title: DOMPurify.sanitize(collection.title),
     languageId: collection.languageId,
-    ...(summaryText && { text: sanitize(summaryText) }),
+    ...(summaryText && { text: DOMPurify.sanitize(summaryText) }),
   }
 }
 
@@ -88,11 +88,11 @@ export function processCollectionForOwnPage(
     id: collection.id,
     publishDate: collection.publishDate,
     bannerImage,
-    title: sanitize(collection.title),
+    title: DOMPurify.sanitize(collection.title),
     childDocumentEntities: orderedChildDocumentEntities,
     languageId: collection.languageId,
     ...(collection.description && {
-      description: sanitize(collection.description),
+      description: DOMPurify.sanitize(collection.description),
     }),
   }
 }

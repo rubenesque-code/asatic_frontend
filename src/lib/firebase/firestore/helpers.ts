@@ -34,12 +34,19 @@ export const fetchFirestoreDocuments = async (
 ) => {
   try {
     const docsRefs = additionalQueryContstraint
-      ? query(
-          collection(firestore, collectionKey),
-          where("id", "in", docIds),
-          additionalQueryContstraint
-        )
-      : query(collection(firestore, collectionKey), where("id", "in", docIds))
+      ? docIds.length
+        ? query(
+            collection(firestore, collectionKey),
+            where("id", "in", docIds),
+            additionalQueryContstraint
+          )
+        : query(
+            collection(firestore, collectionKey),
+            additionalQueryContstraint
+          )
+      : docIds.length
+      ? query(collection(firestore, collectionKey), where("id", "in", docIds))
+      : query(collection(firestore, collectionKey))
 
     const docsSnap = await getDocs(docsRefs)
     const data: DocumentData[] = []

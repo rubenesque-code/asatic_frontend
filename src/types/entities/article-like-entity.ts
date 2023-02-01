@@ -17,13 +17,16 @@ import {
 import { Translations } from "./entity-translation"
 import { SummaryImageField } from "./entity-image"
 
-type SectionTypes = "text" | "image" | "video"
+type SectionTypes = "text" | "image" | "video" | "table"
 
 type Section<TType extends SectionTypes> = ComponentFields<"id" | "index"> & {
   type: TType
 }
 
-export type TextSection = Section<"text"> & { text?: RichText }
+export type TextSection = Section<"text"> & {
+  text?: RichText
+  footnotes?: Footnote[]
+}
 
 export type ImageSection = Section<"image"> &
   MediaFields<"caption"> & {
@@ -32,10 +35,26 @@ export type ImageSection = Section<"image"> &
 
 export type VideoSection = Section<"video"> &
   MediaFields<"caption" | "youtubeId">
+
 export type Footnote = { id: string; num: number; text: string }
 
+type Column = { accessor: string; Header: string }
+
+type TableSection = Section<"table"> & {
+  title: string | null
+  notes: string | null
+  columns: Column[]
+  rows: ({ col1: string } & Record<string, string>)[]
+  col1IsTitular: boolean
+}
+
 type ArticleLikeTranslationFields = TranslationField<"title"> & {
-  body: (Expand<TextSection> | Expand<ImageSection> | Expand<VideoSection>)[]
+  body: (
+    | Expand<TextSection>
+    | Expand<ImageSection>
+    | Expand<VideoSection>
+    | TableSection
+  )[]
   summary?: string
 }
 

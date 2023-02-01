@@ -24,8 +24,10 @@ export const DocumentBody_ = ({
             <$ImageSection_ section={section} />
           ) : section.type === "text" ? (
             <Prose_ htmlStr={section.text} />
-          ) : (
+          ) : section.type === "video" ? (
             <$VideoSection_ section={section} />
+          ) : (
+            <p>table</p>
           )}
         </Fragment>
       ))}

@@ -1,4 +1,4 @@
-import { sanitize } from "isomorphic-dompurify"
+import DOMPurify from "isomorphic-dompurify"
 
 import { RecordedEventType } from "^types/entities"
 import { validateTranslation } from "./validate"
@@ -20,7 +20,7 @@ export function processRecordedEventTypeAsChild(
 
       return {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        name: sanitize(name!),
+        name: DOMPurify.sanitize(name!),
         ...restOfTranslation,
       }
     })

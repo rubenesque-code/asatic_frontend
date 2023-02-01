@@ -1,4 +1,4 @@
-import { sanitize } from "isomorphic-dompurify"
+import DOMPurify from "isomorphic-dompurify"
 
 import { sortEntitiesByDate } from "^helpers/manipulateEntity"
 
@@ -96,9 +96,9 @@ function processArticleLikeEntitiesForAuthorTranslation<
       return {
         id: entity.id,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        title: sanitize(translation.title!),
+        title: DOMPurify.sanitize(translation.title!),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        text: sanitize(getArticleLikeSummaryText(translation)!),
+        text: DOMPurify.sanitize(getArticleLikeSummaryText(translation)!),
         publishDate: entity.publishDate,
         type: entity.type,
       }
@@ -122,7 +122,7 @@ function processRecordedEventsForAuthorTranslation(
       return {
         id: entity.id,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        title: sanitize(translation.title!),
+        title: DOMPurify.sanitize(translation.title!),
         publishDate: entity.publishDate,
         type: entity.type,
       }
@@ -166,7 +166,7 @@ export function processAuthorAsChild(
 
       return {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        name: sanitize(name! || ""),
+        name: DOMPurify.sanitize(name! || ""),
         ...restOfTranslation,
       }
     })
