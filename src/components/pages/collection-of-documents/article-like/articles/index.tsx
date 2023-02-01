@@ -15,7 +15,9 @@ const ArticlesPageContent = ({ globalData, pageData }: StaticData) => {
       globalData={globalData}
       pageTitle={siteTranslations.articles[siteLanguage.id]}
     >
-      <PageBody_ pageData={pageData} />
+      <>
+        <PageBody_ pageData={pageData} />
+      </>
     </PageWrapper_>
   )
 }

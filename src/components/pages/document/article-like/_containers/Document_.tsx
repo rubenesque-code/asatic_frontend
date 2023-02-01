@@ -51,7 +51,10 @@ export const Document_ = ({
               styles={$authors}
             />
           </$DocumentHeader>
-          <DocumentBody_ body={translation.body} />
+          <DocumentBody_
+            body={translation.body}
+            footnotes={translation.footnotes}
+          />
         </div>
       </$DocumentMaxWidthContainer>
     </BodyFontWrapper>

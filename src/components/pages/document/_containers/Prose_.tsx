@@ -3,7 +3,15 @@ import tw, { TwStyle } from "twin.macro"
 
 import HtmlStrToJSX from "^components/HtmlStrToJSX"
 
-const Prose_ = ({ htmlStr, styles }: { htmlStr: string; styles?: TwStyle }) => {
+const Prose_ = ({
+  htmlStr,
+  styles,
+  validFootnoteIds,
+}: {
+  htmlStr: string
+  styles?: TwStyle
+  validFootnoteIds?: string[]
+}) => {
   const windowSize = useWindowSize()
 
   return (
@@ -14,7 +22,7 @@ const Prose_ = ({ htmlStr, styles }: { htmlStr: string; styles?: TwStyle }) => {
         width: "auto",
       }}
     >
-      <HtmlStrToJSX htmlStr={htmlStr} />
+      <HtmlStrToJSX htmlStr={htmlStr} validFootnoteIds={validFootnoteIds} />
     </div>
   )
 }

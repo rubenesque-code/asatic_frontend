@@ -70,22 +70,33 @@ export function processArticleLikeEntityForOwnPage<
 
       const textSections = body.flatMap((s) => (s.type === "text" ? [s] : []))
 
-      /*       const text = textSections.flatMap((s) => (s.text ? [s.text] : [])).join()
+      const text = textSections.flatMap((s) => (s.text ? [s.text] : [])).join()
       const regex = new RegExp(/<(sup).*?id="([^"]*?)".*?>(.+?)<\/\1>/gi)
       const footnoteTagIds = text.match(regex)?.flatMap((match) => {
         const a = regex.exec(match)
         const id = a ? a[2] : null
 
         return id ? [id] : []
-      }) */
+      })
 
-      const footnotesText = textSections
-        .flatMap((s) => (s.footnotes ? s.footnotes : []))
+      const footnotesText = textSections.flatMap((s) =>
+        s.footnotes ? s.footnotes : []
+      )
+
+      const footnotesTextProcessed = footnotesText
+        .filter(
+          (footnote) =>
+            footnoteTagIds?.includes(footnote.id) && footnote.text.length
+        )
         .map((footnote, i) => ({
           ...footnote,
           num: i + 1,
           text: DOMPurify.sanitize(footnote.text),
         }))
+
+      const footnoteTagIdsValid = footnoteTagIds?.filter((id) =>
+        mapIds(footnotesTextProcessed).includes(id)
+      )
 
       const translationBodyDataMerged = body.map((section) => {
         if (section.type === "text") {
@@ -142,7 +153,12 @@ export function processArticleLikeEntityForOwnPage<
       return {
         ...restOfTranslation,
         body: translationBodyDataMerged,
-        footnotesText,
+        footnotes: footnotesTextProcessed.length
+          ? {
+              text: footnotesTextProcessed,
+              idsValid: footnoteTagIdsValid,
+            }
+          : null,
       }
     })
 

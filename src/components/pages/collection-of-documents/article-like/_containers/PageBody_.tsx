@@ -38,7 +38,7 @@ export const PageBody_ = ({
   )
 
   return (
-    <BodyFontWrapper documentLanguageId={filterLanguage.id}>
+    <>
       <BodyHeaderLayout_
         title={siteTranslations.articles[siteLanguage.id]}
         languages={{
@@ -47,40 +47,42 @@ export const PageBody_ = ({
         }}
         useMargin
       />
-      <div css={[tw`border-b`]}>
-        <$ContentSectionLayout_ useMargin>
-          <div css={[tw`border-l border-r grid grid-cols-1 sm:grid-cols-2`]}>
-            {articleLikeEntitiesProcessed.map((article, i) => {
-              return (
-                <$SummaryContainer
-                  css={[
-                    i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
-                    i < articleLikeEntitiesProcessed.length
-                      ? tw`border-b`
-                      : tw`border-b-0`,
-                    articleLikeEntitiesProcessed.length % 2 === 0
-                      ? i < articleLikeEntitiesProcessed.length - 2
+      <BodyFontWrapper documentLanguageId={filterLanguage.id}>
+        <div css={[tw`border-b`]}>
+          <$ContentSectionLayout_ useMargin>
+            <div css={[tw`border-l border-r grid grid-cols-1 sm:grid-cols-2`]}>
+              {articleLikeEntitiesProcessed.map((article, i) => {
+                return (
+                  <$SummaryContainer
+                    css={[
+                      i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
+                      i < articleLikeEntitiesProcessed.length
+                        ? tw`border-b`
+                        : tw`border-b-0`,
+                      articleLikeEntitiesProcessed.length % 2 === 0
+                        ? i < articleLikeEntitiesProcessed.length - 2
+                          ? tw`sm:border-b`
+                          : tw`sm:border-b-0`
+                        : articleLikeEntitiesProcessed.length % 2 === 1 &&
+                          i < articleLikeEntitiesProcessed.length - 1
                         ? tw`sm:border-b`
-                        : tw`sm:border-b-0`
-                      : articleLikeEntitiesProcessed.length % 2 === 1 &&
-                        i < articleLikeEntitiesProcessed.length - 1
-                      ? tw`sm:border-b`
-                      : tw`sm:border-b-0`,
-                  ]}
-                  key={article.id}
-                >
-                  <ArticleLikeSummaryDefault
-                    articleLikeEntity={article}
-                    isSmall={false}
-                    parentCurrentLanguageId={filterLanguage.id}
-                    useImage={true}
-                  />
-                </$SummaryContainer>
-              )
-            })}
-          </div>
-        </$ContentSectionLayout_>
-      </div>
-    </BodyFontWrapper>
+                        : tw`sm:border-b-0`,
+                    ]}
+                    key={article.id}
+                  >
+                    <ArticleLikeSummaryDefault
+                      articleLikeEntity={article}
+                      isSmall={false}
+                      parentCurrentLanguageId={filterLanguage.id}
+                      useImage={true}
+                    />
+                  </$SummaryContainer>
+                )
+              })}
+            </div>
+          </$ContentSectionLayout_>
+        </div>
+      </BodyFontWrapper>
+    </>
   )
 }

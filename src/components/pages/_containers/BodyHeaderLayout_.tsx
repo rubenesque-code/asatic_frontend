@@ -21,8 +21,6 @@ export const BodyHeaderLayout_ = ({
   useMargin?: boolean
   styles?: CSSInterpolation
 }) => {
-  // const alignLeft = typeof title === "object" && title.align === "left"
-
   return (
     <div css={[tw`border-b pt-xl pb-md`]}>
       <$ContentSectionLayout_
