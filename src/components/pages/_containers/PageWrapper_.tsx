@@ -31,6 +31,7 @@ export const PageWrapper_ = ({
               ? tw`font-serif-primary-tamil`
               : tw`font-serif-primary`,
             tw`min-h-screen flex flex-col`,
+            tw`dark:bg-white`,
           ]}
         >
           <Header />
