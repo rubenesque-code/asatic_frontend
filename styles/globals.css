@@ -84,3 +84,9 @@ a {
   color: #72757a;
   font-size: 1.2em;
 }
+.custom-prose h3,
+h4,
+h5 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
