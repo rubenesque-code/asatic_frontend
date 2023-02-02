@@ -4,11 +4,11 @@ import { reorderSections } from "^helpers/manipulateEntity"
 
 import { StaticData } from "../_types"
 
-import { $ImageSection_, $VideoSection_ } from "../_presentation"
+import { $ImageSection_, $VideoSection_, $Footnotes_ } from "../_presentation"
 
 import { $DocumentBody } from "../_styles"
 import Prose_ from "../../_containers/Prose_"
-import tw from "twin.macro"
+import Table_ from "./Table_"
 
 export const DocumentBody_ = ({
   body,
@@ -18,6 +18,8 @@ export const DocumentBody_ = ({
   footnotes: StaticData["pageData"]["articleLikeEntity"]["translations"][number]["footnotes"]
 }) => {
   const ordered = reorderSections(body)
+
+  const tables = body.flatMap((s) => (s.type === "table" ? [s] : []))
 
   return (
     <$DocumentBody>
@@ -33,36 +35,15 @@ export const DocumentBody_ = ({
           ) : section.type === "video" ? (
             <$VideoSection_ section={section} />
           ) : (
-            <p>table</p>
+            <Table_
+              table={section}
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              tableNum={tables.findIndex((t) => t.id === section.id)! + 1}
+            />
           )}
         </Fragment>
       ))}
-      <Footnotes footnotes={footnotes} />
+      <$Footnotes_ footnotes={footnotes} />
     </$DocumentBody>
-  )
-}
-
-const Footnotes = ({
-  footnotes,
-}: {
-  footnotes: StaticData["pageData"]["articleLikeEntity"]["translations"][number]["footnotes"]
-}) => {
-  if (!footnotes) {
-    return null
-  }
-
-  return (
-    <div css={[tw`flex flex-col gap-sm pt-md border-t mt-2xl`]}>
-      {footnotes.text.map((footnote) => (
-        <div
-          css={[tw`flex gap-sm`]}
-          id={`ft-text-${footnote.id}`}
-          key={footnote.id}
-        >
-          <span css={[tw`text-xs text-gray-600`]}>{footnote.num}</span>
-          <span css={[tw`text-gray-700`]}>{footnote.text}</span>
-        </div>
-      ))}
-    </div>
   )
 }

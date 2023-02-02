@@ -30,7 +30,7 @@ export const Document_ = ({
   return (
     <BodyFontWrapper documentLanguageId={translation.languageId}>
       <$DocumentMaxWidthContainer>
-        <div css={[tw`mt-xl`]}>
+        <div css={[tw`mt-xl px-sm`]}>
           <$DocumentHeader>
             <div css={[tw`mb-sm sm:mb-md`]}>
               <Languages_

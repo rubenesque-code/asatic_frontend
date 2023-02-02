@@ -40,7 +40,7 @@ export type Footnote = { id: string; num: number; text: string }
 
 type Column = { accessor: string; Header: string }
 
-type TableSection = Section<"table"> & {
+export type TableSection = Section<"table"> & {
   title: string | null
   notes: string | null
   columns: Column[]

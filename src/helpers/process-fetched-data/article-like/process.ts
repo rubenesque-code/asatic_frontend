@@ -55,11 +55,6 @@ export function processArticleLikeEntityForOwnPage<
             if (!bodySection.youtubeId) {
               draft.body.splice(j, 1)
             }
-          } else {
-            const { columns, rows } = bodySection
-            if (!columns.length || !rows.length) {
-              draft.body.splice(j, 1)
-            }
           }
         }
       })

@@ -13,7 +13,7 @@ export const $Title = tw.h1`text-2xl sm:text-3xl text-gray-900 `
 
 export const $authors = tw`flex gap-xs text-xl sm:text-2xl text-gray-600 mt-xxs sm:mt-sm`
 
-export const $DocumentBody = tw.div`flex flex-col gap-sm mt-sm`
+export const $DocumentBody = tw.div`flex flex-col gap-md mt-sm`
 
 export const $ImageSection = tw.div``
 
