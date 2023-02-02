@@ -6,4 +6,5 @@ export const routes = {
   landing: "/",
   recordedEvents: "/recorded-events",
   subjects: "/subjects",
+  about: "/about",
 }

@@ -84,6 +84,10 @@ const Content = () => {
           pathname={routes.recordedEvents}
         />
         <CollectionsLink />
+        <PageLink
+          label={siteTranslations.about[siteLanguage.id]}
+          pathname={routes.about}
+        />
         <Subjects />
       </div>
     </div>

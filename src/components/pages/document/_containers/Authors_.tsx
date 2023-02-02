@@ -1,6 +1,8 @@
 import Link from "next/link"
 import tw, { TwStyle } from "twin.macro"
 import { routes } from "^constants/routes"
+import { useGlobalDataContext } from "^context/GlobalData"
+import { $link } from "^styles/global"
 
 import { Author } from "^types/entities"
 
@@ -22,6 +24,8 @@ export const Authors_ = ({
   authors: Author[]
   styles: TwStyle
 }) => {
+  const { isMultipleAuthors } = useGlobalDataContext()
+
   if (!authors.length) {
     return null
   }
@@ -47,18 +51,13 @@ export const Authors_ = ({
     <div css={[styles]}>
       {authorsProcessed.map((author, i) => (
         <div css={[tw`flex gap-xxxs`]} key={author.id}>
-          <Link
-            href={`${routes.contributors}/${author.translation.id}`}
-            passHref
-          >
-            <h4
-              css={[
-                tw`cursor-pointer hover:text-blue-900 transition-colors ease-in-out`,
-              ]}
-            >
-              {author.translation.name}
-            </h4>
-          </Link>
+          {isMultipleAuthors ? (
+            <Link href={`${routes.contributors}/${author.id}`} passHref>
+              <h4 css={[$link]}>{author.translation.name}</h4>
+            </Link>
+          ) : (
+            <h4 css={[$link]}>{author.translation.name}</h4>
+          )}
           {i !== authorsProcessed.length - 1 ? "," : ""}
         </div>
       ))}

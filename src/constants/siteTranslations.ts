@@ -51,5 +51,9 @@ export const siteTranslations = {
     english: "more",
     tamil: "மேலும்",
   },
+  about: {
+    english: "about",
+    tamil: "பற்றி",
+  },
   tamil: "தமிழ்",
 }

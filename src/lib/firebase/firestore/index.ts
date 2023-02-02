@@ -22,6 +22,7 @@ import {
   FetchedCollection,
   SanitisedCollection,
 } from "^types/entities"
+import { AboutPage } from "^types/entities/about"
 
 import {
   fetchFirestoreDocument,
@@ -257,4 +258,10 @@ export const fetchTags = async (ids: string[] | "all") => {
   ) as Tag[]
 
   return firestoreDocs
+}
+
+export const fetchAbout = async () => {
+  const firestoreDocs = await fetchFirestoreCollection("about")
+
+  return firestoreDocs[0] as AboutPage
 }
