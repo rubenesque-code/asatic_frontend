@@ -1,4 +1,4 @@
-import parse from "html-react-parser"
+import parse, { attributesToProps, domToReact } from "html-react-parser"
 import { useLayoutEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 
@@ -38,13 +38,26 @@ const HtmlStrToJSX = ({
       <div>
         {parse(htmlStr, {
           replace: (domNode) => {
-            if (!validFootnoteIds?.length) {
-              return
-            }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const domNodeAsserted = domNode as any
 
             if (domNodeAsserted.type !== "tag") {
+              return
+            }
+
+            if (domNodeAsserted.name === "a") {
+              return (
+                <a
+                  {...attributesToProps(domNodeAsserted.attribs)}
+                  target="_blank"
+                >
+                  {domToReact(domNodeAsserted.children)}
+                </a>
+              )
+            }
+
+            // footnotes
+            if (!validFootnoteIds?.length) {
               return
             }
             if (domNodeAsserted.name !== "sup") {
