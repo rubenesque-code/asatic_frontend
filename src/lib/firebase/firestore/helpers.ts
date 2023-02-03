@@ -7,6 +7,7 @@ import {
   query,
   where,
   QueryConstraint,
+  QuerySnapshot,
 } from "@firebase/firestore/lite"
 
 import { firestore } from "../init"
@@ -81,20 +82,41 @@ export async function fetchFirestorePublishableDocuments(
   docIds: string[]
 ) {
   try {
-    const docsRefs = query(
-      collection(firestore, collectionKey),
-      where("id", "in", docIds),
-      where("publishStatus", "==", "published")
-    )
-    const docsSnap = await getDocs(docsRefs)
-    const data: DocumentData[] = []
-    docsSnap.forEach((doc) => {
-      const d = doc.data()
-      data.push(d)
+    const idBatches: string[][] = [[]]
+
+    docIds.forEach((id, i) => {
+      const num = i + 1
+      const batchIndex = Math.floor(num / 10)
+      if (idBatches[batchIndex]) {
+        idBatches[batchIndex].push(id)
+      } else {
+        idBatches[batchIndex] = [id]
+      }
     })
 
+    const promises: Promise<QuerySnapshot<DocumentData>>[] = []
+
+    idBatches.forEach((idBatch) => {
+      const docsRefs = query(
+        collection(firestore, collectionKey),
+        where("id", "in", idBatch),
+        where("publishStatus", "==", "published")
+      )
+      const getDocsSnap = getDocs(docsRefs)
+
+      promises.push(getDocsSnap)
+    })
+
+    const docsSnapBatches = await Promise.all(promises)
+    const data = docsSnapBatches
+      .flatMap((docSnap) => docSnap.docs)
+      .map((doc) => doc.data())
+
     return data
-  } catch (error) {}
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log("error:", error)
+  }
 }
 
 export async function fetchFirestorePublishableCollection(

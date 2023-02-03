@@ -1,4 +1,3 @@
-import { firestore_collection_key } from "^constants/firestoreCollections"
 import {
   UnsanitizedFirestoreDocument,
   sanitiseNonSerializableDoc,
@@ -36,7 +35,7 @@ import {
 
 export const fetchArticle = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    firestore_collection_key.articles,
+    "articles",
     docId
   )) as UnsanitizedFirestoreDocument<FetchedArticle>
 
@@ -65,7 +64,7 @@ export const fetchArticles = async (ids: string[] | "all") => {
 
 export const fetchAuthor = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    firestore_collection_key.authors,
+    "authors",
     docId
   )) as Author
 
@@ -102,9 +101,7 @@ export const fetchBlogs = async (ids: string[] | "all") => {
 
   const firestoreDocs = (
     ids === "all"
-      ? await fetchFirestorePublishableCollection(
-          firestore_collection_key.blogs
-        )
+      ? await fetchFirestorePublishableCollection("blogs")
       : await fetchFirestorePublishableDocuments("blogs", ids)
   ) as UnsanitizedFirestoreDocument<FetchedBlog>[]
 
@@ -168,7 +165,7 @@ export const fetchLanding = async () =>
 
 export const fetchRecordedEvent = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    firestore_collection_key.recordedevents,
+    "recordedEvents",
     docId
   )) as UnsanitizedFirestoreDocument<FetchedRecordedEvent>
 
@@ -199,7 +196,7 @@ export const fetchRecordedEvents = async (ids: string[] | "all") => {
 
 export const fetchRecordedEventType = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    firestore_collection_key.recordedeventtypes,
+    "recordedEventTypes",
     docId
   )) as RecordedEventType
 
@@ -219,7 +216,7 @@ export const fetchRecordedEventTypes = async (ids: string[] | "all") => {
 
 export const fetchSubject = async (docId: string) => {
   const firestoreDoc = (await fetchFirestoreDocument(
-    firestore_collection_key.subjects,
+    "subjects",
     docId
   )) as UnsanitizedFirestoreDocument<FetchedSubject>
 
