@@ -12,6 +12,7 @@ import {
 } from "^entity-summary/recorded-events/_containers"
 import { $Title, $authors, $Date } from "^entity-summary/_styles/$summary"
 import { $ImageContainer } from "../_styles"
+import { useGlobalDataContext } from "^context/GlobalData"
 
 const RecordedEvent = ({
   recordedEvent,
@@ -20,6 +21,8 @@ const RecordedEvent = ({
   recordedEvent: RecordedEventAsSummary
   parentCurrentLanguageId: string
 }) => {
+  const globalData = useGlobalDataContext()
+
   const translation = determineChildTranslation(
     recordedEvent.translations,
     parentCurrentLanguageId
@@ -45,11 +48,13 @@ const RecordedEvent = ({
         >
           <$Title>{translation.title}</$Title>
         </EntityLink_>
-        <Authors_
-          authors={recordedEvent.authors}
-          parentLanguageId={translation.languageId}
-          styles={$authors}
-        />
+        {globalData.isMultipleAuthors ? (
+          <Authors_
+            authors={recordedEvent.authors}
+            parentLanguageId={translation.languageId}
+            styles={$authors}
+          />
+        ) : null}
         <$Date languageId={parentCurrentLanguageId}>
           <DateString_
             engDateStr={recordedEvent.publishDate}

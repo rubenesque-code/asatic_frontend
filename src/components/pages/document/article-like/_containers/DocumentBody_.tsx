@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useRef } from "react"
 
 import { reorderSections } from "^helpers/manipulateEntity"
 
@@ -21,6 +21,8 @@ export const DocumentBody_ = ({
 
   const tables = body.flatMap((s) => (s.type === "table" ? [s] : []))
 
+  const footnotesRef = useRef<HTMLDivElement>(null)
+
   return (
     <$DocumentBody>
       {ordered.map((section) => (
@@ -30,7 +32,18 @@ export const DocumentBody_ = ({
           ) : section.type === "text" ? (
             <Prose_
               htmlStr={section.text}
-              validFootnoteIds={footnotes?.idsValid}
+              footnotes={
+                footnotes
+                  ? {
+                      validIds: footnotes.idsValid || [],
+                      scrollToContainer: () => {
+                        footnotesRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                        })
+                      },
+                    }
+                  : undefined
+              }
             />
           ) : section.type === "video" ? (
             <$VideoSection_ section={section} />
@@ -43,7 +56,12 @@ export const DocumentBody_ = ({
           )}
         </Fragment>
       ))}
-      <$Footnotes_ footnotes={footnotes} />
+
+      {footnotes ? (
+        <div ref={footnotesRef}>
+          <$Footnotes_ footnotes={footnotes} />
+        </div>
+      ) : null}
     </$DocumentBody>
   )
 }

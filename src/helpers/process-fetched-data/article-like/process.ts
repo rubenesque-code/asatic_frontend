@@ -99,7 +99,9 @@ export function processArticleLikeEntityForOwnPage<
           const { text, footnotes, ...restOfSection } = section
           return {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            text: DOMPurify.sanitize(text!),
+            text: DOMPurify.sanitize(text!, {
+              ADD_ATTR: ["number"],
+            }),
             ...restOfSection,
           }
         } else if (section.type === "video") {

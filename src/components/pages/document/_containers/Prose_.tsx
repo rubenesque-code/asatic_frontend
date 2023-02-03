@@ -6,11 +6,14 @@ import HtmlStrToJSX from "^components/HtmlStrToJSX"
 const Prose_ = ({
   htmlStr,
   styles,
-  validFootnoteIds,
+  footnotes,
 }: {
   htmlStr: string
   styles?: TwStyle
-  validFootnoteIds?: string[]
+  footnotes?: {
+    validIds: string[]
+    scrollToContainer: () => void
+  }
 }) => {
   const windowSize = useWindowSize()
 
@@ -22,7 +25,7 @@ const Prose_ = ({
         width: "auto",
       }}
     >
-      <HtmlStrToJSX htmlStr={htmlStr} validFootnoteIds={validFootnoteIds} />
+      <HtmlStrToJSX htmlStr={htmlStr} footnotes={footnotes} />
     </div>
   )
 }

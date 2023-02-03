@@ -11,6 +11,7 @@ import {
 } from "^entity-summary/_styles/$swiper-summary"
 import { EntityLink_ } from "^entity-summary/_containers"
 import tw from "twin.macro"
+import { useGlobalDataContext } from "^context/GlobalData"
 
 export type Summary_Props = {
   recordedEvent: RecordedEventAsSummary
@@ -21,6 +22,8 @@ export const Summary_ = ({
   recordedEvent,
   parentCurrentLanguageId,
 }: Summary_Props) => {
+  const globalData = useGlobalDataContext()
+
   const translation = determineChildTranslation(
     recordedEvent.translations,
     parentCurrentLanguageId
@@ -48,11 +51,13 @@ export const Summary_ = ({
       >
         <$Title>{translation.title}</$Title>
       </EntityLink_>
-      <Authors_
-        authors={recordedEvent.authors}
-        parentLanguageId={translation.languageId}
-        styles={$authors}
-      />
+      {globalData.isMultipleAuthors ? (
+        <Authors_
+          authors={recordedEvent.authors}
+          parentLanguageId={translation.languageId}
+          styles={$authors}
+        />
+      ) : null}
       <$Date languageId={parentCurrentLanguageId}>
         <DateString_
           engDateStr={recordedEvent.publishDate}

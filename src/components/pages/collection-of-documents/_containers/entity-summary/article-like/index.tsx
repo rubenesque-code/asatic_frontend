@@ -14,6 +14,7 @@ import {
   $Date,
   $image,
 } from "^entity-summary/_styles/$summary"
+import { useGlobalDataContext } from "^context/GlobalData"
 
 export const ArticleLikeSummaryDefault = ({
   articleLikeEntity,
@@ -28,6 +29,8 @@ export const ArticleLikeSummaryDefault = ({
   isSmall: boolean
   isDouble?: boolean
 }) => {
+  const globalData = useGlobalDataContext()
+
   const translation = determineChildTranslation(
     articleLikeEntity.translations,
     parentCurrentLanguageId
@@ -79,11 +82,13 @@ export const ArticleLikeSummaryDefault = ({
       >
         <$Title>{translation.title}</$Title>
       </EntityLink_>
-      <Authors_
-        authors={articleLikeEntity.authors}
-        parentLanguageId={translation.languageId}
-        styles={$authors}
-      />
+      {globalData.isMultipleAuthors ? (
+        <Authors_
+          authors={articleLikeEntity.authors}
+          parentLanguageId={translation.languageId}
+          styles={$authors}
+        />
+      ) : null}
       <$Date languageId={parentCurrentLanguageId}>
         <DateString_
           engDateStr={articleLikeEntity.publishDate}

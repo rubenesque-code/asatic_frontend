@@ -11,7 +11,7 @@ const Head = ({ pageTitle }: { pageTitle?: string }) => {
       <title>
         {siteName} {!pageTitle ? null : `· ${pageTitle}`}
       </title>
-      <link rel="icon" href="/icon.ico" />
+      <link rel="icon" href="/favicon.ico" />
       <meta name="description" content="News site." />
     </NextHead>
   )

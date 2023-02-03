@@ -3,17 +3,21 @@ import { useLayoutEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 
 import { truncateText } from "^helpers/document"
+import { $link } from "^styles/global"
 
 const HtmlStrToJSX = ({
   htmlStr,
   flattenContent,
-  validFootnoteIds,
+  footnotes,
 }: {
   htmlStr: string
   flattenContent?: {
     numChars: number
   }
-  validFootnoteIds?: string[]
+  footnotes?: {
+    validIds: string[]
+    scrollToContainer: () => void
+  }
 }) => {
   const [flattenedTextContent, setFlattenedTextContent] = useState<
     string | null
@@ -57,7 +61,7 @@ const HtmlStrToJSX = ({
             }
 
             // footnotes
-            if (!validFootnoteIds?.length) {
+            if (!footnotes?.validIds.length) {
               return
             }
             if (domNodeAsserted.name !== "sup") {
@@ -65,7 +69,7 @@ const HtmlStrToJSX = ({
             }
 
             const id = domNodeAsserted.attribs.id
-            const index = validFootnoteIds.findIndex(
+            const index = footnotes.validIds.findIndex(
               (validId) => validId === id
             )
 
@@ -73,7 +77,15 @@ const HtmlStrToJSX = ({
               return <></>
             }
 
-            return <sup id={`ft-num-${id}`}>{index + 1}</sup>
+            return (
+              <sup
+                id={`ft-num-${id}`}
+                onClick={footnotes.scrollToContainer}
+                css={[$link]}
+              >
+                {index + 1}
+              </sup>
+            )
           },
         })}
       </div>
