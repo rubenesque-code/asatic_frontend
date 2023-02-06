@@ -22,7 +22,7 @@ const SideBar = () => {
           </Menu.Button>
           <Menu.Items
             css={[
-              tw`bg-white h-full py-sm pl-md pr-md border-r-2`,
+              tw`bg-white h-screen overflow-auto py-sm pl-md pr-md pb-xl border-r-2`,
               tw`z-40 fixed top-0 left-0 transition-all ease-in duration-300`,
               open
                 ? tw`translate-x-0 opacity-100`

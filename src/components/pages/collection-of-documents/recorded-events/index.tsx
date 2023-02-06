@@ -66,7 +66,7 @@ const PageBody = ({
                 <$SummaryContainer
                   css={[
                     i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
-                    i < recordedEventsProcessed.length
+                    i < recordedEventsProcessed.length - 1
                       ? tw`border-b`
                       : tw`border-b-0`,
                     recordedEventsProcessed.length % 2 === 0

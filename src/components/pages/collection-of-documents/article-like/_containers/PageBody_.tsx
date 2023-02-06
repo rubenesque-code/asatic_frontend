@@ -40,7 +40,11 @@ export const PageBody_ = ({
   return (
     <>
       <BodyHeaderLayout_
-        title={siteTranslations.articles[siteLanguage.id]}
+        title={
+          siteTranslations[
+            articleLikeEntities[0].type === "article" ? "articles" : "blogs"
+          ][siteLanguage.id]
+        }
         languages={{
           documentLanguage: filterLanguage,
           documentLanguages: languages,
@@ -56,7 +60,7 @@ export const PageBody_ = ({
                   <$SummaryContainer
                     css={[
                       i % 2 === 0 ? tw`sm:border-r` : tw`border-r-0`,
-                      i < articleLikeEntitiesProcessed.length
+                      i < articleLikeEntitiesProcessed.length - 1
                         ? tw`border-b`
                         : tw`border-b-0`,
                       articleLikeEntitiesProcessed.length % 2 === 0

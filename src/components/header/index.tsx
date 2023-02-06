@@ -24,16 +24,18 @@ const Header = () => {
       <div
         css={[tw`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`]}
       >
-        <div css={[tw`flex flex-col items-center`]}>
+        <div css={[tw`flex flex-col items-center font-serif-primary`]}>
           <Link
             href={{ pathname: "/", query: { siteLanguageId: siteLanguage.id } }}
             passHref
           >
-            <h1 css={[tw`text-5xl tracking-wider font-bold`, $link]}>
+            <h1
+              css={[tw`text-4xl sm:text-5xl tracking-wider font-bold`, $link]}
+            >
               {siteTranslations.siteName[siteLanguage.id]}
             </h1>
           </Link>
-          <h3 css={[tw`text-gray-600 text-lg`]}>
+          <h3 css={[tw`text-gray-600 sm:text-lg`]}>
             {siteTranslations.siteByline[siteLanguage.id]}
           </h3>
         </div>

@@ -15,7 +15,7 @@ const Footer = () => {
       <$ContentSectionMaxWidthWrapper styles={[$pagePx]}>
         <div css={[tw`flex items-center justify-between py-xl`]}>
           <div css={[tw`flex items-center gap-lg`]}>
-            <div>
+            <div css={[tw`font-serif-primary`]}>
               <Link
                 href={{
                   pathname: "/",
@@ -37,39 +37,38 @@ const Footer = () => {
               </p>
             </div>
           </div>
-          <div>
-            <Link
-              href={{
-                pathname: routes.about,
-                query: { siteLanguageId: siteLanguage.id },
-              }}
-              passHref
-            >
-              <span
-                css={[
-                  tw`text-gray-600 capitalize`,
-                  $link,
-                  siteLanguage.id === "tamil"
-                    ? tw`font-sans-primary-tamil`
-                    : tw`font-sans-primary`,
-                ]}
+          <div
+            css={[
+              tw`flex flex-col items-end gap-sm sm:flex-row sm:items-baseline sm:flex-grow sm:justify-between`,
+            ]}
+          >
+            <div css={[tw`hidden sm:block`]} />
+            <div>
+              <Link
+                href={{
+                  pathname: routes.about,
+                  query: { siteLanguageId: siteLanguage.id },
+                }}
+                passHref
               >
-                {siteTranslations.about_us[siteLanguage.id]}
-              </span>
-            </Link>
-          </div>
-          <div css={[tw`flex items-center`]}>
-            <a
-              css={[
-                tw`text-gray-600`,
-                siteLanguage.id === "tamil"
-                  ? tw`font-sans-primary-tamil`
-                  : tw`font-sans-primary`,
-                $link,
-              ]}
-            >
-              asatic@gmail.com
-            </a>
+                <span
+                  css={[
+                    tw`text-gray-600 capitalize`,
+                    $link,
+                    siteLanguage.id === "tamil"
+                      ? tw`font-sans-primary-tamil`
+                      : tw`font-sans-primary`,
+                  ]}
+                >
+                  {siteTranslations.about_us[siteLanguage.id]}
+                </span>
+              </Link>
+            </div>
+            <div css={[tw`flex items-center`]}>
+              <a css={[tw`text-gray-600`, tw`font-sans-primary`]}>
+                asatic@gmail.com
+              </a>
+            </div>
           </div>
         </div>
       </$ContentSectionMaxWidthWrapper>

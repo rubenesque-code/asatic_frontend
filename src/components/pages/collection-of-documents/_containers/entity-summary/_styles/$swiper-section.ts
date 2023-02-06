@@ -3,7 +3,7 @@ import { SiteLanguageId } from "^constants/languages"
 
 export const $SectionContent = tw.div`border-l border-r`
 
-export const $SectionHeaderContainer = tw.div`flex justify-between  px-xl pb-sm pt-md`
+export const $SectionHeaderContainer = tw.div`flex justify-between pl-md pr-sm sm:pl-lg md:pl-xl pb-sm pt-md`
 export const $SectionHeaderTitle = tw.div`text-2xl capitalize text-gray-700`
 export const $SectionHeaderSeeAllContainer = tw.div`flex items-center gap-xs text-gray-600`
 export const $SectionHeaderSeeAllText = styled.div(

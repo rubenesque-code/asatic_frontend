@@ -21,13 +21,9 @@ const BodyHeader = ({
   }
 
   return (
-    <$CenterMaxWidth_ maxWidth={tw`max-w-[3500px]`}>
+    <$CenterMaxWidth_ maxWidth={tw`max-w-[3500px]`} styles={tw`border-b`}>
       <div>
-        <div
-          css={[
-            tw`relative pb-sm border-b h-[300px] sm:h-[500px] md:h-[600px]`,
-          ]}
-        >
+        <div css={[tw`relative pb-sm h-[300px] sm:h-[500px] md:h-[600px]`]}>
           <div css={[tw`absolute left-0 top-0 w-full h-full`]}>
             <StorageImage
               image={collection.bannerImage.storageImage}
