@@ -95,12 +95,22 @@ const CustomSection = ({
   const rightBorderArr = calcIsRightBorder(components)
   const bottomBorderArr = calcIsBottomBorder(components)
 
+  const firstSectionFirstRowIds =
+    section === 0 ? getIsFirstRowIds(components) : null
+
   return (
     <div css={[tw`border-b`, section === 1 && tw`mt-xl border-t`]}>
       <$ContentSectionLayout_ useMargin>
         <div css={[tw`border-l border-r grid grid-cols-4`]}>
           {components.map((component, i) => {
             const useImage = windowSize.width < 1024 || component.width === 2
+
+            const isFirstSectionFirstRow =
+              section === 0 &&
+              ((windowSize.width >= 1024 &&
+                firstSectionFirstRowIds?.includes(component.id)) ||
+                (windowSize.width >= 768 && i < 2) ||
+                (windowSize.width < 768 && i === 0))
 
             return (
               <$SummaryContainer
@@ -118,6 +128,7 @@ const CustomSection = ({
                   component.width === 2 ? tw`lg:col-span-2` : tw`lg:col-span-1`,
                   rightBorderArr[i] ? tw`lg:border-r` : tw`lg:border-r-0`,
                   bottomBorderArr[i] ? tw`lg:border-b` : tw`lg:border-b-0`,
+                  isFirstSectionFirstRow && tw`pt-md`,
                 ]}
                 key={component.id}
               >
@@ -134,6 +145,25 @@ const CustomSection = ({
       </$ContentSectionLayout_>
     </div>
   )
+}
+
+const getIsFirstRowIds = (components: LandingCustomSectionComponent[]) => {
+  const componentIds: string[] = []
+
+  const rowSpanTotalMax = 4
+  let rowSpanTotal = 0
+
+  for (let i = 0; i < components.length; i++) {
+    const component = components[i]
+    rowSpanTotal += component.width
+    if (rowSpanTotal <= rowSpanTotalMax) {
+      componentIds.push(component.id)
+      continue
+    }
+    break
+  }
+
+  return componentIds
 }
 
 const calcIsRightBorder = (components: LandingCustomSectionComponent[]) => {

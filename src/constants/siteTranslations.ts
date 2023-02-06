@@ -1,7 +1,11 @@
 export const siteTranslations = {
   siteName: {
-    english: "Asatic",
-    tamil: "அசதி",
+    english: "ASATiC",
+    tamil: "ASATiC",
+  },
+  siteByline: {
+    english: "Scientific is Art of Life",
+    tamil: "Scientific is Art of Life",
   },
   home: {
     english: "home",
@@ -54,6 +58,10 @@ export const siteTranslations = {
   about: {
     english: "about",
     tamil: "பற்றி",
+  },
+  about_us: {
+    english: "about us",
+    tamil: "எங்களை பற்றி",
   },
   tamil: "தமிழ்",
 }

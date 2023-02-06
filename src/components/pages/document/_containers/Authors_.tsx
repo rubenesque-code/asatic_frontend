@@ -56,7 +56,7 @@ export const Authors_ = ({
               <h4 css={[$link]}>{author.translation.name}</h4>
             </Link>
           ) : (
-            <h4 css={[$link]}>{author.translation.name}</h4>
+            <h4>{author.translation.name}</h4>
           )}
           {i !== authorsProcessed.length - 1 ? "," : ""}
         </div>

@@ -22,7 +22,7 @@ const SiteLanguage = () => {
   )
 
   return (
-    <div css={[tw`flex gap-xs`]}>
+    <div css={[tw`flex gap-xs `]}>
       <span css={[tw`text-gray-400`]}>
         <TranslateIcon weight="thin" />
       </span>

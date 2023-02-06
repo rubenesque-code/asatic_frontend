@@ -34,6 +34,9 @@ export const PageWrapper_ = ({
             tw`dark:bg-white`,
           ]}
         >
+          <div css={[tw`z-50 fixed left-0 top-0 w-full bg-white`]}>
+            <Header />
+          </div>
           <Header />
           <div css={[tw`flex-grow`]}>{pageBody}</div>
           <Footer />

@@ -84,11 +84,11 @@ const Content = () => {
           pathname={routes.recordedEvents}
         />
         <CollectionsLink />
+        <Subjects />
         <PageLink
           label={siteTranslations.about[siteLanguage.id]}
           pathname={routes.about}
         />
-        <Subjects />
       </div>
     </div>
   )
@@ -140,13 +140,15 @@ const Subjects = () => {
       </div>
       <div
         css={[
-          tw`ml-sm flex flex-col gap-sm mt-md`,
-          !isExpanded ? tw`max-h-0 opacity-10` : tw`max-h-full opacity-100`,
+          tw`ml-sm flex flex-col gap-sm`,
+          !isExpanded
+            ? tw`max-h-0 opacity-10 mt-0`
+            : tw`max-h-full opacity-100 mt-md`,
           tw`overflow-hidden transition-all ease-in-out duration-150`,
         ]}
       >
-        {subjectsForLanguage.map((subject) => (
-          <Subject subject={subject} key={subject.id} />
+        {subjectsForLanguage.map((subject, i) => (
+          <Subject subject={subject} isFirst={i === 0} key={subject.id} />
         ))}
       </div>
     </div>
@@ -155,12 +157,14 @@ const Subjects = () => {
 
 const Subject = ({
   subject,
+  isFirst,
 }: {
   subject: ReturnType<typeof processSubjectsAsLinks>[number]
+  isFirst: boolean
 }) => {
   return (
     <Link href={`/subjects/${subject.id}`} passHref>
-      <div css={[$text, $link]}>{subject.title}</div>
+      <div css={[$text, $link, isFirst && tw`mt-0`]}>{subject.title}</div>
     </Link>
   )
 }

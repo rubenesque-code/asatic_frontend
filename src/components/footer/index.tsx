@@ -1,4 +1,6 @@
+import Link from "next/link"
 import tw from "twin.macro"
+import { routes } from "^constants/routes"
 import { siteTranslations } from "^constants/siteTranslations"
 import { useSiteLanguageContext } from "^context/SiteLanguage"
 
@@ -9,16 +11,63 @@ const Footer = () => {
   const { siteLanguage } = useSiteLanguageContext()
 
   return (
-    <div css={[tw`border-t-2 mt-lg sm:mt-xl md:mt-2xl`]}>
+    <div css={[tw`border-t mt-lg sm:mt-xl md:mt-2xl`]}>
       <$ContentSectionMaxWidthWrapper styles={[$pagePx]}>
         <div css={[tw`flex items-center justify-between py-xl`]}>
           <div css={[tw`flex items-center gap-lg`]}>
-            <h3 css={[tw`text-xl font-bold border-b border-b-gray-300 pb-xs`]}>
-              {siteTranslations.siteName[siteLanguage.id]}
-            </h3>
+            <div>
+              <Link
+                href={{
+                  pathname: "/",
+                  query: { siteLanguageId: siteLanguage.id },
+                }}
+                passHref
+              >
+                <h3
+                  css={[
+                    tw`text-xl font-bold border-b border-b-gray-300 pb-xs`,
+                    $link,
+                  ]}
+                >
+                  {siteTranslations.siteName[siteLanguage.id]}
+                </h3>
+              </Link>
+              <p css={[tw`mt-xs text-gray-600`]}>
+                {siteTranslations.siteByline[siteLanguage.id]}
+              </p>
+            </div>
+          </div>
+          <div>
+            <Link
+              href={{
+                pathname: routes.about,
+                query: { siteLanguageId: siteLanguage.id },
+              }}
+              passHref
+            >
+              <span
+                css={[
+                  tw`text-gray-600 capitalize`,
+                  $link,
+                  siteLanguage.id === "tamil"
+                    ? tw`font-sans-primary-tamil`
+                    : tw`font-sans-primary`,
+                ]}
+              >
+                {siteTranslations.about_us[siteLanguage.id]}
+              </span>
+            </Link>
           </div>
           <div css={[tw`flex items-center`]}>
-            <a css={[tw`font-sans-primary font-light`, $link]}>
+            <a
+              css={[
+                tw`text-gray-600`,
+                siteLanguage.id === "tamil"
+                  ? tw`font-sans-primary-tamil`
+                  : tw`font-sans-primary`,
+                $link,
+              ]}
+            >
               asatic@gmail.com
             </a>
           </div>
