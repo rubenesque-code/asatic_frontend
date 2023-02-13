@@ -137,6 +137,9 @@ const CustomSection = ({
                   parentCurrentLanguageId={siteLanguage.id}
                   useImage={useImage}
                   isSmall={windowSize.width >= 1024 && component.width === 1}
+                  imagePriority={
+                    section === 0 && windowSize.width < 800 && i < 2
+                  }
                 />
               </$SummaryContainer>
             )

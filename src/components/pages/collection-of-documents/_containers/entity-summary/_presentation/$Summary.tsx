@@ -6,12 +6,14 @@ import { Image } from "^types/entities"
 export const $SummaryImage = ({
   image,
   styles,
+  imagePriority,
 }: {
   image: {
     vertPosition: number | undefined
     storageImage: Image
   } | null
   styles?: TwStyle
+  imagePriority?: boolean
 }) => {
   if (!image) {
     return null
@@ -22,6 +24,7 @@ export const $SummaryImage = ({
       <StorageImage
         image={image.storageImage}
         vertPosition={image.vertPosition}
+        priority={imagePriority}
       />
     </div>
   )

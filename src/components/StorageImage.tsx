@@ -7,6 +7,7 @@ type FirestoreImageProps = {
   layout?: ImageProps["layout"]
   objectFit?: ImageProps["objectFit"]
   vertPosition?: number
+  priority?: boolean
 }
 
 const StorageImage = ({
@@ -14,6 +15,7 @@ const StorageImage = ({
   layout = "fill",
   objectFit = "cover",
   vertPosition,
+  priority = false,
 }: FirestoreImageProps) => {
   const position = `50% ${vertPosition}%`
 
@@ -25,6 +27,7 @@ const StorageImage = ({
       layout={layout}
       objectFit={objectFit}
       objectPosition={position}
+      priority={priority}
     />
   )
 }

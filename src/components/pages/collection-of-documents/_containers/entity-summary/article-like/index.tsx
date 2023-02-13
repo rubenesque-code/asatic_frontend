@@ -22,12 +22,14 @@ export const ArticleLikeSummaryDefault = ({
   useImage,
   isSmall,
   isDouble,
+  imagePriority,
 }: {
   articleLikeEntity: ArticleLikeEntityAsSummary
   parentCurrentLanguageId: string
   useImage: boolean
   isSmall: boolean
   isDouble?: boolean
+  imagePriority?: boolean
 }) => {
   const globalData = useGlobalDataContext()
 
@@ -73,7 +75,11 @@ export const ArticleLikeSummaryDefault = ({
       ]}
     >
       {useImage ? (
-        <$SummaryImage image={articleLikeEntity.summaryImage} styles={$image} />
+        <$SummaryImage
+          image={articleLikeEntity.summaryImage}
+          styles={$image}
+          imagePriority={imagePriority}
+        />
       ) : null}
       <EntityLink_
         entityId={articleLikeEntity.id}

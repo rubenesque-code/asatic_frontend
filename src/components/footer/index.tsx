@@ -66,7 +66,7 @@ const Footer = () => {
             </div>
             <div css={[tw`flex items-center`]}>
               <a css={[tw`text-gray-600`, tw`font-sans-primary`]}>
-                asatic@gmail.com
+                contact@asatic.org
               </a>
             </div>
           </div>
