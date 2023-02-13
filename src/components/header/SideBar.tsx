@@ -17,7 +17,11 @@ const SideBar = () => {
     <Menu>
       {({ open }) => (
         <>
-          <Menu.Button css={[tw`text-3xl`]}>
+          <Menu.Button
+            css={[tw`text-3xl`]}
+            aria-label="open site navigation button"
+            role="button"
+          >
             <List weight="thin" />
           </Menu.Button>
           <Menu.Items

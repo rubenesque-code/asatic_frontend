@@ -28,6 +28,7 @@ const StorageImage = ({
       objectFit={objectFit}
       objectPosition={position}
       priority={priority}
+      alt=""
     />
   )
 }

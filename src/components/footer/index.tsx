@@ -65,7 +65,10 @@ const Footer = () => {
               </Link>
             </div>
             <div css={[tw`flex items-center`]}>
-              <a css={[tw`text-gray-600`, tw`font-sans-primary`]}>
+              <a
+                css={[tw`text-gray-600`, tw`font-sans-primary`]}
+                href="contact@asatic.org"
+              >
                 contact@asatic.org
               </a>
             </div>

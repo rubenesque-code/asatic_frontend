@@ -9,7 +9,8 @@ const Head = ({ pageTitle }: { pageTitle?: string }) => {
   return (
     <NextHead>
       <title>
-        {siteName} {!pageTitle ? null : `· ${pageTitle}`}
+        {siteName}
+        {!pageTitle ? null : ` · ${pageTitle}`}
       </title>
       <link rel="icon" href="/favicon.ico" />
       <meta name="description" content="News site." />

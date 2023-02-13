@@ -61,10 +61,17 @@ const Navigation_ = ({
           css={[tw`opacity-60 hover:opacity-90`]}
           onClick={swipeLeft}
           type="button"
+          aria-label="next image button"
+          role="button"
         >
           <CaretLeft />
         </$NavButton>
-        <$NavButton onClick={swipeRight} type="button">
+        <$NavButton
+          onClick={swipeRight}
+          type="button"
+          aria-label="previous image button"
+          role="button"
+        >
           <CaretRight />
         </$NavButton>
       </div>

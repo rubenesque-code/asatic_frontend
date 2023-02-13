@@ -1,5 +1,5 @@
 import parse, { attributesToProps, domToReact } from "html-react-parser"
-import { useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import tw from "twin.macro"
 
 import { truncateText } from "^helpers/document"
@@ -25,7 +25,10 @@ const HtmlStrToJSX = ({
 
   const textRef = useRef<HTMLDivElement | null>(null)
 
-  useLayoutEffect(() => {
+  const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect
+
+  useIsomorphicLayoutEffect(() => {
     if (!flattenContent) {
       return
     }
