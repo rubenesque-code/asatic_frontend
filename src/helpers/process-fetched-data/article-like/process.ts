@@ -40,7 +40,7 @@ export function processArticleLikeEntityForOwnPage<
 
           if (bodySection.type === "image") {
             if (
-              !bodySection.image.imageId ||
+              !bodySection?.image?.imageId ||
               !mapIds(validImages).includes(bodySection.image.imageId)
             ) {
               draft.body.splice(j, 1)
@@ -184,7 +184,7 @@ const getSummaryImage = (
   if (entity.summaryImage.useImage === false) {
     return null
   }
-  const summaryImage = entity.summaryImage.imageId
+  const summaryImage = entity.summaryImage?.imageId
     ? validImages.find(
         (validImage) => validImage.id === entity.summaryImage.imageId
       )

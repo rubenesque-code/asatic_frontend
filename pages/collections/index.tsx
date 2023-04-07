@@ -4,10 +4,10 @@ import { useLayoutEffect } from "react"
 
 import { routes } from "^constants/routes"
 
-import { StaticData } from "^components/pages/list/collections/staticData"
-import PageContent from "^components/pages/list/collections"
+import { StaticData } from "^components/my-pages/list/collections/staticData"
+import PageContent from "^components/my-pages/list/collections"
 
-export { getStaticProps } from "^components/pages/list/collections/staticData"
+export { getStaticProps } from "^components/my-pages/list/collections/staticData"
 
 const CollectionsPage: NextPage<StaticData> = (staticData) => {
   const isCollection = staticData.pageData.collections.length
