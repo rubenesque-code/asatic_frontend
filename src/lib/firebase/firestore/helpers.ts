@@ -1,13 +1,12 @@
 import {
-  doc,
-  getDoc,
   collection,
-  getDocs,
+  doc,
   DocumentData,
+  getDoc,
+  getDocs,
   query,
-  where,
-  QueryConstraint,
   QuerySnapshot,
+  where,
 } from "@firebase/firestore/lite"
 
 import { firestore } from "../init"
@@ -30,11 +29,35 @@ export const fetchFirestoreDocument = async (
 
 export const fetchFirestoreDocuments = async (
   collectionKey: FirestoreCollectionKey,
-  docIds: string[],
-  additionalQueryContstraint?: QueryConstraint
+  docIds: string[]
+  // additionalQueryContstraint?: QueryConstraint
 ) => {
   try {
-    const docsRefs = additionalQueryContstraint
+    const idBatches: string[][] = [[]]
+
+    docIds.forEach((id, i) => {
+      const num = i + 1
+      const batchIndex = Math.floor(num / 10)
+      if (idBatches[batchIndex]) {
+        idBatches[batchIndex].push(id)
+      } else {
+        idBatches[batchIndex] = [id]
+      }
+    })
+
+    const promises: Promise<QuerySnapshot<DocumentData>>[] = []
+
+    idBatches.forEach((idBatch) => {
+      const docsRefs = query(
+        collection(firestore, collectionKey),
+        where("id", "in", idBatch)
+      )
+      const getDocsSnap = getDocs(docsRefs)
+
+      promises.push(getDocsSnap)
+    })
+
+    /*     const docsRefs = additionalQueryContstraint
       ? docIds.length
         ? query(
             collection(firestore, collectionKey),
@@ -47,17 +70,24 @@ export const fetchFirestoreDocuments = async (
           )
       : docIds.length
       ? query(collection(firestore, collectionKey), where("id", "in", docIds))
-      : query(collection(firestore, collectionKey))
+      : query(collection(firestore, collectionKey)) */
 
-    const docsSnap = await getDocs(docsRefs)
+    /*     const docsSnap = await getDocs(docsRefs)
     const data: DocumentData[] = []
     docsSnap.forEach((doc) => {
       const d = doc.data()
       data.push(d)
-    })
+    }) */
+
+    const docsSnapBatches = await Promise.all(promises)
+    const data = docsSnapBatches
+      .flatMap((docSnap) => docSnap.docs)
+      .map((doc) => doc.data())
 
     return data
-  } catch (error) {}
+  } catch (error) {
+    // console.log("error:", error)
+  }
 }
 
 export const fetchFirestoreCollection = async (
@@ -113,10 +143,7 @@ export async function fetchFirestorePublishableDocuments(
       .map((doc) => doc.data())
 
     return data
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log("error:", error)
-  }
+  } catch (error) {}
 }
 
 export async function fetchFirestorePublishableCollection(

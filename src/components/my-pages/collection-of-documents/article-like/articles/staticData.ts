@@ -59,6 +59,7 @@ async function handleProcessArticles({
   const imageIds = getUniqueChildEntitiesImageIds({
     articleLikeEntities: validArticles.entities,
   })
+
   const fetchedImages = await fetchImages(imageIds)
 
   const processedArticles = processArticleLikeEntitiesAsSummarries(
