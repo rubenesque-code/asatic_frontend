@@ -14,7 +14,7 @@ const Header = () => {
   return (
     <div
       css={[
-        tw`relative flex justify-between items-center py-xl border-b`,
+        tw`relative flex justify-between items-center py-sm sm:py-lg md:py-xl border-b bg-white`,
         $pagePx,
       ]}
     >
@@ -30,12 +30,12 @@ const Header = () => {
             passHref
           >
             <h1
-              css={[tw`text-4xl sm:text-5xl tracking-wider font-bold`, $link]}
+              css={[tw`text-2xl sm:text-5xl tracking-wider font-bold`, $link]}
             >
               {siteTranslations.siteName[siteLanguage.id]}
             </h1>
           </Link>
-          <h3 css={[tw`text-gray-600 sm:text-lg`]}>
+          <h3 css={[tw`text-gray-600 text-sm sm:text-lg`]}>
             {siteTranslations.siteByline[siteLanguage.id]}
           </h3>
         </div>
@@ -46,43 +46,3 @@ const Header = () => {
 }
 
 export default Header
-
-/* const Header = () => {
-  const { siteLanguage } = useSiteLanguageContext()
-
-  return (
-    <div>
-      <div
-        css={[
-          tw`relative flex justify-between items-baseline gap-md pt-md pb-md border-b`,
-          $pagePx,
-        ]}
-      >
-        <div css={[tw`flex flex-col`]}>
-          <Link
-            href={{ pathname: "/", query: { siteLanguageId: siteLanguage.id } }}
-            passHref
-          >
-            <h1 css={[tw`text-4xl tracking-wider font-bold`, $link]}>
-              {siteTranslations.siteName[siteLanguage.id]}
-            </h1>
-          </Link>
-          <h3 css={[tw`text-gray-700 text-lg`]}>
-            {siteTranslations.siteByline[siteLanguage.id]}
-          </h3>
-        </div>
-        <div
-          css={[
-            tw`flex-grow flex items-center justify-end gap-sm mt-auto border uppercase font-serif-secondary`,
-          ]}
-        >
-          <p>Articles</p>
-          <p>Blogs</p>
-        </div>
-        <div css={[tw`mt-auto`]}>
-          <SiteLanguage />
-        </div>
-      </div>
-    </div>
-  )
-} */

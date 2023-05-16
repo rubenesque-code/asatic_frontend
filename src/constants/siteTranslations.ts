@@ -16,7 +16,7 @@ export const siteTranslations = {
     tamil: "கட்டுரை",
   },
   articles: {
-    english: "articles",
+    english: "Articles",
     tamil: "கட்டுரைகள்",
   },
   blog: {
@@ -24,7 +24,7 @@ export const siteTranslations = {
     tamil: "வலைப்பதிவு",
   },
   blogs: {
-    english: "blog",
+    english: "Blog",
     tamil: "வலைப்பதிவு",
   },
   recordedEvent: {
@@ -32,11 +32,11 @@ export const siteTranslations = {
     tamil: "காணொளி",
   },
   recordedEvents: {
-    english: "videos",
+    english: "Videos",
     tamil: "வீடியோக்கள்",
   },
   subjects: {
-    english: "subjects",
+    english: "Subjects",
     tamil: "பொருள்",
   },
   collection: {
@@ -44,11 +44,11 @@ export const siteTranslations = {
     tamil: "சேகரிப்பு",
   },
   collections: {
-    english: "collections",
+    english: "Collections",
     tamil: "சேகரிப்புகள்",
   },
   authors: {
-    english: "contributors",
+    english: "Contributors",
     tamil: "ஆசிரியர்கள்",
   },
   more: {
@@ -56,11 +56,11 @@ export const siteTranslations = {
     tamil: "மேலும்",
   },
   about: {
-    english: "about",
+    english: "About",
     tamil: "பற்றி",
   },
   about_us: {
-    english: "about us",
+    english: "About Us",
     tamil: "எங்களை பற்றி",
   },
   tamil: "தமிழ்",
