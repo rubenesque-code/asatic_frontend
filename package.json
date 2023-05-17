@@ -20,7 +20,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.4",
-    "@headlessui/react": "^1.7.3",
+    "@headlessui/react": "^1.7.14",
     "@tailwindcss/typography": "^0.5.7",
     "firebase": "^9.13.0",
     "html-react-parser": "^3.0.4",
