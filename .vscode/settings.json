@@ -1,6 +1,34 @@
 {
-  "window.title": "Asatic - frontend",
+  "window.title": "asatic - frontend",
   "workbench.editor.labelFormat": "short",
   "css.lint.unknownAtRules": "ignore",
-  "editor.codeActionsOnSave": { "source.fixAll.eslint": true }
+  "editor.codeActionsOnSave": { "source.fixAll.eslint": true },
+  "restoreTerminals.runOnStartup": true,
+  "restoreTerminals.terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "localhost",
+          "commands": ["yarn dev"],
+          "shouldRunCommands": false
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "emulators",
+          "commands": ["yarn firebase-emulators"],
+          "shouldRunCommands": false
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "git"
+        }
+      ]
+    }
+  ]
 }

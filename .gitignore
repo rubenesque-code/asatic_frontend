@@ -37,7 +37,7 @@ next-env.d.ts
 
 /.husky
 /db-local-data
-.firestore.rules
-.storage.rules
-.ui-debug.log
-.firestore-debug.log
+/.firestore.rules
+/.storage.rules
+/.ui-debug.log
+/.firestore-debug.log

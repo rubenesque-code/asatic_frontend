@@ -16,12 +16,19 @@ type ImageSection = Extract<Section, { type: "image" }>
 type VideoSection = Extract<Section, { type: "video" }>
 
 export const $ImageSection_ = ({ section }: { section: ImageSection }) => (
-  <div>
-    <div css={[tw`relative aspect-ratio[16 / 9]`]}>
+  <>
+    <div
+      css={[tw`relative`]}
+      style={{
+        aspectRatio: `${
+          !section.image.aspectRatio ? "16/9" : section.image.aspectRatio
+        }`,
+      }}
+    >
       <StorageImage image={section.image.storageImage} />
     </div>
     {section.caption ? <$Caption>{section.caption}</$Caption> : null}
-  </div>
+  </>
 )
 
 export const $VideoSection_ = ({ section }: { section: VideoSection }) => (
