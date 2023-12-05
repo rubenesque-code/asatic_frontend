@@ -1,4 +1,5 @@
-import { ComponentProps, ReactElement, useRef } from "react"
+import { ComponentProps, ReactElement, useState } from "react"
+import { usePrevious, useWindowScroll, useWindowSize } from "react-use"
 import tw from "twin.macro"
 
 import { GlobalDataProvider } from "^context/GlobalData"
@@ -6,10 +7,9 @@ import { useSiteLanguageContext } from "^context/SiteLanguage"
 
 import Header from "^components/header"
 
-import { MyOmit } from "^types/utilities"
 import Head from "^components/Head"
 import Footer from "^components/footer"
-import { usePrevious, useWindowScroll, useWindowSize } from "react-use"
+import { MyOmit } from "^types/utilities"
 
 export const PageWrapper_ = ({
   children: pageBody,
@@ -20,10 +20,13 @@ export const PageWrapper_ = ({
   globalData: MyOmit<ComponentProps<typeof GlobalDataProvider>, "children">
   pageTitle?: string
 }) => {
+  const [headerNode, setHeaderNode] = useState<HTMLDivElement | null>(null)
+
   const { siteLanguage } = useSiteLanguageContext()
 
-  const headerRef = useRef<HTMLDivElement | null>(null)
-  const headerHeight = headerRef?.current?.getBoundingClientRect().height
+  // const headerRef = useRef<HTMLDivElement | null>(null)
+  // const headerHeight = headerRef?.current?.getBoundingClientRect().height
+  const headerHeight = headerNode?.getBoundingClientRect().height
 
   const { y: currentY } = useWindowScroll()
   const previousY = usePrevious(currentY)
@@ -40,6 +43,7 @@ export const PageWrapper_ = ({
   return (
     <>
       <Head pageTitle={pageTitle} />
+
       <GlobalDataProvider {...globalData}>
         <div
           css={[
@@ -55,10 +59,11 @@ export const PageWrapper_ = ({
               tw`z-50 fixed left-0 top-0 w-full transition-transform ease-in-out duration-300`,
               headerOffscreen && tw`-translate-y-full`,
             ]}
-            ref={headerRef}
+            ref={setHeaderNode}
           >
             <Header />
           </div>
+
           {headerHeight ? (
             <div css={[tw`flex-grow`]} style={{ marginTop: headerHeight }}>
               {pageBody}
