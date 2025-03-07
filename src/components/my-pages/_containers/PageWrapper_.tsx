@@ -53,6 +53,9 @@ export const PageWrapper_ = ({
             tw`min-h-screen flex flex-col`,
             tw`dark:bg-white`,
           ]}
+          style={{
+            wordSpacing: "normal",
+          }}
         >
           <div
             css={[
